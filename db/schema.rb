@@ -10,14 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_10_11_165601) do
+ActiveRecord::Schema[7.1].define(version: 2023_10_14_055916) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "assets", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_assets_on_name", unique: true
+  end
 
   create_table "trades", force: :cascade do |t|
     t.decimal "price", precision: 20, scale: 10, null: false
     t.decimal "volume", precision: 20, scale: 10, null: false
     t.datetime "created_at", precision: nil, null: false
+    t.bigint "asset_id", null: false
+    t.index ["asset_id"], name: "index_trades_on_asset_id"
   end
 
+  add_foreign_key "trades", "assets"
 end
