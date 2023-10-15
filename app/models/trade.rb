@@ -3,7 +3,7 @@ class Trade < ApplicationRecord
 
   def self.create_partition_for_asset(asset_id, asset_name)
     sql = <<-SQL
-      CREATE TABLE asset_#{asset_name.downcase}_trades PARTITION OF trades
+      CREATE TABLE asset_#{asset_name.downcase.gsub('.', '_')}_trades PARTITION OF trades
         FOR VALUES IN (#{asset_id});
     SQL
 
