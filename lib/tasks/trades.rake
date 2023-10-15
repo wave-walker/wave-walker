@@ -5,15 +5,18 @@ namespace :trades do
   task :import, [:path] => [:environment] do |t, args|
     path = args.fetch(:path)
 
-    Dir["#{path}*USD.csv"].each do |asset_path|
-      asset_name = asset_path.match(/\/(?<asset>[\d,A-Z]+)USD.csv\z/)[:asset]
-      asset = Asset.find_or_create_by!(name: asset_name)
+    AssetSyncService.call
+
+    Asset.find_each do |asset|
+      puts "Importing #{asset.name} trades... "
+
+      asset_path = "#{path}#{asset.name}USD.csv"
+
+      next unless File.exist?(asset_path)
 
       trades = []
 
-      puts "Importing #{asset.name} trades... "
-
-      CSV.foreach(asset_path, headers: %i[timestamp price, volume]) do |row|
+      CSV.foreach(asset_path, headers: %i[timestamp price volume]) do |row|
         trades << {
           asset_id: asset.id,
           price: row[:price].to_f,
@@ -21,7 +24,7 @@ namespace :trades do
           created_at: Time.zone.at(row[:timestamp].to_i)
         }
 
-        if trades.size == 10000
+        if trades.size == 100_000
           puts "Inserting #{trades.size} trades..."
           Trade.insert_all(trades)
           trades = []

@@ -73,8 +73,8 @@ CREATE TABLE public.schema_migrations (
 CREATE TABLE public.trades (
     id bigint NOT NULL,
     asset_id bigint NOT NULL,
-    price numeric(20,10) NOT NULL,
-    volume numeric(20,10) NOT NULL,
+    price double precision NOT NULL,
+    volume double precision NOT NULL,
     created_at timestamp without time zone NOT NULL
 )
 PARTITION BY LIST (asset_id);
