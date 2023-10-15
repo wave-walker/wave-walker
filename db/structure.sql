@@ -33,7 +33,8 @@ CREATE TABLE public.assets (
     id bigint NOT NULL,
     name character varying NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    decimals integer NOT NULL
 );
 
 
@@ -166,6 +167,7 @@ ALTER TABLE public.trades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20231015063555'),
 ('20231014070704'),
 ('20231014055916'),
 ('20231011165601');
