@@ -14,8 +14,8 @@ class PartitionTrades < ActiveRecord::Migration[7.1]
     create_table(:trades, primary_key: [:asset_id, :id], options: "PARTITION BY LIST (asset_id)") do |t|
       t.bigint :id, null: false
       t.belongs_to :asset, null: false, foreign_key: true, index: false
-      t.decimal :price, precision: 20, scale: 10, null: false
-      t.decimal :volume, precision: 20, scale: 10, null: false
+      t.float :price, null: false
+      t.float :volume, null: false
 
       t.timestamp :created_at, null: false
     end
