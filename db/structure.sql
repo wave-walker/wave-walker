@@ -81,36 +81,10 @@ PARTITION BY LIST (asset_id);
 
 
 --
--- Name: trades_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.trades_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: trades_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.trades_id_seq OWNED BY public.trades.id;
-
-
---
 -- Name: assets id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.assets ALTER COLUMN id SET DEFAULT nextval('public.assets_id_seq'::regclass);
-
-
---
--- Name: trades id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.trades ALTER COLUMN id SET DEFAULT nextval('public.trades_id_seq'::regclass);
 
 
 --
@@ -167,6 +141,7 @@ ALTER TABLE public.trades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20231018170228'),
 ('20231015063555'),
 ('20231014070704'),
 ('20231014055916'),
