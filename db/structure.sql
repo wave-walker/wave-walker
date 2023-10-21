@@ -35,7 +35,7 @@ CREATE TABLE public.assets (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     decimals integer NOT NULL,
-    last_synced_trade_at timestamp without time zone
+    kraken_cursor_position bigint DEFAULT 0 NOT NULL
 );
 
 
@@ -142,6 +142,7 @@ ALTER TABLE public.trades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20231021145729'),
 ('20231018170228'),
 ('20231018161855'),
 ('20231015063555'),
