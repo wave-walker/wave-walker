@@ -10,6 +10,16 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: order_type; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.order_type AS ENUM (
+    'market',
+    'limit'
+);
+
+
+--
 -- Name: trade_action; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -87,7 +97,8 @@ CREATE TABLE public.trades (
     price double precision NOT NULL,
     volume double precision NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    action public.trade_action NOT NULL
+    action public.trade_action NOT NULL,
+    order_type public.order_type NOT NULL
 )
 PARTITION BY LIST (asset_id);
 
@@ -153,6 +164,7 @@ ALTER TABLE public.trades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20231022150331'),
 ('20231022144646'),
 ('20231021145729'),
 ('20231018170228'),
