@@ -1,6 +1,7 @@
 module Kraken
   def self.trades(pair:, since:)
-    connection.get('public/Trades', pair:, since:, count: 10000).body.fetch('result')
+    response = connection.get('public/Trades', pair:, since:, count: 10000).body.fetch('result')
+    { trades: response.fetch(pair), last: response.fetch('last') }
   end
 
   def self.assets
