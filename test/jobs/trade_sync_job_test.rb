@@ -5,6 +5,18 @@ class TradeSyncJobTest < ActiveJob::TestCase
     Trade.create_partition_for_asset(assets(:atom).id, assets(:atom).name)
   end
 
+  test "should sync a trade with correct params" do
+    Kraken.stub(:trades, { trades: [[1, 2, 3, 4, 5, 6, 7]], last: 1 }) do
+      TradeSyncJob.perform_now(assets(:atom))
+      trade = Trade.find_by!(asset_id: assets(:atom).id, id: 7)
+
+      assert_equal assets(:atom).id, trade.asset_id
+      assert_equal 1, trade.price
+      assert_equal 2, trade.volume
+      assert_equal Time.zone.at(3), trade.created_at
+    end
+  end
+
   test "should sync 1000 trades and should schedule follow up sync" do
     Kraken.stub(:trades, { trades: Array.new(1000) {|i| [1, 1, 1, 1, 1, 1, i] }, last: 1 }) do
       assert_changes -> { Trade.count }, from: 0, to: 1000 do
