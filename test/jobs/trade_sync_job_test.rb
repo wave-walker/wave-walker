@@ -6,7 +6,7 @@ class TradeSyncJobTest < ActiveJob::TestCase
   end
 
   test "should sync a trade with correct params" do
-    Kraken.stub(:trades, { trades: [[1, 2, 3, 4, 5, 6, 7]], last: 1 }) do
+    Kraken.stub(:trades, { trades: [[1, 2, 3, "s", 5, 6, 7]], last: 1 }) do
       TradeSyncJob.perform_now(assets(:atom))
       trade = Trade.find_by!(asset_id: assets(:atom).id, id: 7)
 
@@ -14,11 +14,12 @@ class TradeSyncJobTest < ActiveJob::TestCase
       assert_equal 1, trade.price
       assert_equal 2, trade.volume
       assert_equal Time.zone.at(3), trade.created_at
+      assert_equal "sell", trade.action
     end
   end
 
   test "should sync 1000 trades and should schedule follow up sync" do
-    Kraken.stub(:trades, { trades: Array.new(1000) {|i| [1, 1, 1, 1, 1, 1, i] }, last: 1 }) do
+    Kraken.stub(:trades, { trades: Array.new(1000) {|i| [1, 1, 1, "b", 1, 1, i] }, last: 1 }) do
       assert_changes -> { Trade.count }, from: 0, to: 1000 do
         TradeSyncJob.perform_now(assets(:atom))
       end
@@ -26,7 +27,7 @@ class TradeSyncJobTest < ActiveJob::TestCase
   end
 
   test "should schedule follow up sync when remaining trades exsiote" do
-    Kraken.stub(:trades, { trades: Array.new(1000) {|i| [1, 1, 1, 1, 1, 1, i] }, last: 1 }) do
+    Kraken.stub(:trades, { trades: Array.new(1000) {|i| [1, 1, 1, "b", 1, 1, i] }, last: 1 }) do
       assert_enqueued_with(job: TradeSyncJob, args: [assets(:atom)]) do
         TradeSyncJob.perform_now(assets(:atom))
       end
@@ -34,7 +35,7 @@ class TradeSyncJobTest < ActiveJob::TestCase
   end
 
   test "should not schedule follow up sync when remaining trades do not exist" do
-    Kraken.stub(:trades, { trades: Array.new(999) {|i| [1, 1, 1, 1, 1, 1, i] }, last: 1 }) do
+    Kraken.stub(:trades, { trades: Array.new(999) {|i| [1, 1, 1, "b", 1, 1, i] }, last: 1 }) do
       assert_no_enqueued_jobs do
         TradeSyncJob.perform_now(assets(:atom))
       end
@@ -42,7 +43,7 @@ class TradeSyncJobTest < ActiveJob::TestCase
   end
 
   test "should update the cursor position" do
-    Kraken.stub(:trades, { trades: Array.new(1) {|i| [1, 1, 1, 1, 1, 1, i] }, last: 123456 }) do
+    Kraken.stub(:trades, { trades: Array.new(1) {|i| [1, 1, 1, "b", 1, 1, i] }, last: 123456 }) do
       assert_changes -> { assets(:atom).reload.kraken_cursor_position }, from: 0, to: 123456 do
         TradeSyncJob.perform_now(assets(:atom))
       end

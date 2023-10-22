@@ -9,6 +9,16 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+--
+-- Name: trade_action; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.trade_action AS ENUM (
+    'buy',
+    'sell'
+);
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -76,7 +86,8 @@ CREATE TABLE public.trades (
     asset_id bigint NOT NULL,
     price double precision NOT NULL,
     volume double precision NOT NULL,
-    created_at timestamp without time zone NOT NULL
+    created_at timestamp without time zone NOT NULL,
+    action public.trade_action NOT NULL
 )
 PARTITION BY LIST (asset_id);
 
@@ -142,6 +153,7 @@ ALTER TABLE public.trades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20231022144646'),
 ('20231021145729'),
 ('20231018170228'),
 ('20231018161855'),
