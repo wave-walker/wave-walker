@@ -11,13 +11,14 @@ class TradeSyncJob < ApplicationJob
         volume: volume,
         action: parse_action(buy_sell),
         order_type: parse_order_type(market_limit),
+        misc: misc,
         created_at: Time.zone.at(time.to_f),
         id: id
       }
     end
 
     ActiveRecord::Base.transaction do
-      Trade.insert_all!(trades)
+      Trade.upsert_all(trades)
       asset.update!(kraken_cursor_position: response.fetch(:last))
     end
 

@@ -98,7 +98,8 @@ CREATE TABLE public.trades (
     volume double precision NOT NULL,
     created_at timestamp without time zone NOT NULL,
     action public.trade_action NOT NULL,
-    order_type public.order_type NOT NULL
+    order_type public.order_type NOT NULL,
+    misc character varying NOT NULL
 )
 PARTITION BY LIST (asset_id);
 
@@ -164,6 +165,7 @@ ALTER TABLE public.trades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20231022151405'),
 ('20231022150331'),
 ('20231022144646'),
 ('20231021145729'),
