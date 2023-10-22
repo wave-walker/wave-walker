@@ -1,12 +1,12 @@
 class TradeSyncJob < ApplicationJob
   queue_as :default
 
-  def perform(asset)
-    response = Kraken.trades(pair: asset.usd_trading_pair, since: asset.kraken_cursor_position)
+  def perform(asset_pair)
+    response = Kraken.trades(pair: asset_pair.name, since: asset_pair.kraken_cursor_position)
 
     trades = response.fetch(:trades).map do |price, volume, time, buy_sell, market_limit, misc, id|
       {
-        asset_id: asset.id,
+        asset_pair_id: asset_pair.id,
         price: price,
         volume: volume,
         action: parse_action(buy_sell),
@@ -19,10 +19,10 @@ class TradeSyncJob < ApplicationJob
 
     ActiveRecord::Base.transaction do
       Trade.upsert_all(trades)
-      asset.update!(kraken_cursor_position: response.fetch(:last))
+      asset_pair.update!(kraken_cursor_position: response.fetch(:last))
     end
 
-    self.class.perform_later(asset) if trades.size == 1000
+    self.class.perform_later(asset_pair) if trades.size == 1000
   end
 
   private

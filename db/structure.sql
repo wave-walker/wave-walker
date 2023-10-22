@@ -46,24 +46,24 @@ CREATE TABLE public.ar_internal_metadata (
 
 
 --
--- Name: assets; Type: TABLE; Schema: public; Owner: -
+-- Name: asset_pairs; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.assets (
+CREATE TABLE public.asset_pairs (
     id bigint NOT NULL,
     name character varying NOT NULL,
+    sync boolean DEFAULT false NOT NULL,
+    kraken_cursor_position bigint DEFAULT 0 NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    decimals integer NOT NULL,
-    kraken_cursor_position bigint DEFAULT 0 NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL
 );
 
 
 --
--- Name: assets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: asset_pairs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.assets_id_seq
+CREATE SEQUENCE public.asset_pairs_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -72,10 +72,10 @@ CREATE SEQUENCE public.assets_id_seq
 
 
 --
--- Name: assets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: asset_pairs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.assets_id_seq OWNED BY public.assets.id;
+ALTER SEQUENCE public.asset_pairs_id_seq OWNED BY public.asset_pairs.id;
 
 
 --
@@ -93,7 +93,7 @@ CREATE TABLE public.schema_migrations (
 
 CREATE TABLE public.trades (
     id bigint NOT NULL,
-    asset_id bigint NOT NULL,
+    asset_pair_id bigint NOT NULL,
     price double precision NOT NULL,
     volume double precision NOT NULL,
     created_at timestamp without time zone NOT NULL,
@@ -101,14 +101,14 @@ CREATE TABLE public.trades (
     order_type public.order_type NOT NULL,
     misc character varying NOT NULL
 )
-PARTITION BY LIST (asset_id);
+PARTITION BY LIST (asset_pair_id);
 
 
 --
--- Name: assets id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: asset_pairs id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.assets ALTER COLUMN id SET DEFAULT nextval('public.assets_id_seq'::regclass);
+ALTER TABLE ONLY public.asset_pairs ALTER COLUMN id SET DEFAULT nextval('public.asset_pairs_id_seq'::regclass);
 
 
 --
@@ -120,11 +120,11 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 
 --
--- Name: assets assets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: asset_pairs asset_pairs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.assets
-    ADD CONSTRAINT assets_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.asset_pairs
+    ADD CONSTRAINT asset_pairs_pkey PRIMARY KEY (id);
 
 
 --
@@ -140,22 +140,22 @@ ALTER TABLE ONLY public.schema_migrations
 --
 
 ALTER TABLE ONLY public.trades
-    ADD CONSTRAINT trades_pkey PRIMARY KEY (asset_id, id);
+    ADD CONSTRAINT trades_pkey PRIMARY KEY (asset_pair_id, id);
 
 
 --
--- Name: index_assets_on_name; Type: INDEX; Schema: public; Owner: -
+-- Name: index_asset_pairs_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_assets_on_name ON public.assets USING btree (name);
+CREATE UNIQUE INDEX index_asset_pairs_on_name ON public.asset_pairs USING btree (name);
 
 
 --
--- Name: trades fk_rails_25d084c853; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: trades fk_rails_2ef4d7a130; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE public.trades
-    ADD CONSTRAINT fk_rails_25d084c853 FOREIGN KEY (asset_id) REFERENCES public.assets(id);
+    ADD CONSTRAINT fk_rails_2ef4d7a130 FOREIGN KEY (asset_pair_id) REFERENCES public.asset_pairs(id);
 
 
 --
@@ -165,6 +165,7 @@ ALTER TABLE public.trades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20231022155204'),
 ('20231022151405'),
 ('20231022150331'),
 ('20231022144646'),

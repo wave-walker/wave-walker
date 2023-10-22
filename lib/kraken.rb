@@ -8,6 +8,10 @@ module Kraken
     connection.get('public/Assets').body.fetch('result')
   end
 
+  def self.asset_pairs
+    connection.get('public/AssetPairs').body.fetch('result')
+  end
+
   def self.connection
     Faraday.new(url: 'https://api.kraken.com/0') do |builder|
       builder.request :json
