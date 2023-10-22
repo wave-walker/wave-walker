@@ -4,12 +4,13 @@ class TradeSyncJob < ApplicationJob
   def perform(asset)
     response = Kraken.trades(pair: asset.usd_trading_pair, since: asset.kraken_cursor_position)
 
-    trades = response.fetch(:trades).map do |price, volume, time, buy_sell, _market_limit, _misc, id|
+    trades = response.fetch(:trades).map do |price, volume, time, buy_sell, market_limit, misc, id|
       {
         asset_id: asset.id,
         price: price,
         volume: volume,
         action: parse_action(buy_sell),
+        order_type: parse_order_type(market_limit),
         created_at: Time.zone.at(time.to_f),
         id: id
       }
@@ -29,5 +30,11 @@ class TradeSyncJob < ApplicationJob
     raise "Invalid action" unless %w[b s].include?(buy_sell)
 
     buy_sell == "b" ? "buy" : "sell"
+  end
+
+  def parse_order_type(market_limit)
+    raise "Invalid order type" unless %w[m l].include?(market_limit)
+
+    market_limit == "m" ? "market" : "limit"
   end
 end
