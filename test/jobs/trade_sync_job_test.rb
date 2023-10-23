@@ -63,4 +63,12 @@ class TradeSyncJobTest < ActiveJob::TestCase
       TradeSyncJob.perform_now(asset_pairs(:atomusd))
     end
   end
+
+  test "should retry on Kraken::TooManyRequests" do
+    Kraken.stub(:trades, -> (_) { raise Kraken::RateLimitExceeded }) do
+      assert_enqueued_with(job: TradeSyncJob, args: [asset_pairs(:atomusd)]) do
+        TradeSyncJob.perform_now(asset_pairs(:atomusd))
+      end
+    end
+  end
 end

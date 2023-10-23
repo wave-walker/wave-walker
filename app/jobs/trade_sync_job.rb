@@ -1,6 +1,8 @@
 class TradeSyncJob < ApplicationJob
   queue_as :default
 
+  retry_on Kraken::RateLimitExceeded, wait: 5.seconds, attempts: 10
+
   def perform(asset_pair)
     response = Kraken.trades(pair: asset_pair.name, since: asset_pair.kraken_cursor_position)
 
