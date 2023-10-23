@@ -1,15 +1,19 @@
 module Kraken
-  def self.trades(pair:, since:)
-    response = connection.get('public/Trades', pair:, since:, count: 10000).body.fetch('result')
-    { trades: response.fetch(pair), last: response.fetch('last') }
-  end
+  class RateLimitExceeded < StandardError; end
+  class Error < StandardError; end
 
-  def self.assets
-    connection.get('public/Assets').body.fetch('result')
+  def self.trades(pair:, since:)
+    response = connection.get('public/Trades', pair:, since:, count: 10000).body
+    check_response(response)
+
+    { trades: response.dig('result', pair), last: response.dig('result', 'last') }
   end
 
   def self.asset_pairs
-    connection.get('public/AssetPairs').body.fetch('result')
+    response = connection.get('public/AssetPairs').body
+    check_response(response)
+
+    response.fetch('result')
   end
 
   def self.connection
@@ -20,5 +24,11 @@ module Kraken
     end
   end
 
-  private_class_method :connection
+  def self.check_response(response)
+    errors = response.fetch('error')
+    raise(RateLimitExceeded, errors.join(', ')) if errors.include?('EGeneral:Too many requests')
+    raise(Error, errors.join(', ')) if errors.any?
+  end
+
+  private_class_method :connection, :check_response
 end
