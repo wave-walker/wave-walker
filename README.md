@@ -45,3 +45,56 @@ WINDOW w AS (
     UNBOUNDED FOLLOWING
 )
 ```
+
+Get trade data with WebSockets
+
+```
+require "json"
+require 'websocket-eventmachine-client'
+
+# Define the Kraken WebSocket URL
+kraken_ws_url = 'wss://ws.kraken.com'
+
+# Define the trading pair for which you want to receive trade data (e.g., BTC/USD)
+trading_pair = 'XBT/USD'
+
+# Create a connection to Kraken's WebSocket API
+EM.run do
+  ws = WebSocket::EventMachine::Client.connect(uri: kraken_ws_url)
+
+  ws.onopen do
+    puts "Connected to Kraken WebSocket"
+
+    # Subscribe to trade data for the specified trading pair
+    subscription_msg = {
+      event: 'subscribe',
+      pair: [trading_pair],
+      subscription: {
+        name: 'trade',
+      },
+    }
+
+    ws.send(subscription_msg.to_json)
+  end
+
+  ws.onmessage do |msg, type|
+    data = JSON.parse(msg)
+    if data.is_a?(Array)
+      p "---> #{data} <---"
+    elsif data['event'] == 'subscriptionStatus'
+      if data['status'] == 'subscribed'
+        puts "Subscribed to #{trading_pair} trade data"
+      elsif data['status'] == 'error'
+        puts "Subscription error: #{data['errorMessage']}"
+      end
+    elsif data['event'] == 'trade'
+      # Handle trade data here
+      puts "Trade Data: #{data}"
+    end
+  end
+
+  ws.onclose do |code, reason|
+    puts "Connection closed with code #{code}, reason: #{reason}"
+  end
+end
+```
