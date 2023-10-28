@@ -3,6 +3,13 @@ class AssetPair < ApplicationRecord
 
   after_create :add_trade_partition_for_asset
 
+  def import_later
+    raise "Already importing!" if importing?
+
+    TradeSyncJob.perform_later(self)
+    update!(importing: true)
+  end
+
   private
 
   def add_trade_partition_for_asset

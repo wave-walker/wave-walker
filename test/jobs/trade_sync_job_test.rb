@@ -44,6 +44,16 @@ class TradeSyncJobTest < ActiveJob::TestCase
     end
   end
 
+  test "should end importing when remaining trades do not exist" do
+    Kraken.stub(:trades, { trades: Array.new(1) {|i| [1, 1, 1, "b", "m", "", i] }, last: 123456 }) do
+      asset_pairs(:atomusd).update!(importing: true)
+
+      assert_changes -> { asset_pairs(:atomusd).reload.importing }, from: true, to: false do
+        TradeSyncJob.perform_now(asset_pairs(:atomusd))
+      end
+    end
+  end
+
   test "should update the cursor position" do
     Kraken.stub(:trades, { trades: Array.new(1) {|i| [1, 1, 1, "b", "m", "", i] }, last: 123456 }) do
       assert_changes -> { asset_pairs(:atomusd).reload.kraken_cursor_position }, from: 0, to: 123456 do

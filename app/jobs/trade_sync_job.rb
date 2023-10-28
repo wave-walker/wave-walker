@@ -21,10 +21,16 @@ class TradeSyncJob < ApplicationJob
 
     ActiveRecord::Base.transaction do
       Trade.upsert_all(trades)
-      asset_pair.update!(kraken_cursor_position: response.fetch(:last))
+      asset_pair.kraken_cursor_position = response.fetch(:last)
+
+      if trades.size == 1000
+        self.class.perform_later(asset_pair)
+      else
+        asset_pair.importing = false
+      end
+      asset_pair.save!
     end
 
-    self.class.perform_later(asset_pair) if trades.size == 1000
   end
 
   private
