@@ -1,9 +1,10 @@
 class Trade < ApplicationRecord
-  belongs_to :asset
+  belongs_to :asset, counter_cache: true
 
   def self.create_partition_for_asset(asset_id, asset_name)
     sql = <<-SQL
-      CREATE TABLE asset_#{asset_name.downcase.gsub('.', '_')}_trades PARTITION OF trades
+      CREATE TABLE IF NOT EXISTS asset_#{asset_name.downcase.gsub('.', '_')}_trades
+        PARTITION OF trades
         FOR VALUES IN (#{asset_id});
     SQL
 

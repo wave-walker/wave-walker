@@ -1,0 +1,9 @@
+<article>
+  <%= asset_pair.name -%>
+  <% if asset_pair.importing? %>
+    <progress></progress>
+  <% else %>
+    <%= button_to "Start import.", asset_pair_import_path(asset_pair) %>
+  <% end %>
+  <p><%= asset_pair.trades_count -%> trades imported!</p>
+</article>

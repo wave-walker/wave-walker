@@ -1,1 +1,6 @@
-/* Application styles */
+@import url("https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css");
+
+/* Hide spinner on <html> tag on Turbolinks page transitions */
+html[aria-busy=true]::before {
+  display: none;
+}
