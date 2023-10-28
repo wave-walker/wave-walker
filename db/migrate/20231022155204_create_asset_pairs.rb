@@ -2,7 +2,7 @@ class CreateAssetPairs < ActiveRecord::Migration[7.1]
   def change
     create_table :asset_pairs do |t|
       t.string :name, null: false, index: { unique: true }
-      t.boolean :sync, null: false, default: false
+      t.boolean :importing, null: false, default: false
       t.bigint :kraken_cursor_position, default: 0, null: false
 
       t.timestamps

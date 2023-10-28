@@ -259,7 +259,7 @@ CREATE TABLE public.ar_internal_metadata (
 CREATE TABLE public.asset_pairs (
     id bigint NOT NULL,
     name character varying NOT NULL,
-    sync boolean DEFAULT false NOT NULL,
+    importing boolean DEFAULT false NOT NULL,
     kraken_cursor_position bigint DEFAULT 0 NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
