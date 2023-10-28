@@ -262,7 +262,8 @@ CREATE TABLE public.asset_pairs (
     importing boolean DEFAULT false NOT NULL,
     kraken_cursor_position bigint DEFAULT 0 NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    trades_count integer DEFAULT 0 NOT NULL
 );
 
 
@@ -494,6 +495,7 @@ ALTER TABLE public.trades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20231028141732'),
 ('20231023161731'),
 ('20231022155204'),
 ('20231022151405'),

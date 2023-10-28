@@ -22,6 +22,7 @@ class TradeSyncJob < ApplicationJob
     ActiveRecord::Base.transaction do
       Trade.upsert_all(trades)
       asset_pair.kraken_cursor_position = response.fetch(:last)
+      asset_pair.trades_count += trades.size
 
       if trades.size == 1000
         self.class.perform_later(asset_pair)
