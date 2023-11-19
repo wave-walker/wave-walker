@@ -1,5 +1,5 @@
 <article>
-  <%= asset_pair.name -%>
+  <%= "#{asset_pair.name} (#{asset_pair.import_state})" -%>
   <% if asset_pair.importing? %>
     <progress></progress>
   <% else %>

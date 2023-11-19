@@ -1,5 +1,5 @@
 class AssetPairsController < ApplicationController
   def index
-    @asset_pairs = AssetPair.order(importing: :desc, name: :asc)
+    @asset_pairs = AssetPair.order(name: :asc)
   end
 end
