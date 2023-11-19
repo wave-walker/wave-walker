@@ -10,6 +10,18 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: import_state; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.import_state AS ENUM (
+    'pending',
+    'waiting',
+    'importing',
+    'imported'
+);
+
+
+--
 -- Name: order_type; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -259,11 +271,11 @@ CREATE TABLE public.ar_internal_metadata (
 CREATE TABLE public.asset_pairs (
     id bigint NOT NULL,
     name character varying NOT NULL,
-    importing boolean DEFAULT false NOT NULL,
     kraken_cursor_position bigint DEFAULT 0 NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    trades_count integer DEFAULT 0 NOT NULL
+    trades_count integer DEFAULT 0 NOT NULL,
+    import_state public.import_state DEFAULT 'pending'::public.import_state NOT NULL
 );
 
 
@@ -432,6 +444,13 @@ ALTER TABLE ONLY public.trades
 
 
 --
+-- Name: index_asset_pairs_on_import_state; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_asset_pairs_on_import_state ON public.asset_pairs USING btree (import_state) WHERE (import_state = 'importing'::public.import_state);
+
+
+--
 -- Name: index_asset_pairs_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -495,6 +514,7 @@ ALTER TABLE public.trades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20231119143912'),
 ('20231028141732'),
 ('20231023161731'),
 ('20231022155204'),

@@ -29,9 +29,9 @@ class TradeSyncJob < ApplicationJob
       if trades.size == 1000
         self.class.perform_later(asset_pair)
       else
-        asset_pair.importing = false
+        asset_pair.imported!
+        AssetPair.import_waiting_later
       end
-      asset_pair.save!
     end
 
   end

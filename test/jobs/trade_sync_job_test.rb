@@ -45,13 +45,29 @@ class TradeSyncJobTest < ActiveJob::TestCase
   end
 
   test "should end importing when remaining trades do not exist" do
-    Kraken.stub(:trades, { trades: Array.new(1) {|i| [1, 1, 1, "b", "m", "", i] }, last: 123456 }) do
-      asset_pairs(:atomusd).update!(importing: true)
+    asset_pairs(:atomusd).importing!
 
-      assert_changes -> { asset_pairs(:atomusd).reload.importing }, from: true, to: false do
+    Kraken.stub(:trades, { trades: Array.new(1) {|i| [1, 1, 1, "b", "m", "", i] }, last: 123456 }) do
+      assert_changes -> { asset_pairs(:atomusd).reload.import_state }, to: 'imported' do
         TradeSyncJob.perform_now(asset_pairs(:atomusd))
       end
     end
+  end
+
+  test "should start importing other trades when finished" do
+    asset_pairs(:atomusd).importing!
+    asset_pairs(:btcusd).waiting!
+
+    import_waiting_later = Minitest::Mock.new
+    import_waiting_later.expect :call, nil
+
+    Kraken.stub(:trades, { trades: Array.new(1) {|i| [1, 1, 1, "b", "m", "", i] }, last: 123456 }) do
+      AssetPair.stub(:import_waiting_later, import_waiting_later) do
+          TradeSyncJob.perform_now(asset_pairs(:atomusd))
+      end
+    end
+
+    assert_mock import_waiting_later
   end
 
   # I guess this trages are not valid ... I need to check this
