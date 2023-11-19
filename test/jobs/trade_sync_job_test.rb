@@ -21,7 +21,7 @@ class TradeSyncJobTest < ActiveJob::TestCase
   end
 
   test "should sync 1000 trades and should schedule follow up sync" do
-    Kraken.stub(:trades, { trades: Array.new(1000) {|i| [1, 1, 1, "b", "m", "", i] }, last: 1 }) do
+    Kraken.stub(:trades, { trades: Array.new(1000) {|i| [1, 1, 1, "b", "m", "", i + 1] }, last: 1 }) do
       assert_changes -> { Trade.count }, from: 0, to: 1000 do
         TradeSyncJob.perform_now(asset_pairs(:atomusd))
       end
@@ -29,7 +29,7 @@ class TradeSyncJobTest < ActiveJob::TestCase
   end
 
   test "should schedule follow up sync when remaining trades exsiote" do
-    Kraken.stub(:trades, { trades: Array.new(1000) {|i| [1, 1, 1, "b", "m", "", i] }, last: 1 }) do
+    Kraken.stub(:trades, { trades: Array.new(1000) {|i| [1, 1, 1, "b", "m", "", i + 1] }, last: 1 }) do
       assert_enqueued_with(job: TradeSyncJob, args: [asset_pairs(:atomusd)]) do
         TradeSyncJob.perform_now(asset_pairs(:atomusd))
       end
@@ -37,7 +37,7 @@ class TradeSyncJobTest < ActiveJob::TestCase
   end
 
   test "should not schedule follow up sync when remaining trades do not exist" do
-    Kraken.stub(:trades, { trades: Array.new(999) {|i| [1, 1, 1, "b", "m", "", i] }, last: 1 }) do
+    Kraken.stub(:trades, { trades: Array.new(999) {|i| [1, 1, 1, "b", "m", "", i + 1] }, last: 1 }) do
       assert_no_enqueued_jobs do
         TradeSyncJob.perform_now(asset_pairs(:atomusd))
       end
@@ -49,6 +49,15 @@ class TradeSyncJobTest < ActiveJob::TestCase
       asset_pairs(:atomusd).update!(importing: true)
 
       assert_changes -> { asset_pairs(:atomusd).reload.importing }, from: true, to: false do
+        TradeSyncJob.perform_now(asset_pairs(:atomusd))
+      end
+    end
+  end
+
+  # I guess this trages are not valid ... I need to check this
+  test "should skip trades without a id" do
+    Kraken.stub(:trades, { trades: [[1, 2, 3, "s", "l", "foo bar", 0]], last: 1 }) do
+      assert_no_changes -> { Trade.count } do
         TradeSyncJob.perform_now(asset_pairs(:atomusd))
       end
     end
