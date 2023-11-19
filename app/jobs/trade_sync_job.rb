@@ -6,7 +6,9 @@ class TradeSyncJob < ApplicationJob
   def perform(asset_pair)
     response = Kraken.trades(pair: asset_pair.name, since: asset_pair.kraken_cursor_position)
 
-    trades = response.fetch(:trades).map do |price, volume, time, buy_sell, market_limit, misc, id|
+    trades = response.fetch(:trades).filter_map do |price, volume, time, buy_sell, market_limit, misc, id|
+      next if id.zero?
+
       {
         asset_pair_id: asset_pair.id,
         price: price,
