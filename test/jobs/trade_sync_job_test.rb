@@ -29,8 +29,8 @@ class TradeSyncJobTest < ActiveJob::TestCase
   end
 
   test "should schedule follow up sync when remaining trades exsiote" do
-    Kraken.stub(:trades, { trades: Array.new(1000) {|i| [1, 1, 1, "b", "m", "", i + 1] }, last: 1 }) do
-      assert_enqueued_with(job: TradeSyncJob, args: [asset_pairs(:atomusd)]) do
+    Kraken.stub(:trades, { trades: Array.new(1000) {|i| [1, 1, 1, "b", "m", "", i + 1] }, last: 123456 }) do
+      assert_enqueued_with(job: TradeSyncJob, args: [asset_pairs(:atomusd), { cursor_position: 123456 }]) do
         TradeSyncJob.perform_now(asset_pairs(:atomusd))
       end
     end
@@ -74,14 +74,6 @@ class TradeSyncJobTest < ActiveJob::TestCase
   test "should skip trades without a id" do
     Kraken.stub(:trades, { trades: [[1, 2, 3, "s", "l", "foo bar", 0]], last: 1 }) do
       assert_no_changes -> { Trade.count } do
-        TradeSyncJob.perform_now(asset_pairs(:atomusd))
-      end
-    end
-  end
-
-  test "should update the cursor position" do
-    Kraken.stub(:trades, { trades: Array.new(1) {|i| [1, 1, 1, "b", "m", "", i] }, last: 123456 }) do
-      assert_changes -> { asset_pairs(:atomusd).reload.kraken_cursor_position }, from: 0, to: 123456 do
         TradeSyncJob.perform_now(asset_pairs(:atomusd))
       end
     end

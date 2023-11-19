@@ -3,8 +3,9 @@ class TradeSyncJob < ApplicationJob
 
   retry_on Kraken::RateLimitExceeded, wait: 5.seconds, attempts: 10
 
-  def perform(asset_pair)
-    response = Kraken.trades(pair: asset_pair.name, since: asset_pair.kraken_cursor_position)
+  def perform(asset_pair, cursor_position: nil)
+    cursor_position ||= asset_pair.trades.maximum(:created_at)&.to_i || 0
+    response = Kraken.trades(pair: asset_pair.name, since: cursor_position)
 
     trades = response.fetch(:trades).filter_map do |price, volume, time, buy_sell, market_limit, misc, id|
       next if id.zero?
@@ -23,11 +24,10 @@ class TradeSyncJob < ApplicationJob
 
     ActiveRecord::Base.transaction do
       Trade.upsert_all(trades)
-      asset_pair.kraken_cursor_position = response.fetch(:last)
       asset_pair.trades_count += trades.size
 
       if trades.size == 1000
-        self.class.perform_later(asset_pair)
+        self.class.perform_later(asset_pair, cursor_position: response.fetch(:last))
       else
         asset_pair.imported!
         AssetPair.import_waiting_later
