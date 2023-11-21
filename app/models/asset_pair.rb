@@ -17,8 +17,8 @@ class AssetPair < ApplicationRecord
   def import_later
     raise "Already importing!" if importing?
 
-    TradeSyncJob.perform_later(self)
     importing!
+    TradeSyncJob.perform_later(self)
   rescue ActiveRecord::RecordNotUnique
     waiting!
   end
