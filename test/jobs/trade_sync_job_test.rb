@@ -7,7 +7,10 @@ class TradeSyncJobTest < ActiveJob::TestCase
 
   test "should sync a trade with correct params" do
     Kraken.stub(:trades, { trades: [[1, 2, 3, "s", "l", "foo bar", 7]], last: 1 }) do
-      TradeSyncJob.perform_now(asset_pairs(:atomusd))
+      assert_difference 'asset_pairs(:atomusd).reload.trades_count', 1 do
+        TradeSyncJob.perform_now(asset_pairs(:atomusd))
+      end
+
       trade = Trade.find_by!(asset_pair_id: asset_pairs(:atomusd).id, id: 7)
 
       assert_equal asset_pairs(:atomusd).id, trade.asset_pair_id
@@ -22,7 +25,7 @@ class TradeSyncJobTest < ActiveJob::TestCase
 
   test "should sync 1000 trades and should schedule follow up sync" do
     Kraken.stub(:trades, { trades: Array.new(1000) {|i| [1, 1, 1, "b", "m", "", i + 1] }, last: 1 }) do
-      assert_changes -> { Trade.count }, from: 0, to: 1000 do
+      assert_difference ['Trade.count', 'asset_pairs(:atomusd).reload.trades_count'], 1000 do
         TradeSyncJob.perform_now(asset_pairs(:atomusd))
       end
     end
