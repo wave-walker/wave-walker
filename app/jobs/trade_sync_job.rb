@@ -27,6 +27,7 @@ class TradeSyncJob < ApplicationJob
       asset_pair.trades_count += trades.size
 
       if trades.size == 1000
+        asset_pair.save!
         self.class.perform_later(asset_pair, cursor_position: response.fetch(:last))
       else
         asset_pair.imported!
