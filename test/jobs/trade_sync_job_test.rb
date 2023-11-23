@@ -43,7 +43,7 @@ class TradeSyncJobTest < ActiveJob::TestCase
     asset_pairs(:atomusd).start_import
 
     Kraken.stub(:trades, { trades: Array.new(999) {|i| Kraken::Trade.new(1, 1, 1, "b", "m", "", i + 1) }, last: 1 }) do
-      assert_no_enqueued_jobs do
+      assert_no_enqueued_jobs(only: TradeSyncJob) do
         TradeSyncJob.perform_now(asset_pairs(:atomusd))
       end
     end

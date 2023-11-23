@@ -41,4 +41,13 @@ class AssetPairTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test "#finish_import, enqueues OHLC creation" do
+    asset_pairs(:atomusd).importing!
+    freeze_time
+
+    assert_enqueued_with(job: OhlcGenerateJob, args: [asset_pairs(:atomusd), Time.current]) do
+      asset_pairs(:atomusd).finish_import
+    end
+  end
 end
