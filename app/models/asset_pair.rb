@@ -24,6 +24,7 @@ class AssetPair < ApplicationRecord
 
     imported!
     self.class.where(import_status: :waiting).first&.start_import
+    OhlcGenerateJob.perform_later(self, Time.current)
   end
 
   private
