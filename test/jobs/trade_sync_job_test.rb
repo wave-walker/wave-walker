@@ -6,9 +6,9 @@ class TradeSyncJobTest < ActiveJob::TestCase
   end
 
   test "should sync a trade with correct params" do
-    Kraken.stub(:trades, { trades: [[1, 2, 3, "s", "l", "foo bar", 7]], last: 1 }) do
+    Kraken.stub(:trades, { trades: [Kraken::Trade.new(1, 2, 3, "s", "l", "foo bar", 7)], last: 1 }) do
       assert_difference 'asset_pairs(:atomusd).reload.trades_count', 1 do
-        TradeSyncJob.perform_now(asset_pairs(:atomusd))
+        perform_enqueued_jobs(only: TradeSyncJob) { asset_pairs(:atomusd).start_import }
       end
 
       trade = Trade.find_by!(asset_pair_id: asset_pairs(:atomusd).id, id: 7)
@@ -24,7 +24,7 @@ class TradeSyncJobTest < ActiveJob::TestCase
   end
 
   test "should sync 1000 trades and should schedule follow up sync" do
-    Kraken.stub(:trades, { trades: Array.new(1000) {|i| [1, 1, 1, "b", "m", "", i + 1] }, last: 1 }) do
+    Kraken.stub(:trades, { trades: Array.new(1000) {|i| Kraken::Trade.new(1, 1, 1, "b", "m", "", i + 1) }, last: 1 }) do
       assert_difference ['Trade.count', 'asset_pairs(:atomusd).reload.trades_count'], 1000 do
         TradeSyncJob.perform_now(asset_pairs(:atomusd))
       end
@@ -32,7 +32,7 @@ class TradeSyncJobTest < ActiveJob::TestCase
   end
 
   test "should schedule follow up sync when remaining trades exsiote" do
-    Kraken.stub(:trades, { trades: Array.new(1000) {|i| [1, 1, 1, "b", "m", "", i + 1] }, last: 123456 }) do
+    Kraken.stub(:trades, { trades: Array.new(1000) {|i| Kraken::Trade.new(1, 1, 1, "b", "m", "", i + 1) }, last: 123456 }) do
       assert_enqueued_with(job: TradeSyncJob, args: [asset_pairs(:atomusd), { cursor_position: 123456 }]) do
         TradeSyncJob.perform_now(asset_pairs(:atomusd))
       end
@@ -40,7 +40,9 @@ class TradeSyncJobTest < ActiveJob::TestCase
   end
 
   test "should not schedule follow up sync when remaining trades do not exist" do
-    Kraken.stub(:trades, { trades: Array.new(999) {|i| [1, 1, 1, "b", "m", "", i + 1] }, last: 1 }) do
+    asset_pairs(:atomusd).start_import
+
+    Kraken.stub(:trades, { trades: Array.new(999) {|i| Kraken::Trade.new(1, 1, 1, "b", "m", "", i + 1) }, last: 1 }) do
       assert_no_enqueued_jobs do
         TradeSyncJob.perform_now(asset_pairs(:atomusd))
       end
@@ -48,41 +50,38 @@ class TradeSyncJobTest < ActiveJob::TestCase
   end
 
   test "should end importing when remaining trades do not exist" do
-    asset_pairs(:atomusd).importing!
+    asset_pairs(:atomusd).start_import
 
-    Kraken.stub(:trades, { trades: Array.new(1) {|i| [1, 1, 1, "b", "m", "", i] }, last: 123456 }) do
-      assert_changes -> { asset_pairs(:atomusd).reload.import_state }, to: 'imported' do
+    Kraken.stub(:trades, { trades: Array.new(1) {|i| Kraken::Trade.new(1, 1, 1, "b", "m", "", i) }, last: 123456 }) do
+      assert_changes -> { asset_pairs(:atomusd).reload.import_status }, to: 'imported' do
         TradeSyncJob.perform_now(asset_pairs(:atomusd))
       end
     end
   end
 
   test "should start importing other trades when finished" do
-    asset_pairs(:atomusd).importing!
-    asset_pairs(:btcusd).waiting!
+    asset_pairs(:atomusd).start_import
+    asset_pairs(:btcusd).start_import
 
-    import_waiting_later = Minitest::Mock.new
-    import_waiting_later.expect :call, nil
-
-    Kraken.stub(:trades, { trades: Array.new(1) {|i| [1, 1, 1, "b", "m", "", i] }, last: 123456 }) do
-      AssetPair.stub(:import_waiting_later, import_waiting_later) do
+    Kraken.stub(:trades, { trades: Array.new(1) {|i| Kraken::Trade.new(1, 1, 1, "b", "m", "", i) }, last: 123456 }) do
+      assert_changes -> { asset_pairs(:btcusd).reload.import_status }, to: 'importing' do
           TradeSyncJob.perform_now(asset_pairs(:atomusd))
       end
     end
-
-    assert_mock import_waiting_later
   end
 
   # I guess this trages are not valid ... I need to check this
   test "should skip trades without a id" do
-    Kraken.stub(:trades, { trades: [[1, 2, 3, "s", "l", "foo bar", 0]], last: 1 }) do
+    Kraken.stub(:trades, { trades: [Kraken::Trade.new(1, 2, 3, "s", "l", "foo bar", 0)], last: 1 }) do
       assert_no_changes -> { Trade.count } do
-        TradeSyncJob.perform_now(asset_pairs(:atomusd))
+        perform_enqueued_jobs(only: TradeSyncJob) { asset_pairs(:atomusd).start_import }
       end
     end
   end
 
   test "should request trades for the atom token" do
+    asset_pairs(:atomusd).importing!
+
     args_check = -> (args) {
       assert_equal "ATOMUSD", args[:pair]
       assert_equal 0, args[:since]

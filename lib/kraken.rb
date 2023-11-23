@@ -1,4 +1,13 @@
 module Kraken
+  Trade = Struct.new(:price, :volume, :created_at, :action, :order_type, :misc, :id) do
+    def initialize(*)
+      super
+      self.created_at = Time.zone.at(created_at.to_f)
+      self.action = { 'b' => 'buy', 's' => 'sell' }.fetch(action)
+      self.order_type = { 'm' => 'market', 'l' => 'limit' }.fetch(order_type)
+    end
+  end
+
   class RateLimitExceeded < StandardError; end
   class Error < StandardError; end
 
@@ -6,7 +15,9 @@ module Kraken
     response = connection.get('public/Trades', pair:, since:, count: 10000).body
     check_response(response)
 
-    { trades: response.dig('result', pair), last: response.dig('result', 'last') }
+    trades = response.dig('result', pair).map {|trade_params| Trade.new(*trade_params) }
+
+    { trades:, last: response.dig('result', 'last') }
   end
 
   def self.asset_pairs
