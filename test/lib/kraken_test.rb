@@ -34,12 +34,12 @@ class KrakenTest < ActiveSupport::TestCase
       stub_request(:get, "https://api.kraken.com/0/public/Trades?count=10000&pair=XXBTZEUR&since=0").
         to_return(
           status: 200,
-          body: { error: [], result: { 'XXBTZEUR' => [[1, 2, 3, 4, 5, 6]], last: 123456 } }.to_json,
+          body: { error: [], result: { 'XXBTZEUR' => [[1, 2, 3, 'b', 'm', 6]], last: 123456 } }.to_json,
           headers: { 'Content-Type' => 'application/json' })
 
       response = Kraken.trades(pair: 'XXBTZEUR', since: 0)
 
-      assert_equal [[1, 2, 3, 4, 5, 6]], response[:trades]
+      assert_equal [Kraken::Trade.new(1, 2, 3, 'b', 'm', 6)], response[:trades]
       assert_equal 123456, response[:last]
     end
   end

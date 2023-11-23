@@ -274,7 +274,7 @@ CREATE TABLE public.asset_pairs (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     trades_count integer DEFAULT 0 NOT NULL,
-    import_state public.import_state DEFAULT 'pending'::public.import_state NOT NULL
+    import_status public.import_state DEFAULT 'pending'::public.import_state NOT NULL
 );
 
 
@@ -443,10 +443,10 @@ ALTER TABLE ONLY public.trades
 
 
 --
--- Name: index_asset_pairs_on_import_state; Type: INDEX; Schema: public; Owner: -
+-- Name: index_asset_pairs_on_import_status; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_asset_pairs_on_import_state ON public.asset_pairs USING btree (import_state) WHERE (import_state = 'importing'::public.import_state);
+CREATE UNIQUE INDEX index_asset_pairs_on_import_status ON public.asset_pairs USING btree (import_status) WHERE (import_status = 'importing'::public.import_state);
 
 
 --
@@ -513,6 +513,7 @@ ALTER TABLE public.trades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20231122153847'),
 ('20231119163918'),
 ('20231119143912'),
 ('20231028141732'),

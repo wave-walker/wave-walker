@@ -3,24 +3,27 @@ class AssetPair < ApplicationRecord
 
   after_create :add_trade_partition_for_asset
 
-  enum import_state: {
+  enum import_status: {
     pending: 'pending',
     waiting: 'waiting',
     importing: 'importing',
     imported: 'imported'
   }
 
-  def self.import_waiting_later
-    where(import_state: :waiting).first&.import_later
-  end
-
-  def import_later
+  def start_import
     raise "Already importing!" if importing?
 
     importing!
     TradeSyncJob.perform_later(self)
   rescue ActiveRecord::RecordNotUnique
     waiting!
+  end
+
+  def finish_import
+    raise "Not importing!" unless importing?
+
+    imported!
+    self.class.where(import_status: :waiting).first&.start_import
   end
 
   private
