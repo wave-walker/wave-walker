@@ -32,6 +32,20 @@ CREATE TYPE public.order_type AS ENUM (
 
 
 --
+-- Name: timeframe; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.timeframe AS ENUM (
+    'PT1H',
+    'PT4H',
+    'PT8H',
+    'P1D',
+    'P2D',
+    'P1W'
+);
+
+
+--
 -- Name: trade_action; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -298,6 +312,44 @@ ALTER SEQUENCE public.asset_pairs_id_seq OWNED BY public.asset_pairs.id;
 
 
 --
+-- Name: ohlcs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.ohlcs (
+    id bigint NOT NULL,
+    asset_pair_id bigint NOT NULL,
+    start_at timestamp(6) without time zone NOT NULL,
+    timeframe public.timeframe NOT NULL,
+    open double precision NOT NULL,
+    high double precision NOT NULL,
+    low double precision NOT NULL,
+    close double precision NOT NULL,
+    volume double precision NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: ohlcs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.ohlcs_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: ohlcs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.ohlcs_id_seq OWNED BY public.ohlcs.id;
+
+
+--
 -- Name: que_jobs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -380,6 +432,13 @@ ALTER TABLE ONLY public.asset_pairs ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: ohlcs id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ohlcs ALTER COLUMN id SET DEFAULT nextval('public.ohlcs_id_seq'::regclass);
+
+
+--
 -- Name: que_jobs id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -400,6 +459,14 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 ALTER TABLE ONLY public.asset_pairs
     ADD CONSTRAINT asset_pairs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: ohlcs ohlcs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ohlcs
+    ADD CONSTRAINT ohlcs_pkey PRIMARY KEY (id);
 
 
 --
@@ -457,6 +524,13 @@ CREATE UNIQUE INDEX index_asset_pairs_on_name ON public.asset_pairs USING btree 
 
 
 --
+-- Name: index_ohlcs_on_asset_pair_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ohlcs_on_asset_pair_id ON public.ohlcs USING btree (asset_pair_id);
+
+
+--
 -- Name: que_jobs_args_gin_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -499,6 +573,14 @@ CREATE TRIGGER que_state_notify AFTER INSERT OR DELETE OR UPDATE ON public.que_j
 
 
 --
+-- Name: ohlcs fk_rails_053bf281dc; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ohlcs
+    ADD CONSTRAINT fk_rails_053bf281dc FOREIGN KEY (asset_pair_id) REFERENCES public.asset_pairs(id);
+
+
+--
 -- Name: trades fk_rails_2ef4d7a130; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -513,6 +595,7 @@ ALTER TABLE public.trades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20231125151612'),
 ('20231122153847'),
 ('20231119163918'),
 ('20231119143912'),

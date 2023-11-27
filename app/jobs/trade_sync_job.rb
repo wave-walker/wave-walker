@@ -13,11 +13,10 @@ class TradeSyncJob < ApplicationJob
 
     ActiveRecord::Base.transaction do
       Trade.upsert_all(trades)
-      asset_pair.trades_count += trades.size
 
       if trades.size == 1000
-        asset_pair.save!
         self.class.perform_later(asset_pair, cursor_position: response.fetch(:last))
+        AssetPair.increment_counter(:trades_count, asset_pair, by: 1000)
       else
         asset_pair.finish_import
       end

@@ -31,7 +31,7 @@ class TradeSyncJobTest < ActiveJob::TestCase
     end
   end
 
-  test "should schedule follow up sync when remaining trades exsiote" do
+  test "should schedule follow up sync when remaining trades exist" do
     Kraken.stub(:trades, { trades: Array.new(1000) {|i| Kraken::Trade.new(1, 1, 1, "b", "m", "", i + 1) }, last: 123456 }) do
       assert_enqueued_with(job: TradeSyncJob, args: [asset_pairs(:atomusd), { cursor_position: 123456 }]) do
         TradeSyncJob.perform_now(asset_pairs(:atomusd))
@@ -74,6 +74,28 @@ class TradeSyncJobTest < ActiveJob::TestCase
   test "should skip trades without a id" do
     Kraken.stub(:trades, { trades: [Kraken::Trade.new(1, 2, 3, "s", "l", "foo bar", 0)], last: 1 }) do
       assert_no_changes -> { Trade.count } do
+        perform_enqueued_jobs(only: TradeSyncJob) { asset_pairs(:atomusd).start_import }
+      end
+    end
+  end
+
+  test "should skip trades with a id that already exists" do
+    Trade.create!(
+      id: [asset_pairs(:atomusd).id, 1],
+      price: 1,
+      volume: 1,
+      action: "buy",
+      order_type: "market",
+      misc: "foo bar",
+    )
+
+    trades = [
+      Kraken::Trade.new(1, 2, 3, "s", "l", "foo bar", 1),
+      Kraken::Trade.new(1, 2, 3, "s", "l", "foo bar", 2),
+    ]
+
+    Kraken.stub(:trades, { trades:, last: 2 }) do
+      assert_difference 'asset_pairs(:atomusd).reload.trades_count', 1 do
         perform_enqueued_jobs(only: TradeSyncJob) { asset_pairs(:atomusd).start_import }
       end
     end

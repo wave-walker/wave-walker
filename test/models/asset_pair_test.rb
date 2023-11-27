@@ -42,12 +42,18 @@ class AssetPairTest < ActiveSupport::TestCase
     end
   end
 
-  test "#finish_import, enqueues OHLC creation" do
-    asset_pairs(:atomusd).importing!
+  test "#finish_import, enqueues new OHLC creation" do
     freeze_time
 
-    assert_enqueued_with(job: OhlcGenerateJob, args: [asset_pairs(:atomusd), Time.current]) do
+    asset_pairs(:atomusd).importing!
+
+    generate_new_later = Minitest::Mock.new
+    generate_new_later.expect(:call, nil, [asset_pairs(:atomusd), 1.minute.ago])
+
+    Ohlc.stub(:generate_new_later, generate_new_later) do
       asset_pairs(:atomusd).finish_import
     end
+
+    assert_mock generate_new_later
   end
 end

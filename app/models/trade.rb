@@ -1,5 +1,5 @@
 class Trade < ApplicationRecord
-  belongs_to :asset, counter_cache: true
+  belongs_to :asset_pair, counter_cache: true
 
   def self.create_partition_for_asset(asset_id, asset_name)
     sql = <<-SQL

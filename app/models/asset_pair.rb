@@ -22,9 +22,10 @@ class AssetPair < ApplicationRecord
   def finish_import
     raise "Not importing!" unless importing?
 
+    self.class.reset_counters(id, :trades)
     imported!
     self.class.where(import_status: :waiting).first&.start_import
-    OhlcGenerateJob.perform_later(self, Time.current)
+    Ohlc.generate_new_later(self, 1.minute.ago) # 1 minute ago to make sure we have all the trades
   end
 
   private
