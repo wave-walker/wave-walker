@@ -17,4 +17,43 @@ class Ohlc < ApplicationRecord
       NewOhlcForTimeframeJob.perform_later(asset_pair, timeframe, last_imported_at)
     end
   end
+
+  def self.last_end_at(asset_pair, timeframe)
+    where(asset_pair:, timeframe:).last&.range&.last ||
+      Range.new(timeframe, asset_pair.trades.first.created_at).begin
+  end
+
+  def self.create_from_trades(asset_pair, timeframe, range) # rubocop:todo Metrics/MethodLength, Metrics/AbcSize
+    trades = asset_pair.trades.where(created_at: range)
+
+    if trades.any?
+      create!(
+        asset_pair:,
+        high: trades.maximum(:price),
+        low: trades.minimum(:price),
+        open: trades.first.price,
+        close: trades.last.price,
+        volume: trades.sum(:volume),
+        timeframe:,
+        start_at: range.begin
+      )
+    else
+      close = Ohlc.where(asset_pair:, timeframe:).last.close
+
+      create!(
+        asset_pair:,
+        high: close,
+        low: close,
+        open: close,
+        close:,
+        volume: 0,
+        timeframe:,
+        start_at: range.begin
+      )
+    end
+  end
+
+  def range
+    @range ||= Range.new(timeframe, start_at)
+  end
 end
