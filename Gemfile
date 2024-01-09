@@ -8,6 +8,7 @@ gem 'bootsnap', require: false
 gem 'faraday'
 gem 'importmap-rails'
 gem 'jbuilder'
+gem 'mocha'
 gem 'pg', '~> 1.1'
 gem 'propshaft'
 gem 'puma', '>= 5.0'

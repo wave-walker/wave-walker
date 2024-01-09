@@ -6,7 +6,8 @@ class Ohlc < ApplicationRecord
 
     def initialize(timeframe, timestamp)
       @timeframe = timeframe
-      @duration = ActiveSupport::Duration.parse(timeframe)
+
+      @duration = ActiveSupport::Duration.parse(timeframe.to_s)
       start_at = Time.zone.at(0) + (@duration * (timestamp.to_i / @duration))
       end_at = start_at + @duration
 
