@@ -1,15 +1,16 @@
-require "test_helper"
+# frozen_string_literal: true
+
+require 'test_helper'
 
 class NewOhlcForTimeframeJobTest < ActiveJob::TestCase
   setup { freeze_time }
 
-  test "creates the inital OHLC" do
-
+  test 'creates the inital OHLC' do
   end
 
-  test "creates new OHLC" do
+  test 'creates new OHLC' do
   end
 
-  test "does not create new OHLC for a timeframe that is not finished" do
+  test 'does not create new OHLC for a timeframe that is not finished' do
   end
 end

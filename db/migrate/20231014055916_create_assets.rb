@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateAssets < ActiveRecord::Migration[7.1]
   def change
     create_table :assets do |t|
@@ -6,6 +8,6 @@ class CreateAssets < ActiveRecord::Migration[7.1]
       t.timestamps
     end
 
-    add_reference :trades, :asset, null: false, foreign_key: true
+    add_reference :trades, :asset, null: false, foreign_key: true # rubocop:todo Rails/NotNullColumn
   end
 end

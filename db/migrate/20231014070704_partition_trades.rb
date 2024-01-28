@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 class PartitionTrades < ActiveRecord::Migration[7.1]
   def up
     drop_table :trades
 
-    execute <<-SQL
+    execute <<-SQL.squish
       CREATE SEQUENCE trades_id_seq
         START WITH 1
         INCREMENT BY 1
@@ -11,8 +13,8 @@ class PartitionTrades < ActiveRecord::Migration[7.1]
         CACHE 1
     SQL
 
-    create_table(:trades, primary_key: [:asset_id, :id], options: "PARTITION BY LIST (asset_id)") do |t|
-      t.bigint :id, null: false
+    create_table(:trades, primary_key: %i[asset_id id], options: 'PARTITION BY LIST (asset_id)') do |t|
+      t.bigint :id, null: false # rubocop:todo Rails/DangerousColumnNames
       t.belongs_to :asset, null: false, foreign_key: true, index: false
       t.float :price, null: false
       t.float :volume, null: false
@@ -20,7 +22,7 @@ class PartitionTrades < ActiveRecord::Migration[7.1]
       t.timestamp :created_at, null: false
     end
 
-    execute "ALTER SEQUENCE trades_id_seq OWNED BY trades.id"
+    execute 'ALTER SEQUENCE trades_id_seq OWNED BY trades.id'
     execute "ALTER TABLE ONLY trades ALTER COLUMN id SET DEFAULT nextval('trades_id_seq'::regclass)"
   end
 

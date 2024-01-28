@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Kraken
   Trade = Struct.new(:price, :volume, :created_at, :action, :order_type, :misc, :id) do
     def initialize(*)
@@ -12,10 +14,10 @@ module Kraken
   class Error < StandardError; end
 
   def self.trades(pair:, since:)
-    response = connection.get('public/Trades', pair:, since:, count: 10000).body
+    response = connection.get('public/Trades', pair:, since:, count: 10_000).body
     check_response(response)
 
-    trades = response.dig('result', pair).map {|trade_params| Trade.new(*trade_params) }
+    trades = response.dig('result', pair).map { |trade_params| Trade.new(*trade_params) }
 
     { trades:, last: response.dig('result', 'last') }
   end

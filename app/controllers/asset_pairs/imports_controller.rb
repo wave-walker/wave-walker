@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AssetPairs
   class ImportsController < ApplicationController
     def create

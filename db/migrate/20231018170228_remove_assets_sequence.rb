@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 class RemoveAssetsSequence < ActiveRecord::Migration[7.1]
   def up
     execute 'DROP SEQUENCE trades_id_seq CASCADE'
   end
 
   def down
-    execute <<-SQL
+    execute <<-SQL.squish
       CREATE SEQUENCE trades_id_seq
         START WITH 1
         INCREMENT BY 1

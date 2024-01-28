@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddImportStateToAssetPair < ActiveRecord::Migration[7.1]
   def change
     create_enum :import_state, %w[pending waiting importing imported]
