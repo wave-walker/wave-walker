@@ -1,9 +1,11 @@
-require "test_helper"
+# frozen_string_literal: true
+
+require 'test_helper'
 
 class AssetPairTest < ActiveSupport::TestCase
   include ActiveJob::TestHelper
 
-  test "#start_import, enqueues a job to import trades" do
+  test '#start_import, enqueues a job to import trades' do
     assert_enqueued_with(job: TradeSyncJob, args: [asset_pairs(:atomusd)]) do
       assert_changes -> { asset_pairs(:atomusd).reload.import_status }, to: 'importing' do
         asset_pairs(:atomusd).start_import
@@ -11,17 +13,17 @@ class AssetPairTest < ActiveSupport::TestCase
     end
   end
 
-  test "#start_import, raises an error if already importing" do
+  test '#start_import, raises an error if already importing' do
     asset_pairs(:atomusd).update!(import_status: :importing)
 
-    error = assert_raises RuntimeError, "Already importing!" do
+    error = assert_raises RuntimeError, 'Already importing!' do
       asset_pairs(:atomusd).start_import
     end
 
-    assert_equal "Already importing!", error.message
+    assert_equal 'Already importing!', error.message
   end
 
-  test "#start_import, change to waiting when another token is importing" do
+  test '#start_import, change to waiting when another token is importing' do
     asset_pairs(:btcusd).importing!
 
     assert_no_enqueued_jobs(only: TradeSyncJob) do
@@ -31,7 +33,7 @@ class AssetPairTest < ActiveSupport::TestCase
     end
   end
 
-  test "#finish_import,  imports the next waiting asset pair" do
+  test '#finish_import,  imports the next waiting asset pair' do
     asset_pairs(:atomusd).importing!
     asset_pairs(:btcusd).waiting!
 
@@ -42,7 +44,7 @@ class AssetPairTest < ActiveSupport::TestCase
     end
   end
 
-  test "#finish_import, enqueues new OHLC creation" do
+  test '#finish_import, enqueues new OHLC creation' do
     freeze_time
 
     asset_pairs(:atomusd).importing!

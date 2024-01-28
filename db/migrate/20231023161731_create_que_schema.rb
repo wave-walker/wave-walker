@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateQueSchema < ActiveRecord::Migration[7.1]
   def up
     Que.migrate!(version: 7)

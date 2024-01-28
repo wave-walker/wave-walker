@@ -1,11 +1,13 @@
-require "test_helper"
+# frozen_string_literal: true
+
+require 'test_helper'
 
 class OhlcFormTest < ActiveSupport::TestCase
   setup do
     Trade.create_partition_for_asset(asset_pairs(:atomusd).id, asset_pairs(:atomusd).name)
   end
 
-  test "should create OHLC with trades in timeframe" do
+  test 'should create OHLC with trades in timeframe' do
     freeze_time
 
     asset_pair = asset_pairs(:atomusd)
@@ -41,7 +43,7 @@ class OhlcFormTest < ActiveSupport::TestCase
     assert_equal asset_pair, ohlc.asset_pair
   end
 
-  test "should not create OHLC without trades in timeframe" do
+  test 'should not create OHLC without trades in timeframe' do
     asset_pair = asset_pairs(:atomusd)
     range = Ohlc::Range.new('PT1H', 1.hour.ago)
 

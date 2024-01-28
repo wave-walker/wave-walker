@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateAssetPairs < ActiveRecord::Migration[7.1]
   def change
     create_table :asset_pairs do |t|

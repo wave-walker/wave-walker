@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AssetPair < ApplicationRecord
   has_many :trades, dependent: :restrict_with_error
 
@@ -11,7 +13,7 @@ class AssetPair < ApplicationRecord
   }
 
   def start_import
-    raise "Already importing!" if importing?
+    raise 'Already importing!' if importing?
 
     importing!
     TradeSyncJob.perform_later(self)
@@ -20,7 +22,7 @@ class AssetPair < ApplicationRecord
   end
 
   def finish_import
-    raise "Not importing!" unless importing?
+    raise 'Not importing!' unless importing?
 
     self.class.reset_counters(id, :trades)
     imported!

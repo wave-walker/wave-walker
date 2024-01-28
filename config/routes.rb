@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
-  get "up" => "rails/health#show", as: :rails_health_check
+  get 'up' => 'rails/health#show', as: :rails_health_check
 
   resources :asset_pairs, only: [:index] do
     with_options module: 'asset_pairs' do
@@ -7,5 +9,5 @@ Rails.application.routes.draw do
     end
   end
 
-  root "asset_pairs#index"
+  root 'asset_pairs#index'
 end

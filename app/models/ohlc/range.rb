@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Ohlc < ApplicationRecord
   class Range < ::Range
     attr_reader :timeframe
@@ -5,7 +7,7 @@ class Ohlc < ApplicationRecord
     def initialize(timeframe, timestamp)
       @timeframe = timeframe
       @duration = ActiveSupport::Duration.parse(timeframe)
-      start_at = Time.zone.at(0) + @duration * (timestamp.to_i / @duration)
+      start_at = Time.zone.at(0) + (@duration * (timestamp.to_i / @duration))
       end_at = start_at + @duration
 
       super(start_at, end_at, true)

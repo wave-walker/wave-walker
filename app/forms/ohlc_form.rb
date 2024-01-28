@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class OhlcForm
   def initialize(asset_pair:, range:)
     @asset_pair = asset_pair

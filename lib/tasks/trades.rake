@@ -1,8 +1,10 @@
-require "csv"
+# frozen_string_literal: true
 
-namespace :trades do
-  desc "Import trades from csv file"
-  task :import, [:path] => [:environment] do |t, args|
+require 'csv'
+
+namespace :trades do # rubocop:todo Metrics/BlockLength
+  desc 'Import trades from csv file'
+  task :import, [:path] => [:environment] do |_t, args| # rubocop:todo Metrics/BlockLength
     path = args.fetch(:path)
 
     AssetSyncService.call
@@ -30,14 +32,14 @@ namespace :trades do
 
         if trades.size == 100_000
           puts "Inserting #{trades.size} trades..."
-          Trade.insert_all(trades)
+          Trade.insert_all(trades) # rubocop:todo Rails/SkipsModelValidations
           trades = []
         end
       end
 
-      Trade.insert_all(trades) if trades.present?
+      Trade.insert_all(trades) if trades.present? # rubocop:todo Rails/SkipsModelValidations
 
-      puts "Done!"
+      puts 'Done!'
     end
   end
 end
