@@ -1,7 +1,9 @@
 <article>
-  <%= "#{asset_pair.name} (#{asset_pair.import_state})" -%>
+  <%= "#{asset_pair.name} (#{asset_pair.import_status})" -%>
   <% if asset_pair.importing? %>
     <progress></progress>
+  <% elsif asset_pair.waiting? %>
+    Import is scheduled.
   <% else %>
     <%= button_to "Start import.", asset_pair_import_path(asset_pair) %>
   <% end %>

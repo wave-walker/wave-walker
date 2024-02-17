@@ -10,4 +10,6 @@ Rails.application.routes.draw do
   end
 
   root 'asset_pairs#index'
+
+  mount GoodJob::Engine => 'good_job'
 end

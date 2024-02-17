@@ -38,6 +38,6 @@ module WaveWalker
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
     config.active_record.schema_format = :sql
-    config.active_job.queue_adapter = :que
+    config.active_job.queue_adapter = :good_job
   end
 end
