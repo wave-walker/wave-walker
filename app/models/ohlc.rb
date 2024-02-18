@@ -24,16 +24,17 @@ class Ohlc < ApplicationRecord
   end
 
   def self.create_from_trades(asset_pair, timeframe, range) # rubocop:todo Metrics/MethodLength, Metrics/AbcSize
-    trades = asset_pair.trades.where(created_at: range)
+    trades = asset_pair.trades.where(created_at: range).to_a
+    prices = trades.map(&:price)
 
     if trades.any?
       create!(
         asset_pair:,
-        high: trades.maximum(:price),
-        low: trades.minimum(:price),
-        open: trades.first.price,
-        close: trades.last.price,
-        volume: trades.sum(:volume),
+        high: prices.max,
+        low: prices.min,
+        open: prices.first,
+        close: prices.last,
+        volume: trades.sum(&:volume),
         timeframe:,
         start_at: range.begin
       )

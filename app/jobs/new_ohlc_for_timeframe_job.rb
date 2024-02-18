@@ -11,6 +11,7 @@ class NewOhlcForTimeframeJob < ApplicationJob
     until range.cover?(last_import_at)
       Ohlc.create_from_trades(asset_pair, timeframe, range)
       range = range.next
+      sleep 0.1 # throttel
     end
   end
 end
