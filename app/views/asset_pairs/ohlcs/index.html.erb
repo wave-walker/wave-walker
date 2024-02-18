@@ -1,0 +1,7 @@
+<%= tag.h1 @ohlc_chart.name %>
+
+<%= tag.div class: 'chart', data: {
+  controller: 'chart',
+  chart_ohlc_series_value: @ohlc_chart.candlestick_series,
+  chart_volume_series_value: @ohlc_chart.volume_series,
+} %>

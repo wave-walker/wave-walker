@@ -5,6 +5,7 @@
   <% elsif asset_pair.waiting? %>
     Import is scheduled.
   <% else %>
+    <%= link_to "Chard", asset_pair_ohlcs_path(asset_pair) %>
     <%= button_to "Start import.", asset_pair_import_path(asset_pair) %>
   <% end %>
   <p><%= asset_pair.trades_count -%> trades imported!</p>

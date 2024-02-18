@@ -4,3 +4,7 @@
 html[aria-busy=true]::before {
   display: none;
 }
+
+.chart {
+  height: 500px;
+}

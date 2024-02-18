@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   resources :asset_pairs, only: [:index] do
     with_options module: 'asset_pairs' do
       resource :import, only: [:create]
+      resources :ohlcs, only: [:index]
     end
   end
 
