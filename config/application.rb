@@ -39,5 +39,13 @@ module WaveWalker
     # config.eager_load_paths << Rails.root.join("extras")
     config.active_record.schema_format = :sql
     config.active_job.queue_adapter = :good_job
+    config.good_job.enable_cron = true
+    config.good_job.cron = {
+      asset_pair_sync_task: {
+        cron: '*/5 * * * *',
+        class: 'AssetPairSyncJob',
+        description: 'Initialize the asset pairs trade sync.'
+      }
+    }
   end
 end
