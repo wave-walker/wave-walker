@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class TradeSyncJob < ApplicationJob
+class TradeImportJob < ApplicationJob
   queue_as :default
 
   retry_on Kraken::RateLimitExceeded, wait: 5.seconds, attempts: 10

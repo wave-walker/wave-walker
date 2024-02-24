@@ -16,7 +16,7 @@ class AssetPair < ApplicationRecord
     raise 'Already importing!' if importing?
 
     importing!
-    TradeSyncJob.perform_later(self)
+    TradeImportJob.perform_later(self)
   rescue ActiveRecord::RecordNotUnique
     waiting!
   end
