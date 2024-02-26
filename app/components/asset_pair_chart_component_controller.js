@@ -10,12 +10,11 @@ export default class extends Controller {
 
     const volumeSeries = this.chart.addHistogramSeries({
       priceFormat: { type: 'volume' },
-      priceScaleId: '', // set as an overlay by setting a blank priceScaleId
+      priceScaleId: '',
     })
     volumeSeries.priceScale().applyOptions({
-      // set the positioning of the volume series
       scaleMargins: {
-        top: 0.7, // highest point of the series will be 70% away from the top
+        top: 0.7,
         bottom: 0,
       },
     });

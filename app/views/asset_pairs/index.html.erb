@@ -1,1 +1,37 @@
-<%= render @asset_pairs %>
+<h1>Asset pairs</h1>
+
+<h2>Synced asset pairs.</h2>
+
+<article class="component">
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Status</th>
+        <th scope="col">Trades</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @asset_pairs.reject(&:pending?).each do |asset_pair| %>
+        <tr>
+          <th scope="row"><%= link_to asset_pair.name, asset_pair_path(asset_pair) -%></th>
+          <td><%= asset_pair.import_status -%></td>
+          <td><%= asset_pair.trades_count -%></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</article>
+
+
+<h2>Pending asset pairs.</h2>
+
+<article class="component">
+  <% @asset_pairs.select(&:pending?).in_groups_of(3, false) do |grouped_asset_pairs| %>
+    <div class="grid">
+      <% grouped_asset_pairs.each do |asset_pair| %>
+        <%= button_to "Import #{asset_pair.name}.", asset_pair_import_path(asset_pair) %>
+      <% end %>
+    </div>
+  <% end %>
+</article>
