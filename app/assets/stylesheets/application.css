@@ -5,6 +5,6 @@ html[aria-busy=true]::before {
   display: none;
 }
 
-.chart {
-  height: 500px;
+.asset-pair-chart-component {
+  height: 75vh;
 }

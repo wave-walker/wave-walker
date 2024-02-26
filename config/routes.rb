@@ -3,10 +3,9 @@
 Rails.application.routes.draw do
   get 'up' => 'rails/health#show', as: :rails_health_check
 
-  resources :asset_pairs, only: [:index] do
+  resources :asset_pairs, only: %i[index show] do
     with_options module: 'asset_pairs' do
       resource :import, only: [:create]
-      resources :ohlcs, only: [:index]
     end
   end
 

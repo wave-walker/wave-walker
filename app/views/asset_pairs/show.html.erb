@@ -1,0 +1,21 @@
+<%= render "breadcrumbs", crumbs: [
+  link_to("Asset Pairs", asset_pairs_path),
+  @asset_pair.name
+] %>
+
+<%= tag.h1 @asset_pair.name %>
+
+  <nav>
+    <details class="dropdown">
+      <summary>
+        <%= @timeframe %>
+      </summary>
+      <ul dir="rtl">
+        <% Ohlc.timeframes.values.each do |timeframe| %>
+          <li><%= link_to(timeframe, asset_pair_path(@asset_pair, timeframe:)) %></li>
+        <% end %>
+      </ul>
+    </details>
+  </nav>
+
+  <%= render AssetPairChartComponent.new(asset_pair: @asset_pair, timeframe: @timeframe) %>

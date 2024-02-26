@@ -12,8 +12,28 @@
   </head>
 
   <body>
+    <header class="container">
+      <nav>
+        <ul>
+          <li><strong>TrendPulse</strong></li>
+        </ul>
+        <ul>
+          <% [['Dashboard', root_path], ['Asset Pairs', asset_pairs_path]].each do |name, path| %>
+            <li><%= link_to name, path, aria: { current: current_page?(path) ? "page" : nil } %></li>
+          <% end %>
+        </ul>
+      </nav>
+    </header>
+
     <main class="container">
       <%= yield %>
     </main>
+
+    <footer class="container">
+      <article>
+        <header>Associated links</header>
+        <li><%= link_to 'Good Job', good_job.root_path, target: '_blank', data: { turbo: false } %></li>
+      </article>
+    </footer>
   </body>
 </html>
