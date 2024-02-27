@@ -7,6 +7,10 @@ require 'minitest/mock'
 require 'mocha/minitest'
 require 'webmock/minitest'
 
+WebMock.disable_net_connect!(allow_localhost: true, allow: [
+                               'https://storage.googleapis.com/chrome-for-testing-public'
+                             ])
+
 module ActiveSupport
   class TestCase
     # Run tests in parallel with specified workers
