@@ -83,4 +83,16 @@ class OhlcTest < ActiveSupport::TestCase
     assert_equal ohlc.timeframe, 'PT1H'
     assert_equal ohlc.start_at, range.next.begin
   end
+
+  test 'it enqueues analysation' do
+    asset_pair = asset_pairs(:atomusd)
+    timeframe = :PT1H
+    range = Ohlc::Range.new(timeframe, Time.current)
+    ohlc = Ohlc.new(asset_pair:, high: 1, low: 2, open: 3, close: 4, volume: 1,
+                    timeframe:, start_at: range.begin)
+
+    assert_enqueued_with(job: OhlcAnalyzeJob, args: [ohlc]) do
+      ohlc.save!
+    end
+  end
 end
