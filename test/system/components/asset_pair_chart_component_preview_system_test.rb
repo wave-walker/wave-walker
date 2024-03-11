@@ -5,27 +5,11 @@ require 'test_helper'
 class AssetPairChartComponentSystemTest < ActionDispatch::SystemTestCase
   def test_asset_pair_chart
     asset_pair = asset_pairs(:atomusd)
-    generate_test_ohlcs(asset_pair)
-
     visit("/rails/view_components/asset_pair_chart_component/asset_pair_chart?asset_pair_id=#{asset_pair.id}")
 
     chart = find("#asset_pair_chard_#{asset_pair.id}").find('.tv-lightweight-charts')
 
     assert_element_is_unchanged(chart)
-  end
-
-  def generate_test_ohlcs(asset_pair)
-    timeframe = 'P1D'
-
-    10.times do |index|
-      low = index + 1
-      open = index + 2
-      close = index + 3
-      high = index + 4
-      volume = index + 1
-      range = Ohlc::Range.new(timeframe, (11 - index).days.ago)
-      Ohlc.create!(asset_pair:, high:, low:, open:, close:, volume:, timeframe:, start_at: range.begin)
-    end
   end
 
   def assert_element_is_unchanged(element) # rubocop:todo Metrics/MethodLength, Metrics/AbcSize
