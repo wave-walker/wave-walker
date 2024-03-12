@@ -1,7 +1,7 @@
-<%= render "breadcrumbs", crumbs: [
-  link_to("Asset Pairs", asset_pairs_path),
-  @asset_pair.name
-] %>
+<%= render 'breadcrumbs', crumbs: [
+      link_to('Asset Pairs', asset_pairs_path),
+      @asset_pair.name
+    ] %>
 
 <%= tag.h1 @asset_pair.name %>
 

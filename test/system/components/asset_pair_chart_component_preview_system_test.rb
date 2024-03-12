@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'test_helper'
+require 'application_system_test_case'
 
-class AssetPairChartComponentSystemTest < ActionDispatch::SystemTestCase
+class AssetPairChartComponentSystemTest < ApplicationSystemTestCase
   def test_asset_pair_chart
     asset_pair = asset_pairs(:atomusd)
     visit("/rails/view_components/asset_pair_chart_component/asset_pair_chart?asset_pair_id=#{asset_pair.id}")
