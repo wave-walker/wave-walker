@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class OhlcAnalyzeJob < ApplicationJob
   queue_as :default
 

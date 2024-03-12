@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class CreateGoodJobs < ActiveRecord::Migration[7.1]
-  def change
+  def change # rubocop:disable Metrics/AbcSize
     # Uncomment for Postgres v12 or earlier to enable gen_random_uuid() support
     # enable_extension 'pgcrypto'
 
@@ -25,7 +25,7 @@ class CreateGoodJobs < ActiveRecord::Migration[7.1]
       t.uuid :batch_id
       t.uuid :batch_callback_id
 
-      t.boolean :is_discrete
+      t.boolean :is_discrete # rubocop:disable Rails/ThreeStateBooleanColumn
       t.integer :executions_count
       t.text :job_class
       t.integer :error_event, limit: 2
@@ -84,9 +84,11 @@ class CreateGoodJobs < ActiveRecord::Migration[7.1]
     add_index :good_jobs, [:finished_at], where: 'retried_good_job_id IS NULL AND finished_at IS NOT NULL',
                                           name: :index_good_jobs_jobs_on_finished_at
     add_index :good_jobs, %i[priority created_at], order: { priority: 'DESC NULLS LAST', created_at: :asc },
-                                                   where: 'finished_at IS NULL', name: :index_good_jobs_jobs_on_priority_created_at_when_unfinished
+                                                   where: 'finished_at IS NULL',
+                                                   name: :index_good_jobs_jobs_on_priority_created_at_when_unfinished
     add_index :good_jobs, %i[priority created_at], order: { priority: 'ASC NULLS LAST', created_at: :asc },
-                                                   where: 'finished_at IS NULL', name: :index_good_job_jobs_for_candidate_lookup
+                                                   where: 'finished_at IS NULL',
+                                                   name: :index_good_job_jobs_for_candidate_lookup
     add_index :good_jobs, [:batch_id], where: 'batch_id IS NOT NULL'
     add_index :good_jobs, [:batch_callback_id], where: 'batch_callback_id IS NOT NULL'
     add_index :good_jobs, :labels, using: :gin, where: '(labels IS NOT NULL)', name: :index_good_jobs_on_labels
