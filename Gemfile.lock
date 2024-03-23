@@ -333,9 +333,9 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   mocha
-  pg (~> 1.1)
+  pg
   propshaft
-  puma (>= 5.0)
+  puma
   rails (~> 7.1.0)
   redis
   rubocop

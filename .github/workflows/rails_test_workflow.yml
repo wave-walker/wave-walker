@@ -13,15 +13,15 @@ jobs:
     name: Test Rails App
     runs-on: ubuntu-latest
     env:
-      DATABASE_URL: postgres://postgres:postgres@localhost/wave_walker_test
+      DATABASE_URL: postgres://root:root@localhost/wave_walker_test
       RAILS_ENV: test
 
     services:
       postgres:
         image: postgres:latest
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
           POSTGRES_DB: wave_walker_test
         ports:
           - 5432:5432
@@ -31,33 +31,33 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Cache Ruby Gems
-        uses: actions/cache@v4
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
+      - name: Install system dependencies
+        run: sudo apt install -y --no-install-recommends libvips
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
+          bundler-cache: true
           ruby-version: 3.3
-
-      - name: Install Bundler
-        run: gem install bundler
-
-      - name: Install system dependencies
-        run: sudo apt-get install -y libvips
 
       - name: Install Dependencies
         run: bundle install --jobs 4 --retry 3
 
       - name: Database Setup
-        run: |
-          bundle exec rails db:schema:load
+        run: bundle exec rails db:schema:load
 
-      - name: Run Rake
-        run: |
-          bin/rake
+      - name: Run rubocop
+        uses: reviewdog/action-rubocop@v2.9.0
+        with:
+          skip_install: true
+          use_bundler: true
+
+      - name: Run erb-lint
+        run: bundle exec erblint --lint-all 
+
+      - name: Run tests
+        run: bin/rails test
+
+      - name: Run tests
+        run: bin/rails test:system
 
