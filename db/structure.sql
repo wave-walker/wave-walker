@@ -346,6 +346,18 @@ CREATE TABLE public.schema_migrations (
 
 
 --
+-- Name: smoothed_moving_averages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.smoothed_moving_averages (
+    ohlc_id bigint NOT NULL,
+    "interval" integer NOT NULL,
+    value double precision NOT NULL,
+    created_at timestamp without time zone NOT NULL
+);
+
+
+--
 -- Name: trades; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -491,6 +503,14 @@ ALTER TABLE ONLY public.ohlcs
 
 ALTER TABLE ONLY public.schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
+
+
+--
+-- Name: smoothed_moving_averages smoothed_moving_averages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.smoothed_moving_averages
+    ADD CONSTRAINT smoothed_moving_averages_pkey PRIMARY KEY (ohlc_id, "interval");
 
 
 --
@@ -665,6 +685,14 @@ ALTER TABLE public.trades
 
 
 --
+-- Name: smoothed_moving_averages fk_rails_4a1da101c3; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.smoothed_moving_averages
+    ADD CONSTRAINT fk_rails_4a1da101c3 FOREIGN KEY (ohlc_id) REFERENCES public.ohlcs(id);
+
+
+--
 -- Name: active_storage_variant_records fk_rails_993965df05; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -687,6 +715,7 @@ ALTER TABLE ONLY public.active_storage_attachments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240323123105'),
 ('20240323010629'),
 ('20240217155603'),
 ('20231125151612'),
