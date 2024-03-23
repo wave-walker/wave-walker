@@ -7,4 +7,4 @@ require_relative 'config/application'
 
 Rails.application.load_tasks
 
-task default: %i[test rubocop erb_lint]
+task default: %i[test rubocop erb_lint system_test]
