@@ -58,6 +58,12 @@ class Ohlc < ApplicationRecord
     end
   end
 
+  def hl2 = (high + low) / 2
+
+  def previous_ohlcs
+    self.class.where(id: ...id, asset_pair:, timeframe:).order(id: :desc)
+  end
+
   def range
     @range ||= Range.new(timeframe, start_at)
   end
