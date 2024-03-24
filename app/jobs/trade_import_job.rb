@@ -2,6 +2,7 @@
 
 class TradeImportJob < ApplicationJob
   include GoodJob::ActiveJobExtensions::Concurrency
+  include JobIteration::Iteration
 
   queue_as :default
 
@@ -9,25 +10,15 @@ class TradeImportJob < ApplicationJob
 
   good_job_control_concurrency_with(perform_limit: 1)
 
-  # rubocop:todo Metrics/MethodLength
-  def perform(asset_pair, cursor_position: nil) # rubocop:todo Metrics/AbcSize, Metrics/MethodLength
-    cursor_position ||= asset_pair.trades.maximum(:created_at).to_i
-    response = Kraken.trades(pair: asset_pair.name, since: cursor_position)
-
-    trades = response.fetch(:trades)
-                     .reject { |trade| trade.id.zero? }
-                     .map { |trade| trade.to_h.merge(asset_pair_id: asset_pair.id) }
-
-    ActiveRecord::Base.transaction do
-      Trade.upsert_all(trades) # rubocop:todo Rails/SkipsModelValidations
-
-      if trades.size == 1000
-        self.class.perform_later(asset_pair, cursor_position: response.fetch(:last))
-        AssetPair.increment_counter(:trades_count, asset_pair, by: 1000) # rubocop:todo Rails/SkipsModelValidations
-      else
-        asset_pair.finish_import
-      end
-    end
+  def build_enumerator(asset_pair, cursor:)
+    cursor ||= asset_pair.trades.maximum(:created_at)
+    KrakenTradesEnumerator.call(asset_pair, cursor:)
   end
-  # rubocop:enable Metrics/MethodLength
+
+  def each_iteration(trades, asset_pair)
+    trades_params = trades.reject { |trade| trade.id.zero? }
+                          .map { |trade| trade.to_h.merge(asset_pair_id: asset_pair.id) }
+
+    Trade.upsert_all(trades_params) # rubocop:disable Rails/SkipsModelValidations
+  end
 end
