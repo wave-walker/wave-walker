@@ -55,6 +55,17 @@ CREATE TYPE public.trade_action AS ENUM (
 );
 
 
+--
+-- Name: trend; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.trend AS ENUM (
+    'bearish',
+    'neutral',
+    'bullish'
+);
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -299,6 +310,19 @@ CREATE TABLE public.good_jobs (
 
 
 --
+-- Name: smoothed_trends; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.smoothed_trends (
+    ohlc_id bigint NOT NULL,
+    fast_smma double precision NOT NULL,
+    slow_smma double precision NOT NULL,
+    trend public.trend NOT NULL,
+    created_at timestamp without time zone NOT NULL
+);
+
+
+--
 -- Name: ohlcs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -487,6 +511,14 @@ ALTER TABLE ONLY public.good_job_settings
 
 ALTER TABLE ONLY public.good_jobs
     ADD CONSTRAINT good_jobs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: smoothed_trends smoothed_trends_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.smoothed_trends
+    ADD CONSTRAINT smoothed_trends_pkey PRIMARY KEY (ohlc_id);
 
 
 --
@@ -693,6 +725,14 @@ ALTER TABLE ONLY public.smoothed_moving_averages
 
 
 --
+-- Name: smoothed_trends fk_rails_58254639e3; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.smoothed_trends
+    ADD CONSTRAINT fk_rails_58254639e3 FOREIGN KEY (ohlc_id) REFERENCES public.ohlcs(id);
+
+
+--
 -- Name: active_storage_variant_records fk_rails_993965df05; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -715,6 +755,7 @@ ALTER TABLE ONLY public.active_storage_attachments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240324052444'),
 ('20240323123105'),
 ('20240323010629'),
 ('20240217155603'),
