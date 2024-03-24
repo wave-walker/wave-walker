@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 class AssetPairChartComponent < ViewComponent::Base
+  TREND_COLORS = {
+    'bearish' => '#1700FF',
+    'bullish' => '#BEFF00',
+    'neutral' => '#808080'
+  }.freeze
+
   def initialize(asset_pair:, timeframe:)
     @asset_pair = asset_pair
     @timeframe = timeframe
@@ -27,6 +33,29 @@ class AssetPairChartComponent < ViewComponent::Base
     end
   end
 
+  def smoothed_trend_slow_series
+    ohlcs.filter(&:smoothed_trend).map do |ohlc|
+      smoothed_trend = ohlc.smoothed_trend
+
+      {
+        value: smoothed_trend.slow_smma,
+        color: TREND_COLORS.fetch(smoothed_trend.trend),
+        time: ohlc.range.end.to_i
+      }
+    end
+  end
+
+  def smoothed_trend_fast_series
+    ohlcs.filter(&:smoothed_trend).map do |ohlc|
+      smoothed_trend = ohlc.smoothed_trend
+      {
+        value: smoothed_trend.fast_smma,
+        color: TREND_COLORS.fetch(smoothed_trend.trend),
+        time: ohlc.range.end.to_i
+      }
+    end
+  end
+
   def volume_series
     ohlcs.map do |ohlc|
       color = ohlc.open < ohlc.close ? 'green' : 'red'
@@ -38,5 +67,5 @@ class AssetPairChartComponent < ViewComponent::Base
 
   attr_reader :asset_pair, :timeframe
 
-  def ohlcs = Ohlc.where(asset_pair:, timeframe:).last(300)
+  def ohlcs = Ohlc.where(asset_pair:, timeframe:).includes(:smoothed_trend).last(300)
 end
