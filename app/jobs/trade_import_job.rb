@@ -1,9 +1,13 @@
 # frozen_string_literal: true
 
 class TradeImportJob < ApplicationJob
+  include GoodJob::ActiveJobExtensions::Concurrency
+
   queue_as :default
 
   retry_on Kraken::RateLimitExceeded, wait: 5.seconds, attempts: 10
+
+  good_job_control_concurrency_with(perform_limit: 1)
 
   # rubocop:todo Metrics/MethodLength
   def perform(asset_pair, cursor_position: nil) # rubocop:todo Metrics/AbcSize, Metrics/MethodLength
