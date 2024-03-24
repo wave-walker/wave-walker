@@ -12,6 +12,9 @@ class Ohlc < ApplicationRecord
 
   belongs_to :asset_pair
 
+  has_many :smoothed_moving_avrages, dependent: :destroy
+  has_one :smoothed_trend, dependent: :destroy
+
   after_commit do
     OhlcAnalyzeJob.perform_later(self)
   end

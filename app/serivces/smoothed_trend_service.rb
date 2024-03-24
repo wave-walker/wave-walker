@@ -29,13 +29,13 @@ class SmoothedTrendService
 
   def trend
     return :neutral if neutral?
-    return :bearish if bearish?
+    return :bullish if bullish?
 
-    :bullish
+    :bearish
   end
 
-  def bearish? = fast_smma > slow_smma
-  def neutral_up? = (fast_smma < medium_fast_smma) == bearish?
-  def neutral_down? = (medium_slow_smma < slow_smma) == bearish?
+  def bullish? = fast_smma > slow_smma
+  def neutral_up? = (fast_smma < medium_fast_smma) == bullish?
+  def neutral_down? = (medium_slow_smma < slow_smma) == bullish?
   def neutral? = neutral_up? || neutral_down?
 end

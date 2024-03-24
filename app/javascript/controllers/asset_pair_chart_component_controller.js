@@ -1,27 +1,38 @@
 import { Controller } from "@hotwired/stimulus"
 import { createChart } from "lightweight-charts"
 
+const volumeHistogramOptions = {
+  priceFormat: { type: 'volume' },
+  priceScaleId: '',
+}
+
+const volumePriceScaleOptions = {
+  scaleMargins: {
+    top: 0.7,
+    bottom: 0,
+  },
+}
+
 export default class extends Controller {
-  static values = { ohlcSeries: Array, volumeSeries: Array }
+  static values = {
+    ohlcSeries: Array,
+    volumeSeries: Array,
+    smoothedTrendSlowSeries: Array,
+    smoothedTrendFastSeries: Array,
+  }
 
   connect() {
-    console.log('sssss')
     this.chart = createChart(this.element)
     const ohlcSeries = this.chart.addCandlestickSeries()
+    const smoothedTrendSlow = this.chart.addLineSeries()
+    const smoothedTrendFast = this.chart.addLineSeries()
+    const volumeSeries = this.chart.addHistogramSeries(volumeHistogramOptions)
+    volumeSeries.priceScale().applyOptions(volumePriceScaleOptions);
 
-    const volumeSeries = this.chart.addHistogramSeries({
-      priceFormat: { type: 'volume' },
-      priceScaleId: '',
-    })
-    volumeSeries.priceScale().applyOptions({
-      scaleMargins: {
-        top: 0.7,
-        bottom: 0,
-      },
-    });
-
-    volumeSeries.setData(this.volumeSeriesValue)
     ohlcSeries.setData(this.ohlcSeriesValue);
+    smoothedTrendSlow.setData(this.smoothedTrendSlowSeriesValue);
+    smoothedTrendFast.setData(this.smoothedTrendFastSeriesValue);
+    volumeSeries.setData(this.volumeSeriesValue)
 
     this.chart.timeScale().fitContent();
   }
