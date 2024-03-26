@@ -8,6 +8,10 @@ class TradeImportJob < ApplicationJob
 
   retry_on Kraken::RateLimitExceeded, wait: 5.seconds, attempts: 10
 
+  on_complete do |job|
+    OhlcJob.enqueue_for_all_timeframes(job.arguments.first, 3.seconds.ago)
+  end
+
   good_job_control_concurrency_with(perform_limit: 1)
 
   def build_enumerator(asset_pair, cursor:)

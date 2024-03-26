@@ -3,26 +3,18 @@
 require 'test_helper'
 
 class AssetPairSyncJobTest < ActiveJob::TestCase
-  test 'start import of synced assets' do
+  test 'starts importing marked asset pairs' do
     atom_usd = asset_pairs(:atomusd)
     btc_usd = asset_pairs(:btcusd)
 
-    atom_usd.imported!
-    btc_usd.imported!
+    atom_usd.import
 
-    assert_changes('AssetPair.where(import_status: [:importing, :waiting]).count', 2) do
-      assert_enqueued_with(job: TradeImportJob) do
-        AssetPairSyncJob.perform_now
-      end
-    end
-  end
+    assert_not btc_usd.importing?
 
-  test 'dose not import unsynced asset pairs' do
-    atom_usd = asset_pairs(:atomusd)
-    atom_usd.pending!
-
-    assert_no_changes('atom_usd.reload.import_status') do
+    assert_enqueued_jobs 1 do
       AssetPairSyncJob.perform_now
     end
+
+    assert_enqueued_with(job: TradeImportJob, args: [atom_usd])
   end
 end

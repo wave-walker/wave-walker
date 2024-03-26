@@ -3,6 +3,10 @@
 require 'test_helper'
 
 class KrakenTradesEnumeratorTest < ActiveSupport::TestCase
+  setup do
+    KrakenTradesEnumerator.reset_load_trades_limit!
+  end
+
   test 'request the first trades if latest trade is not present' do
     asset_pair = AssetPair.new(name: 'ATOMUSD')
     Kraken.expects(:trades).with(pair: 'ATOMUSD', since: 0)
@@ -44,10 +48,6 @@ class KrakenTradesEnumeratorTest < ActiveSupport::TestCase
     trades_yield = KrakenTradesEnumerator.call(asset_pair, cursor: nil).first
     assert_equal trades_yield[0], trades
     assert_equal trades_yield[1], cursor
-  end
-
-  setup do
-    KrakenTradesEnumerator.reset_load_trades_limit!
   end
 
   test 'rate limites the API requests to 1 per second' do
