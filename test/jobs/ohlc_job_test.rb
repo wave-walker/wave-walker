@@ -2,7 +2,19 @@
 
 require 'test_helper'
 
-class NewOhlcForTimeframeJobTest < ActiveJob::TestCase
+class OhlcJobTest < ActiveJob::TestCase
+  test '.enqueue_for_all_timeframes, enqueues the OHLC for all timeframes' do
+    last_imported_at = 1.minute.ago
+    asset_pair = asset_pairs(:atomusd)
+    timeframes = Ohlc.timeframes.keys
+
+    timeframes.each do |timeframe|
+      assert_enqueued_with(job: OhlcJob, args: [asset_pair, timeframe, last_imported_at]) do
+        OhlcJob.enqueue_for_all_timeframes(asset_pair, last_imported_at)
+      end
+    end
+  end
+
   test 'creates the inital OHLC' do
     Trade.create_partition_for_asset(asset_pairs(:atomusd).id, asset_pairs(:atomusd).name)
 
@@ -17,7 +29,7 @@ class NewOhlcForTimeframeJobTest < ActiveJob::TestCase
 
     Ohlc.expects(:create_from_trades).with(asset_pair, 'PT1H', range)
 
-    NewOhlcForTimeframeJob.perform_now(asset_pair, 'PT1H', Time.current)
+    OhlcJob.perform_now(asset_pair, 'PT1H', Time.current)
   end
 
   test 'creates new OHLC' do
@@ -29,7 +41,7 @@ class NewOhlcForTimeframeJobTest < ActiveJob::TestCase
 
     Ohlc.expects(:create_from_trades).with(asset_pair, 'PT1H', range.next)
 
-    NewOhlcForTimeframeJob.perform_now(asset_pair, 'PT1H', Time.current)
+    OhlcJob.perform_now(asset_pair, 'PT1H', Time.current)
   end
 
   test 'does not create new OHLC for a timeframe that is not finished' do
@@ -41,6 +53,6 @@ class NewOhlcForTimeframeJobTest < ActiveJob::TestCase
 
     Ohlc.expects(:create_from_trades).never
 
-    NewOhlcForTimeframeJob.perform_now(asset_pair, 'PT1H', Time.current)
+    OhlcJob.perform_now(asset_pair, 'PT1H', Time.current)
   end
 end

@@ -9,18 +9,6 @@ class OhlcTest < ActiveSupport::TestCase
     Trade.create_partition_for_asset(asset_pairs(:atomusd).id, asset_pairs(:atomusd).name)
   end
 
-  test '.generate_new_later, enqueues the OHLC for all timeframes' do
-    last_imported_at = 1.minute.ago
-    asset_pair = asset_pairs(:atomusd)
-    timeframes = Ohlc.timeframes.keys
-
-    timeframes.each do |timeframe|
-      assert_enqueued_with(job: NewOhlcForTimeframeJob, args: [asset_pair, timeframe, last_imported_at]) do
-        Ohlc.generate_new_later(asset_pair, last_imported_at)
-      end
-    end
-  end
-
   test '.last_end_at, returns the last end_at for the given asset_pair and timeframe' do
     asset_pair = asset_pairs(:atomusd)
     timeframe = :PT1H

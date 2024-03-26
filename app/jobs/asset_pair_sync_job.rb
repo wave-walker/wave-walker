@@ -4,6 +4,8 @@ class AssetPairSyncJob < ApplicationJob
   queue_as :default
 
   def perform
-    AssetPair.imported.order(id: :desc).find_each(&:start_import)
+    AssetPair.importing.find_each do |asset_pair|
+      TradeImportJob.perform_later(asset_pair)
+    end
   end
 end

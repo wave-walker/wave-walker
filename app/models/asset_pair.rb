@@ -5,30 +5,9 @@ class AssetPair < ApplicationRecord
 
   after_create :add_trade_partition_for_asset
 
-  enum import_status: {
-    pending: 'pending',
-    waiting: 'waiting',
-    importing: 'importing',
-    imported: 'imported'
-  }
+  scope :importing, -> { where(importing: true) }
 
-  def start_import
-    raise 'Already importing!' if importing?
-
-    importing!
-    TradeImportJob.perform_later(self)
-  rescue ActiveRecord::RecordNotUnique
-    waiting!
-  end
-
-  def finish_import
-    raise 'Not importing!' unless importing?
-
-    self.class.reset_counters(id, :trades)
-    imported!
-    self.class.where(import_status: :waiting).first&.start_import
-    Ohlc.generate_new_later(self, 1.minute.ago) # 1 minute ago to make sure we have all the trades
-  end
+  def import = update!(importing: true)
 
   private
 

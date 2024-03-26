@@ -1,10 +1,36 @@
 # frozen_string_literal: true
 
 require 'test_helper'
+require 'job-iteration/test_helper'
 
 class TradeImportJobTest < ActiveJob::TestCase
+  include JobIteration::TestHelper
+
   setup do
     Trade.create_partition_for_asset(asset_pairs(:atomusd).id, asset_pairs(:atomusd).name)
+    KrakenTradesEnumerator.reset_load_trades_limit!
+  end
+
+  test 'enquest trade analyzation after import is completed' do
+    freeze_time
+    asset_pair = asset_pairs(:atomusd)
+
+    Kraken.stubs(:trades).with(pair: 'ATOMUSD', since: 0).returns(trades: [], last: 1).once
+
+    OhlcJob.expects(:enqueue_for_all_timeframes).with(asset_pair, 3.seconds.ago)
+
+    TradeImportJob.perform_now(asset_pair)
+  end
+
+  test 'dose not enquest trade analyzation when interrupted' do
+    asset_pair = asset_pairs(:atomusd)
+    trades = [Kraken::Trade.new(1, 2, 3, 's', 'l', 'foo bar', 7)]
+
+    iterate_once
+    Kraken.stubs(:trades).with(pair: 'ATOMUSD', since: 0).returns(trades:, last: 1).once
+    OhlcJob.expects(:enqueue_for_all_timeframes).with(asset_pair, 3.seconds.ago).never
+
+    TradeImportJob.perform_now(asset_pair)
   end
 
   test '#perfrom, should import trades with correct params' do

@@ -19,12 +19,6 @@ class Ohlc < ApplicationRecord
     OhlcAnalyzeJob.perform_later(self)
   end
 
-  def self.generate_new_later(asset_pair, last_imported_at)
-    timeframes.each_key do |timeframe|
-      NewOhlcForTimeframeJob.perform_later(asset_pair, timeframe, last_imported_at)
-    end
-  end
-
   def self.last_end_at(asset_pair, timeframe)
     where(asset_pair:, timeframe:).last&.range&.last ||
       Range.new(timeframe, asset_pair.trades.first.created_at).begin
