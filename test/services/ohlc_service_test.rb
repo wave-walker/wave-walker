@@ -2,12 +2,31 @@
 
 require 'test_helper'
 
-class OhlcFormTest < ActiveSupport::TestCase
+class OhlcServiceTest < ActiveSupport::TestCase
   setup do
     PartitionService.call(asset_pairs(:atomusd))
   end
 
-  test 'should create OHLC with trades in timeframe' do
+  test '.create_from_trades, when no trades exists' do
+    asset_pair = asset_pairs(:atomusd)
+    timeframe = :PT1H
+    range = Ohlc::Range.new(timeframe, Time.current)
+
+    Ohlc.create!(asset_pair:, high: 1, low: 2, open: 3, close: 4, volume: 1,
+                 timeframe:, start_at: range.begin)
+
+    ohlc = OhlcService.call(asset_pair:, range: range.next)
+
+    assert_equal ohlc.high, 4
+    assert_equal ohlc.low, 4
+    assert_equal ohlc.open, 4
+    assert_equal ohlc.close, 4
+    assert_equal ohlc.volume, 0
+    assert_equal ohlc.timeframe, 'PT1H'
+    assert_equal ohlc.start_at, range.next.begin
+  end
+
+  test '.call, should create OHLC with trades in timeframe' do
     freeze_time
 
     asset_pair = asset_pairs(:atomusd)
@@ -31,7 +50,7 @@ class OhlcFormTest < ActiveSupport::TestCase
     Trade.create!(id: [asset_pair.id, 6], price: 6, volume: 6, created_at: range.end,
                   action: :buy, order_type: :limit, misc: '')
 
-    ohlc = OhlcForm.new(asset_pair:, range:).save
+    ohlc = OhlcService.call(asset_pair:, range:)
 
     assert_equal 1.hour.ago.beginning_of_hour, ohlc.start_at
     assert_equal 'PT1H', ohlc.timeframe
@@ -47,7 +66,7 @@ class OhlcFormTest < ActiveSupport::TestCase
     asset_pair = asset_pairs(:atomusd)
     range = Ohlc::Range.new('PT1H', 1.hour.ago)
 
-    ohlc = OhlcForm.new(asset_pair:, range:).save
+    ohlc = OhlcService.call(asset_pair:, range:)
 
     assert_not ohlc
   end

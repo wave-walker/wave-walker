@@ -3,6 +3,40 @@
 require 'test_helper'
 
 class OhlcRangeTest < ActiveSupport::TestCase
+  test '.next_new_range, when there are no OHLCs' do
+    asset_pair = asset_pairs(:atomusd)
+    timeframe = :PT1H
+    timestamp = 4.hours.ago
+    PartitionService.call(asset_pair)
+
+    Trade.create!(
+      id: [asset_pair.id, 1],
+      price: 1,
+      volume: 1,
+      action: :buy,
+      order_type: :market,
+      misc: '',
+      created_at: timestamp
+    )
+
+    expected_range = Ohlc::Range.new(timeframe, timestamp)
+
+    assert_equal expected_range, Ohlc::Range.next_new_range(asset_pair:, timeframe:)
+  end
+
+  test '.next_new_range, when there are previous OHLCs' do
+    asset_pair = asset_pairs(:atomusd)
+    timeframe = :PT1H
+
+    ohlc_range = Ohlc::Range.new(timeframe, 3.hours.ago)
+
+    Ohlc.create!(asset_pair:, start_at: ohlc_range.begin, timeframe:,
+                 open: 1, high: 1, low: 1, close: 1, volume: 1)
+    expected_range = Ohlc::Range.new(timeframe, 2.hours.ago)
+
+    assert_equal expected_range, Ohlc::Range.next_new_range(asset_pair:, timeframe:)
+  end
+
   test '.new, should create range for timeframe' do
     range = Ohlc::Range.new('PT1H', Time.zone.at(0))
     assert_equal Time.zone.at(0), range.begin
