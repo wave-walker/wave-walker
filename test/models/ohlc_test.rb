@@ -6,7 +6,7 @@ class OhlcTest < ActiveSupport::TestCase
   include ActiveJob::TestHelper
 
   setup do
-    Trade.create_partition_for_asset(asset_pairs(:atomusd).id, asset_pairs(:atomusd).name)
+    PartitionService.call(asset_pairs(:atomusd))
   end
 
   test '.last_end_at, returns the last end_at for the given asset_pair and timeframe' do

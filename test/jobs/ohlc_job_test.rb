@@ -16,9 +16,9 @@ class OhlcJobTest < ActiveJob::TestCase
   end
 
   test 'creates the inital OHLC' do
-    Trade.create_partition_for_asset(asset_pairs(:atomusd).id, asset_pairs(:atomusd).name)
-
     asset_pair = asset_pairs(:atomusd)
+
+    PartitionService.call(asset_pair)
 
     Trade.create!(id: [asset_pair.id, 1], price: 1, volume: 1, action: 'buy',
                   order_type: 'market', misc: '')
