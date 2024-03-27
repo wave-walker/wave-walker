@@ -16,6 +16,7 @@ class OhlcJob < ApplicationJob
   end
 
   def each_iteration(range, attr)
-    OhlcService.call(range:, asset_pair: attr.fetch(:asset_pair))
+    ohlc = OhlcService.call(range:, asset_pair: attr.fetch(:asset_pair))
+    SmoothedTrendService.call(ohlc)
   end
 end
