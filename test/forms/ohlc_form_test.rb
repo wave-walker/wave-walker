@@ -4,7 +4,7 @@ require 'test_helper'
 
 class OhlcFormTest < ActiveSupport::TestCase
   setup do
-    Trade.create_partition_for_asset(asset_pairs(:atomusd).id, asset_pairs(:atomusd).name)
+    PartitionService.call(asset_pairs(:atomusd))
   end
 
   test 'should create OHLC with trades in timeframe' do

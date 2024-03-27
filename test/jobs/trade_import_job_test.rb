@@ -7,7 +7,7 @@ class TradeImportJobTest < ActiveJob::TestCase
   include JobIteration::TestHelper
 
   setup do
-    Trade.create_partition_for_asset(asset_pairs(:atomusd).id, asset_pairs(:atomusd).name)
+    PartitionService.call(asset_pairs(:atomusd))
     KrakenTradesEnumerator.reset_load_trades_limit!
   end
 
