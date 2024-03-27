@@ -20,39 +20,22 @@ class OhlcJobTest < ActiveJob::TestCase
 
     PartitionService.call(asset_pair)
 
-    Trade.create!(id: [asset_pair.id, 1], price: 1, volume: 1, action: 'buy',
-                  order_type: 'market', misc: '')
+    Trade.create!(
+      id: [asset_pair.id, 1],
+      price: 1, volume: 1, action: 'buy',
+      order_type: 'market', misc: '',
+      created_at: 2.hours.ago
+    )
 
-    range = Ohlc::Range.new('PT1H', Time.current)
+    Trade.create!(
+      id: [asset_pair.id, 2],
+      price: 1, volume: 1, action: 'buy',
+      order_type: 'market', misc: '',
+      created_at: 1.hour.ago
+    )
 
-    travel 1.hour
-
-    Ohlc.expects(:create_from_trades).with(asset_pair, 'PT1H', range)
-
-    OhlcJob.perform_now(asset_pair, 'PT1H', Time.current)
-  end
-
-  test 'creates new OHLC' do
-    asset_pair = asset_pairs(:atomusd)
-    range = Ohlc::Range.new('PT1H', Time.current)
-    Ohlc.create!(asset_pair:, high: 1, low: 1, open: 1, close: 1, volume: 1, timeframe: 'PT1H', start_at: range.begin)
-
-    travel 2.hours
-
-    Ohlc.expects(:create_from_trades).with(asset_pair, 'PT1H', range.next)
-
-    OhlcJob.perform_now(asset_pair, 'PT1H', Time.current)
-  end
-
-  test 'does not create new OHLC for a timeframe that is not finished' do
-    asset_pair = asset_pairs(:atomusd)
-    range = Ohlc::Range.new('PT1H', Time.current)
-    Ohlc.create!(asset_pair:, high: 1, low: 1, open: 1, close: 1, volume: 1, timeframe: 'PT1H', start_at: range.begin)
-
-    travel 1.hour
-
-    Ohlc.expects(:create_from_trades).never
-
-    OhlcJob.perform_now(asset_pair, 'PT1H', Time.current)
+    assert_difference 'Ohlc.count', 2 do
+      OhlcJob.perform_now(asset_pair:, timeframe: 'PT1H', last_imported_at: Time.current)
+    end
   end
 end

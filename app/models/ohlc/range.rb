@@ -4,6 +4,13 @@ class Ohlc < ApplicationRecord
   class Range < ::Range
     attr_reader :timeframe
 
+    def self.next_new_range(asset_pair:, timeframe:)
+      timestamp = Ohlc.where(asset_pair:, timeframe:).last&.range&.last ||
+                  asset_pair.trades.first.created_at
+
+      new(timeframe, timestamp)
+    end
+
     def initialize(timeframe, timestamp)
       @timeframe = timeframe
 
