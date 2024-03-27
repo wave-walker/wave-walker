@@ -15,7 +15,7 @@ class OhlcJobTest < ActiveJob::TestCase
     end
   end
 
-  test 'creates the inital OHLC' do
+  test '#perform, creates the inital OHLC' do
     asset_pair = asset_pairs(:atomusd)
 
     PartitionService.call(asset_pair)
@@ -37,5 +37,16 @@ class OhlcJobTest < ActiveJob::TestCase
     assert_difference 'Ohlc.count', 2 do
       OhlcJob.perform_now(asset_pair:, timeframe: 'PT1H', last_imported_at: Time.current)
     end
+  end
+
+  test '#each_iteration, creates the smoothed trend with the new ohlc' do
+    range = Ohlc::Range.new('P1D', Time.current)
+    asset_pair = AssetPair.new
+    ohlc = Ohlc.new
+
+    OhlcService.stubs(:call).with(range:, asset_pair:).returns(ohlc)
+    SmoothedTrendService.expects(:call).with(ohlc)
+
+    OhlcJob.new.each_iteration(range, { asset_pair: })
   end
 end
