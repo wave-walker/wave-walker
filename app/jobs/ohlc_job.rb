@@ -1,7 +1,13 @@
 # frozen_string_literal: true
 
 class OhlcJob < ApplicationJob
+  include GoodJob::ActiveJobExtensions::Concurrency
   include JobIteration::Iteration
+
+  good_job_control_concurrency_with(
+    total_limit: 1,
+    key: -> { "#{self.class.name}-#{arguments[0]}-#{arguments[1]}" }
+  )
 
   queue_as :default
 
