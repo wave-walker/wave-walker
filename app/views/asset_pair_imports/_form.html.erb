@@ -1,0 +1,5 @@
+<%= form_with url: asset_pair_import_path do |f| %>
+  <%= f.label :asset_pair_id %>
+  <%= f.select :asset_pair_id, options_from_collection_for_select(asset_pairs, :id, :name)  %>
+  <%= f.submit %>
+<% end %>
