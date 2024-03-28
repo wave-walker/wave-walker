@@ -3,13 +3,10 @@
 Rails.application.routes.draw do
   get 'up' => 'rails/health#show', as: :rails_health_check
 
-  resources :asset_pairs, only: %i[index show] do
-    with_options module: 'asset_pairs' do
-      resource :import, only: [:create]
-    end
-  end
+  resource :asset_pair_import, only: %i[new create]
+  resources :asset_pairs, only: %i[index show]
 
-  root 'asset_pairs#index'
+  root 'dashboards#show'
 
   mount GoodJob::Engine => 'good_job'
 end

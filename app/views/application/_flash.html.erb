@@ -1,0 +1,7 @@
+<div class="flash">
+  <% flash.each do |level, message| %>
+    <div class="flash__message <%= flash_class(level) -%>">
+      <%= message %>
+    </div>
+  <% end %>
+</div>

@@ -2,8 +2,7 @@
 
 class AssetPairsController < ApplicationController
   def index
-    @asset_pairs = AssetPair.order(Arel.sql("import_status = 'importing' DESC"))
-                            .order(import_status: :desc).order(:name)
+    @asset_pairs = AssetPair.importing.order(:name)
   end
 
   def show
