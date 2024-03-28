@@ -5,8 +5,9 @@ class KrakenTradesEnumerator
 
   def self.call(asset_pair, cursor:) = new(asset_pair, cursor:).to_enum(:each).lazy
 
-  # Kraken allows 1 request per second.
-  limit_method :load_trades, rate: 60, balanced: true
+  # Kraken allows 1 request per second. Allowing 55 requests ensures staying
+  # staing under the rate limit.
+  limit_method :load_trades, rate: 55, balanced: true
 
   def initialize(asset_pair, cursor:)
     @asset_pair = asset_pair
