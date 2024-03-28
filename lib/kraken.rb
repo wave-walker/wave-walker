@@ -26,7 +26,9 @@ module Kraken
     response = connection.get('public/AssetPairs').body
     check_response(response)
 
-    response.fetch('result')
+    response.fetch('result').values.filter_map do |pair_params|
+      pair_params.fetch('altname') if pair_params['status'] == 'online'
+    end
   end
 
   def self.connection

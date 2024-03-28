@@ -1,4 +1,6 @@
 atomusd:
   name: ATOMUSD
+  name_on_exchange: ATOMUSD
 btcusd:
   name: BTCUSD
+  name_on_exchange: XBTUSD

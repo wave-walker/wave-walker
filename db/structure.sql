@@ -178,7 +178,8 @@ CREATE TABLE public.asset_pairs (
     name character varying NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    importing boolean DEFAULT false NOT NULL
+    importing boolean DEFAULT false NOT NULL,
+    name_on_exchange character varying NOT NULL
 );
 
 
@@ -735,6 +736,7 @@ ALTER TABLE ONLY public.active_storage_attachments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240328144026'),
 ('20240326132858'),
 ('20240324052444'),
 ('20240323123105'),
