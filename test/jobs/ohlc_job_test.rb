@@ -8,10 +8,10 @@ class OhlcJobTest < ActiveJob::TestCase
     asset_pair = asset_pairs(:atomusd)
     timeframes = Ohlc.timeframes.keys
 
+    OhlcJob.enqueue_for_all_timeframes(asset_pair, last_imported_at)
+
     timeframes.each do |timeframe|
-      assert_enqueued_with(job: OhlcJob, args: [asset_pair, timeframe, last_imported_at]) do
-        OhlcJob.enqueue_for_all_timeframes(asset_pair, last_imported_at)
-      end
+      assert_enqueued_with(job: OhlcJob, args: [{asset_pair:, timeframe:, last_imported_at:}])
     end
   end
 
