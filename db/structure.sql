@@ -577,6 +577,13 @@ CREATE UNIQUE INDEX index_asset_pairs_on_name ON public.asset_pairs USING btree 
 
 
 --
+-- Name: index_asset_pairs_on_name_on_exchange; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_asset_pairs_on_name_on_exchange ON public.asset_pairs USING btree (name_on_exchange);
+
+
+--
 -- Name: index_good_job_executions_on_active_job_id_and_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
