@@ -8,21 +8,28 @@ class TradeImportJob < ApplicationJob
 
   retry_on Kraken::RateLimitExceeded, wait: 5.seconds, attempts: 10
 
-  on_complete do |job|
-    OhlcJob.enqueue_for_all_timeframes(job.arguments.first, 3.seconds.ago)
+  good_job_control_concurrency_with(total_limit: 1)
+
+  def build_enumerator(cursor:)
+    enumerator_builder.nested(
+      [
+        ->(asser_cursor) { enumerator_builder.active_record_on_records(AssetPair.importing, cursor: asser_cursor) },
+        ->(asset_pair, trades_cursor) { KrakenTradesEnumerator.call(asset_pair, cursor: trades_cursor) }
+      ],
+      cursor:
+    )
   end
 
-  good_job_control_concurrency_with(perform_limit: 1)
+  def each_iteration(args)
+    asset_pair = args.fetch(:asset_pair)
+    trades = args.fetch(:trades)
 
-  def build_enumerator(asset_pair, cursor:)
-    cursor ||= asset_pair.trades.maximum(:created_at)
-    KrakenTradesEnumerator.call(asset_pair, cursor:)
-  end
-
-  def each_iteration(trades, asset_pair)
     trades_params = trades.reject { |trade| trade.id.zero? }
                           .map { |trade| trade.to_h.merge(asset_pair_id: asset_pair.id) }
 
-    Trade.upsert_all(trades_params) # rubocop:disable Rails/SkipsModelValidations
+    ActiveRecord::Base.transaction do
+      asset_pair.update!(imported_until: Time.current)
+      Trade.upsert_all(trades_params) # rubocop:disable Rails/SkipsModelValidations
+    end
   end
 end

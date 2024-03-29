@@ -11,7 +11,7 @@ class KrakenTradesEnumerator
 
   def initialize(asset_pair, cursor:)
     @asset_pair = asset_pair
-    @cursor = cursor.to_i
+    @cursor = cursor
   end
 
   def each
@@ -19,17 +19,21 @@ class KrakenTradesEnumerator
       trades = load_trades
       break if trades.empty?
 
-      yield trades, cursor
+      yield({ asset_pair:, trades: }, cursor)
     end
   end
 
   private
 
   attr_reader :asset_pair
-  attr_accessor :cursor
+  attr_writer :cursor
+
+  def cursor
+    @cursor ||= asset_pair.trades.last&.created_at.to_i
+  end
 
   def load_trades
-    response = Kraken.trades(pair: asset_pair.name, since: cursor)
+    response = Kraken.trades(pair: asset_pair.name_on_exchange, since: cursor)
     self.cursor = response.fetch(:last)
 
     response.fetch(:trades)

@@ -3,20 +3,9 @@
 require 'test_helper'
 
 class OhlcJobTest < ActiveJob::TestCase
-  test '.enqueue_for_all_timeframes, enqueues the OHLC for all timeframes' do
-    last_imported_at = 1.minute.ago
-    asset_pair = asset_pairs(:atomusd)
-    timeframes = Ohlc.timeframes.keys
-
-    OhlcJob.enqueue_for_all_timeframes(asset_pair, last_imported_at)
-
-    timeframes.each do |timeframe|
-      assert_enqueued_with(job: OhlcJob, args: [{ asset_pair:, timeframe:, last_imported_at: }])
-    end
-  end
-
   test '#perform, creates the inital OHLC' do
     asset_pair = asset_pairs(:atomusd)
+    asset_pair.update!(imported_until: Time.current)
 
     PartitionService.call(asset_pair)
 
@@ -35,7 +24,7 @@ class OhlcJobTest < ActiveJob::TestCase
     )
 
     assert_difference 'Ohlc.count', 2 do
-      OhlcJob.perform_now(asset_pair:, timeframe: 'PT1H', last_imported_at: Time.current)
+      OhlcJob.perform_now(asset_pair:, timeframe: 'PT1H')
     end
   end
 

@@ -11,26 +11,13 @@ class TradeImportJobTest < ActiveJob::TestCase
     KrakenTradesEnumerator.reset_load_trades_limit!
   end
 
-  test 'enquest trade analyzation after import is completed' do
-    freeze_time
-    asset_pair = asset_pairs(:atomusd)
+  test '#perform, should import trades for all imorting asset_pairs' do
+    asset_pairs(:btcusd).update!(importing: true)
 
-    Kraken.stubs(:trades).with(pair: 'ATOMUSD', since: 0).returns(trades: [], last: 1).once
+    Kraken.expects(:trades).with(pair: 'ATOMUSD', since: 0).returns(trades: [], last: 1)
+    Kraken.expects(:trades).with(pair: 'XBTUSD', since: 0).returns(trades: [], last: 1)
 
-    OhlcJob.expects(:enqueue_for_all_timeframes).with(asset_pair, 3.seconds.ago)
-
-    TradeImportJob.perform_now(asset_pair)
-  end
-
-  test 'dose not enquest trade analyzation when interrupted' do
-    asset_pair = asset_pairs(:atomusd)
-    trades = [Kraken::Trade.new(1, 2, 3, 's', 'l', 'foo bar', 7)]
-
-    iterate_once
-    Kraken.stubs(:trades).with(pair: 'ATOMUSD', since: 0).returns(trades:, last: 1).once
-    OhlcJob.expects(:enqueue_for_all_timeframes).with(asset_pair, 3.seconds.ago).never
-
-    TradeImportJob.perform_now(asset_pair)
+    TradeImportJob.perform_now
   end
 
   test '#perfrom, should import trades with correct params' do
@@ -40,9 +27,7 @@ class TradeImportJobTest < ActiveJob::TestCase
     Kraken.expects(:trades).with(pair: 'ATOMUSD', since: 0).returns(trades:, last: 1)
     Kraken.expects(:trades).with(pair: 'ATOMUSD', since: 1).returns(trades: [], last: 2)
 
-    assert_difference 'asset_pair.trades.count', 1 do
-      TradeImportJob.perform_now(asset_pair)
-    end
+    assert_changes(-> { asset_pair.trades.count }, 1) { TradeImportJob.perform_now }
 
     trade = Trade.find_by!(asset_pair_id: asset_pairs(:atomusd).id, id: 7)
 
@@ -57,40 +42,10 @@ class TradeImportJobTest < ActiveJob::TestCase
 
   test '#perform, should retry on Kraken::TooManyRequests' do
     Kraken.stub(:trades, ->(_) { raise Kraken::RateLimitExceeded }) do
-      assert_enqueued_with(job: TradeImportJob, args: [asset_pairs(:atomusd)]) do
-        TradeImportJob.perform_now(asset_pairs(:atomusd))
+      assert_enqueued_with(job: TradeImportJob) do
+        TradeImportJob.perform_now
       end
     end
-  end
-
-  test 'build_enumerator, sets no cursor if no previous trades exsite' do
-    asset_pair = asset_pairs(:atomusd)
-
-    KrakenTradesEnumerator.expects(:call).with(asset_pair, cursor: nil)
-
-    TradeImportJob.new.build_enumerator(asset_pair, cursor: nil)
-  end
-
-  test 'build_enumerator, sets cursor if previous trades exsite' do
-    asset_pair = asset_pairs(:atomusd)
-    traded_at = 1.month.ago
-
-    Trade.create!(
-      id: [asset_pair.id, 1],
-      price: 1,
-      volume: 1,
-      action: 'buy',
-      order_type: 'market',
-      misc: 'foo bar',
-      created_at: traded_at
-    )
-
-    KrakenTradesEnumerator.expects(:call).with do |record, args|
-      assert_equal record, asset_pair
-      assert_in_delta args.fetch(:cursor), traded_at, 0.1.seconds
-    end
-
-    TradeImportJob.new.build_enumerator(asset_pair, cursor: nil)
   end
 
   # I guess this trades are not valid ... I need to check this
@@ -99,7 +54,7 @@ class TradeImportJobTest < ActiveJob::TestCase
     trades = [Kraken::Trade.new(1, 2, 3, 's', 'l', 'foo bar', 0)]
 
     assert_no_changes -> { Trade.count } do
-      TradeImportJob.new.each_iteration(trades, asset_pair)
+      TradeImportJob.new.each_iteration({ trades:, asset_pair: })
     end
   end
 
@@ -121,7 +76,18 @@ class TradeImportJobTest < ActiveJob::TestCase
     ]
 
     assert_difference 'asset_pair.trades.count', 1 do
-      TradeImportJob.new.each_iteration(trades, asset_pair)
+      TradeImportJob.new.each_iteration({ trades:, asset_pair: })
+    end
+  end
+
+  test '#each_iteration, records the import progress' do
+    freeze_time
+
+    trades = [Kraken::Trade.new(1, 2, 3, 's', 'l', 'foo bar', 1)]
+    asset_pair = asset_pairs(:atomusd)
+
+    assert_changes -> { asset_pair.reload.imported_until }, to: Time.current do
+      TradeImportJob.new.each_iteration({ trades:, asset_pair: })
     end
   end
 end
