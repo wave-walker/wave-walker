@@ -48,8 +48,13 @@ module WaveWalker
       },
       asset_pair_sync_task: {
         cron: '*/5 * * * *',
-        class: 'AssetPairSyncJob',
-        description: 'Initialize the asset pairs trade sync.'
+        class: 'TradeImportJob',
+        description: 'Get latest Kraken trades.'
+      },
+      schedual_ohlc_generation_task: {
+        cron: '*/5 * * * *',
+        class: 'TriggerOhlcGenerationJob',
+        description: 'Schedual OHCL creation until the latest import.'
       }
     }
   end

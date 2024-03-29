@@ -3,10 +3,9 @@
 class OhlcRangeEnumerator
   def self.call(**) = new(**).to_enum(:each).lazy
 
-  def initialize(asset_pair:, timeframe:, last_imported_at:, cursor: nil)
+  def initialize(asset_pair:, timeframe:, cursor: nil)
     @asset_pair = asset_pair
     @timeframe = timeframe
-    @last_imported_at = last_imported_at
     @cursor = cursor
   end
 
@@ -20,10 +19,10 @@ class OhlcRangeEnumerator
 
   private
 
-  attr_reader :asset_pair, :timeframe, :last_imported_at
+  attr_reader :asset_pair, :timeframe
   attr_writer :cursor
 
-  def after_last_import? = cursor.end > last_imported_at
+  def after_last_import? = cursor.end > asset_pair.imported_until - 10.seconds
 
   def cursor
     @cursor ||= Ohlc::Range.next_new_range(asset_pair:, timeframe:)
