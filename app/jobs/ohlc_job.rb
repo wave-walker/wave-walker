@@ -13,7 +13,7 @@ class OhlcJob < ApplicationJob
 
   def self.enqueue_for_all_timeframes(asset_pair, last_imported_at)
     Ohlc.timeframes.each_key do |timeframe|
-      perform_later(asset_pair, timeframe, last_imported_at)
+      perform_later(asset_pair:, timeframe:, last_imported_at:)
     end
   end
 
