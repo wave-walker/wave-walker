@@ -10,7 +10,6 @@ gem 'good_job'
 gem 'importmap-rails'
 gem 'jbuilder'
 gem 'job-iteration'
-gem 'mocha'
 gem 'pg'
 gem 'propshaft'
 gem 'puma'
@@ -38,6 +37,7 @@ end
 
 group :test do
   gem 'capybara'
+  gem 'mocha'
   gem 'selenium-webdriver'
   gem 'webmock'
 end
