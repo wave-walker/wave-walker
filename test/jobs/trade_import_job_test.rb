@@ -41,10 +41,10 @@ class TradeImportJobTest < ActiveJob::TestCase
   end
 
   test '#perform, should retry on Kraken::TooManyRequests' do
-    Kraken.stub(:trades, ->(_) { raise Kraken::RateLimitExceeded }) do
-      assert_enqueued_with(job: TradeImportJob) do
-        TradeImportJob.perform_now
-      end
+    Kraken.stubs(:trades).raises(Kraken::RateLimitExceeded)
+
+    assert_enqueued_with(job: TradeImportJob) do
+      TradeImportJob.perform_now
     end
   end
 
