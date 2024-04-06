@@ -4,7 +4,7 @@ require 'test_helper'
 
 class TriggerOhlcGenerationJobTest < ActiveJob::TestCase
   test 'enqueus OHLC creation for all assert paris' do
-    timeframes = Ohlc.timeframes.keys
+    durations = Ohlc.durations.keys
     atomusd = asset_pairs(:atomusd)
     btcusd = asset_pairs(:btcusd)
     atomusd.update!(imported_until: Time.current)
@@ -12,9 +12,9 @@ class TriggerOhlcGenerationJobTest < ActiveJob::TestCase
 
     TriggerOhlcGenerationJob.perform_now
 
-    timeframes.each do |timeframe|
-      assert_enqueued_with(job: OhlcJob, args: [{ asset_pair: atomusd, timeframe: }])
-      assert_enqueued_with(job: OhlcJob, args: [{ asset_pair: btcusd, timeframe: }])
+    durations.each do |duration|
+      assert_enqueued_with(job: OhlcJob, args: [{ asset_pair: atomusd, duration: }])
+      assert_enqueued_with(job: OhlcJob, args: [{ asset_pair: btcusd, duration: }])
     end
   end
 

@@ -319,7 +319,7 @@ CREATE TABLE public.ohlcs (
     id bigint NOT NULL,
     asset_pair_id bigint NOT NULL,
     start_at timestamp(6) without time zone NOT NULL,
-    timeframe public.timeframe NOT NULL,
+    duration public.timeframe NOT NULL,
     open double precision NOT NULL,
     high double precision NOT NULL,
     low double precision NOT NULL,
@@ -744,6 +744,7 @@ ALTER TABLE ONLY public.active_storage_attachments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240406140027'),
 ('20240329105130'),
 ('20240328144026'),
 ('20240326132858'),

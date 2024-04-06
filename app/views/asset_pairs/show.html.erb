@@ -8,14 +8,14 @@
   <nav>
     <details class="dropdown">
       <summary>
-        <%= @timeframe %>
+        <%= @duration %>
       </summary>
       <ul dir="rtl">
-        <% Ohlc.timeframes.values.each do |timeframe| %>
-          <li><%= link_to(timeframe, asset_pair_path(@asset_pair, timeframe:)) %></li>
+        <% Ohlc.durations.values.each do |duration| %>
+          <li><%= link_to(duration, asset_pair_path(@asset_pair, duration:)) %></li>
         <% end %>
       </ul>
     </details>
   </nav>
 
-  <%= render AssetPairChartComponent.new(asset_pair: @asset_pair, timeframe: @timeframe) %>
+  <%= render AssetPairChartComponent.new(asset_pair: @asset_pair, duration: @duration) %>

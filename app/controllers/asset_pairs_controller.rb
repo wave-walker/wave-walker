@@ -7,6 +7,6 @@ class AssetPairsController < ApplicationController
 
   def show
     @asset_pair = AssetPair.find(params[:id])
-    @timeframe = params[:timeframe] || 'P1D'
+    @duration = params[:duration] || 'P1D'
   end
 end

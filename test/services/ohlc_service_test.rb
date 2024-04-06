@@ -9,11 +9,11 @@ class OhlcServiceTest < ActiveSupport::TestCase
 
   test '.create_from_trades, when no trades exists' do
     asset_pair = asset_pairs(:atomusd)
-    timeframe = :PT1H
-    range = Ohlc::Range.new(timeframe, Time.current)
+    duration = 'PT1H'
+    range = OhlcRangeValue.at(duration:, time: Time.current)
 
     Ohlc.create!(asset_pair:, high: 1, low: 2, open: 3, close: 4, volume: 1,
-                 timeframe:, start_at: range.begin)
+                 duration:, start_at: range.begin)
 
     ohlc = OhlcService.call(asset_pair:, range: range.next)
 
@@ -22,15 +22,15 @@ class OhlcServiceTest < ActiveSupport::TestCase
     assert_equal ohlc.open, 4
     assert_equal ohlc.close, 4
     assert_equal ohlc.volume, 0
-    assert_equal ohlc.timeframe, 'PT1H'
+    assert_equal ohlc.duration, 'PT1H'
     assert_equal ohlc.start_at, range.next.begin
   end
 
-  test '.call, should create OHLC with trades in timeframe' do
+  test '.call, should create OHLC with trades in duration' do
     freeze_time
 
     asset_pair = asset_pairs(:atomusd)
-    range = Ohlc::Range.new('PT1H', 1.hour.ago)
+    range = OhlcRangeValue.at(duration: 'PT1H', time: 1.hour.ago)
 
     Trade.create!(id: [asset_pair.id, 1], price: 1, volume: 1, created_at: range.first - 1.second,
                   action: :buy, order_type: :limit, misc: '')
@@ -53,7 +53,7 @@ class OhlcServiceTest < ActiveSupport::TestCase
     ohlc = OhlcService.call(asset_pair:, range:)
 
     assert_equal 1.hour.ago.beginning_of_hour, ohlc.start_at
-    assert_equal 'PT1H', ohlc.timeframe
+    assert_equal 'PT1H', ohlc.duration
     assert_equal 3, ohlc.open
     assert_equal 5, ohlc.high
     assert_equal 2, ohlc.low
@@ -62,9 +62,9 @@ class OhlcServiceTest < ActiveSupport::TestCase
     assert_equal asset_pair, ohlc.asset_pair
   end
 
-  test 'should not create OHLC without trades in timeframe' do
+  test 'should not create OHLC without trades in duration' do
     asset_pair = asset_pairs(:atomusd)
-    range = Ohlc::Range.new('PT1H', 1.hour.ago)
+    range = OhlcRangeValue.at(duration: 'PT1H', time: 1.hour.ago)
 
     ohlc = OhlcService.call(asset_pair:, range:)
 
