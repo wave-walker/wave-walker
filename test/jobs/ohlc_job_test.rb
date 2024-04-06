@@ -24,12 +24,12 @@ class OhlcJobTest < ActiveJob::TestCase
     )
 
     assert_difference 'Ohlc.count', 2 do
-      OhlcJob.perform_now(asset_pair:, timeframe: 'PT1H')
+      OhlcJob.perform_now(asset_pair:, duration: 'PT1H')
     end
   end
 
   test '#each_iteration, creates the smoothed trend with the new ohlc' do
-    range = Ohlc::Range.new('P1D', Time.current)
+    range = OhlcRangeValue.at(duration: 'P1D', time: Time.current)
     asset_pair = AssetPair.new
     ohlc = Ohlc.new
 

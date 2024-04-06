@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 class OhlcChart
-  def initialize(asset_pair:, timeframe:)
+  def initialize(asset_pair:, duration:)
     @asset_pair = asset_pair
-    @timeframe = timeframe
+    @duration = duration
   end
 
-  def name = "#{asset_pair.name} - #{timeframe}"
+  def name = "#{asset_pair.name} - #{duration}"
 
   def candlestick_series
     ohlcs.map do |ohlc|
@@ -29,7 +29,7 @@ class OhlcChart
 
   private
 
-  attr_reader :asset_pair, :timeframe
+  attr_reader :asset_pair, :duration
 
-  def ohlcs = Ohlc.where(asset_pair:, timeframe:).last(300)
+  def ohlcs = Ohlc.where(asset_pair:, duration:).last(300)
 end

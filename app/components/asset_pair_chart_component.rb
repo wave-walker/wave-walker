@@ -7,9 +7,9 @@ class AssetPairChartComponent < ViewComponent::Base
     'neutral' => '#808080'
   }.freeze
 
-  def initialize(asset_pair:, timeframe:)
+  def initialize(asset_pair:, duration:)
     @asset_pair = asset_pair
-    @timeframe = timeframe
+    @duration = duration
     super
   end
 
@@ -18,7 +18,7 @@ class AssetPairChartComponent < ViewComponent::Base
   end
 
   def tile
-    "#{asset_pair.name} #{timeframe}"
+    "#{asset_pair.name} #{duration}"
   end
 
   def candlestick_series
@@ -65,7 +65,7 @@ class AssetPairChartComponent < ViewComponent::Base
 
   private
 
-  attr_reader :asset_pair, :timeframe
+  attr_reader :asset_pair, :duration
 
-  def ohlcs = Ohlc.where(asset_pair:, timeframe:).includes(:smoothed_trend).last(300)
+  def ohlcs = Ohlc.where(asset_pair:, duration:).includes(:smoothed_trend).last(300)
 end

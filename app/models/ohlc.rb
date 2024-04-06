@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Ohlc < ApplicationRecord
-  enum timeframe: {
+  enum duration: {
     PT1H: 'PT1H',
     PT4H: 'PT4H',
     PT8H: 'PT8H',
@@ -18,10 +18,10 @@ class Ohlc < ApplicationRecord
   def hl2 = (high + low) / 2
 
   def previous_ohlcs
-    self.class.where(id: ...id, asset_pair:, timeframe:).order(id: :desc)
+    self.class.where(id: ...id, asset_pair:, duration:).order(id: :desc)
   end
 
   def range
-    @range ||= Range.new(timeframe, start_at)
+    @range ||= OhlcRangeValue.at(duration:, time: start_at)
   end
 end
