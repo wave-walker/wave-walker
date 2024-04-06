@@ -11,14 +11,14 @@ class OhlcService
   def call
     return if trades.empty? && previous_close.blank?
 
-    Ohlc.create!(open:, close:, high:, low:, volume:, duration:, asset_pair:, start_at:)
+    Ohlc.create!(open:, close:, high:, low:, volume:, duration:, asset_pair:, range_position:)
   end
 
   private
 
   attr_reader :asset_pair, :range
 
-  def start_at = range.first
+  def range_position = range.position
   def duration = range.duration.iso8601
   def trades = @trades ||= asset_pair.trades.where(created_at: range).load
   def open = trades.first&.price || previous_close

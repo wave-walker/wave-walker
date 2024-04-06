@@ -30,7 +30,7 @@ class NextNewOhlcRangeValueServiceTest < ActiveSupport::TestCase
 
     ohlc_range = OhlcRangeValue.at(time: 3.hours.ago, duration:)
 
-    Ohlc.create!(asset_pair:, start_at: ohlc_range.begin, duration:,
+    Ohlc.create!(asset_pair:, range_position: ohlc_range.position, duration:,
                  open: 1, high: 1, low: 1, close: 1, volume: 1)
     expected_range = OhlcRangeValue.at(time: 2.hours.ago, duration:)
 

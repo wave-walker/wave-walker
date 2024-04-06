@@ -12,16 +12,17 @@ class Ohlc < ApplicationRecord
 
   belongs_to :asset_pair
 
-  has_many :smoothed_moving_avrages, dependent: :destroy
-  has_one :smoothed_trend, dependent: :destroy
+  has_one :smoothed_trend, query_constraints: %i[asset_pair_id duration range_position],
+                           dependent: :restrict_with_exception
 
   def hl2 = (high + low) / 2
 
   def previous_ohlcs
-    self.class.where(id: ...id, asset_pair:, duration:).order(id: :desc)
+    self.class.where(range_position: ...range_position, asset_pair:, duration:)
+        .order(range_position: :desc)
   end
 
   def range
-    @range ||= OhlcRangeValue.at(duration:, time: start_at)
+    @range ||= OhlcRangeValue.new(duration:, position: range_position)
   end
 end

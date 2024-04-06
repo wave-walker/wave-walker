@@ -10,7 +10,7 @@ class SmoothedTrendService
   def call
     ActiveRecord::Base.transaction do
       create_smmas
-      SmoothedTrend.create!(ohlc:, fast_smma:, slow_smma:, trend:) if valid?
+      SmoothedTrend.create!(id: ohlc.id, fast_smma:, slow_smma:, trend:) if valid?
     end
   end
 

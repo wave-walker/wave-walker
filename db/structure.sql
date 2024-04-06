@@ -170,6 +170,150 @@ CREATE TABLE public.ar_internal_metadata (
 
 
 --
+-- Name: ohlcs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.ohlcs (
+    asset_pair_id bigint NOT NULL,
+    duration public.timeframe NOT NULL,
+    range_position bigint NOT NULL,
+    open double precision NOT NULL,
+    high double precision NOT NULL,
+    low double precision NOT NULL,
+    close double precision NOT NULL,
+    volume double precision NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+)
+PARTITION BY LIST (asset_pair_id);
+
+
+--
+-- Name: asset_pair_1_ohlcs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.asset_pair_1_ohlcs (
+    asset_pair_id bigint NOT NULL,
+    duration public.timeframe NOT NULL,
+    range_position bigint NOT NULL,
+    open double precision NOT NULL,
+    high double precision NOT NULL,
+    low double precision NOT NULL,
+    close double precision NOT NULL,
+    volume double precision NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: smoothed_moving_averages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.smoothed_moving_averages (
+    asset_pair_id bigint NOT NULL,
+    duration public.timeframe NOT NULL,
+    range_position bigint NOT NULL,
+    "interval" integer NOT NULL,
+    value double precision NOT NULL,
+    created_at timestamp without time zone NOT NULL
+)
+PARTITION BY LIST (asset_pair_id);
+
+
+--
+-- Name: asset_pair_1_smoothed_moving_averages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.asset_pair_1_smoothed_moving_averages (
+    asset_pair_id bigint NOT NULL,
+    duration public.timeframe NOT NULL,
+    range_position bigint NOT NULL,
+    "interval" integer NOT NULL,
+    value double precision NOT NULL,
+    created_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: smoothed_trends; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.smoothed_trends (
+    asset_pair_id bigint NOT NULL,
+    duration public.timeframe NOT NULL,
+    range_position bigint NOT NULL,
+    fast_smma double precision NOT NULL,
+    slow_smma double precision NOT NULL,
+    trend public.trend NOT NULL,
+    created_at timestamp without time zone NOT NULL
+)
+PARTITION BY LIST (asset_pair_id);
+
+
+--
+-- Name: asset_pair_1_smoothed_trends; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.asset_pair_1_smoothed_trends (
+    asset_pair_id bigint NOT NULL,
+    duration public.timeframe NOT NULL,
+    range_position bigint NOT NULL,
+    fast_smma double precision NOT NULL,
+    slow_smma double precision NOT NULL,
+    trend public.trend NOT NULL,
+    created_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: asset_pair_2_ohlcs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.asset_pair_2_ohlcs (
+    asset_pair_id bigint NOT NULL,
+    duration public.timeframe NOT NULL,
+    range_position bigint NOT NULL,
+    open double precision NOT NULL,
+    high double precision NOT NULL,
+    low double precision NOT NULL,
+    close double precision NOT NULL,
+    volume double precision NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: asset_pair_2_smoothed_moving_averages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.asset_pair_2_smoothed_moving_averages (
+    asset_pair_id bigint NOT NULL,
+    duration public.timeframe NOT NULL,
+    range_position bigint NOT NULL,
+    "interval" integer NOT NULL,
+    value double precision NOT NULL,
+    created_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: asset_pair_2_smoothed_trends; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.asset_pair_2_smoothed_trends (
+    asset_pair_id bigint NOT NULL,
+    duration public.timeframe NOT NULL,
+    range_position bigint NOT NULL,
+    fast_smma double precision NOT NULL,
+    slow_smma double precision NOT NULL,
+    trend public.trend NOT NULL,
+    created_at timestamp without time zone NOT NULL
+);
+
+
+--
 -- Name: asset_pairs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -299,74 +443,11 @@ CREATE TABLE public.good_jobs (
 
 
 --
--- Name: smoothed_trends; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.smoothed_trends (
-    ohlc_id bigint NOT NULL,
-    fast_smma double precision NOT NULL,
-    slow_smma double precision NOT NULL,
-    trend public.trend NOT NULL,
-    created_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: ohlcs; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.ohlcs (
-    id bigint NOT NULL,
-    asset_pair_id bigint NOT NULL,
-    start_at timestamp(6) without time zone NOT NULL,
-    duration public.timeframe NOT NULL,
-    open double precision NOT NULL,
-    high double precision NOT NULL,
-    low double precision NOT NULL,
-    close double precision NOT NULL,
-    volume double precision NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
--- Name: ohlcs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.ohlcs_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: ohlcs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.ohlcs_id_seq OWNED BY public.ohlcs.id;
-
-
---
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.schema_migrations (
     version character varying NOT NULL
-);
-
-
---
--- Name: smoothed_moving_averages; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.smoothed_moving_averages (
-    ohlc_id bigint NOT NULL,
-    "interval" integer NOT NULL,
-    value double precision NOT NULL,
-    created_at timestamp without time zone NOT NULL
 );
 
 
@@ -385,6 +466,48 @@ CREATE TABLE public.trades (
     misc character varying NOT NULL
 )
 PARTITION BY LIST (asset_pair_id);
+
+
+--
+-- Name: asset_pair_1_ohlcs; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ohlcs ATTACH PARTITION public.asset_pair_1_ohlcs FOR VALUES IN ('1');
+
+
+--
+-- Name: asset_pair_1_smoothed_moving_averages; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.smoothed_moving_averages ATTACH PARTITION public.asset_pair_1_smoothed_moving_averages FOR VALUES IN ('1');
+
+
+--
+-- Name: asset_pair_1_smoothed_trends; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.smoothed_trends ATTACH PARTITION public.asset_pair_1_smoothed_trends FOR VALUES IN ('1');
+
+
+--
+-- Name: asset_pair_2_ohlcs; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ohlcs ATTACH PARTITION public.asset_pair_2_ohlcs FOR VALUES IN ('2');
+
+
+--
+-- Name: asset_pair_2_smoothed_moving_averages; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.smoothed_moving_averages ATTACH PARTITION public.asset_pair_2_smoothed_moving_averages FOR VALUES IN ('2');
+
+
+--
+-- Name: asset_pair_2_smoothed_trends; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.smoothed_trends ATTACH PARTITION public.asset_pair_2_smoothed_trends FOR VALUES IN ('2');
 
 
 --
@@ -413,13 +536,6 @@ ALTER TABLE ONLY public.active_storage_variant_records ALTER COLUMN id SET DEFAU
 --
 
 ALTER TABLE ONLY public.asset_pairs ALTER COLUMN id SET DEFAULT nextval('public.asset_pairs_id_seq'::regclass);
-
-
---
--- Name: ohlcs id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.ohlcs ALTER COLUMN id SET DEFAULT nextval('public.ohlcs_id_seq'::regclass);
 
 
 --
@@ -452,6 +568,78 @@ ALTER TABLE ONLY public.active_storage_variant_records
 
 ALTER TABLE ONLY public.ar_internal_metadata
     ADD CONSTRAINT ar_internal_metadata_pkey PRIMARY KEY (key);
+
+
+--
+-- Name: ohlcs ohlcs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ohlcs
+    ADD CONSTRAINT ohlcs_pkey PRIMARY KEY (asset_pair_id, duration, range_position);
+
+
+--
+-- Name: asset_pair_1_ohlcs asset_pair_1_ohlcs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.asset_pair_1_ohlcs
+    ADD CONSTRAINT asset_pair_1_ohlcs_pkey PRIMARY KEY (asset_pair_id, duration, range_position);
+
+
+--
+-- Name: smoothed_moving_averages smoothed_moving_averages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.smoothed_moving_averages
+    ADD CONSTRAINT smoothed_moving_averages_pkey PRIMARY KEY (asset_pair_id, duration, range_position, "interval");
+
+
+--
+-- Name: asset_pair_1_smoothed_moving_averages asset_pair_1_smoothed_moving_averages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.asset_pair_1_smoothed_moving_averages
+    ADD CONSTRAINT asset_pair_1_smoothed_moving_averages_pkey PRIMARY KEY (asset_pair_id, duration, range_position, "interval");
+
+
+--
+-- Name: smoothed_trends smoothed_trends_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.smoothed_trends
+    ADD CONSTRAINT smoothed_trends_pkey PRIMARY KEY (asset_pair_id, duration, range_position);
+
+
+--
+-- Name: asset_pair_1_smoothed_trends asset_pair_1_smoothed_trends_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.asset_pair_1_smoothed_trends
+    ADD CONSTRAINT asset_pair_1_smoothed_trends_pkey PRIMARY KEY (asset_pair_id, duration, range_position);
+
+
+--
+-- Name: asset_pair_2_ohlcs asset_pair_2_ohlcs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.asset_pair_2_ohlcs
+    ADD CONSTRAINT asset_pair_2_ohlcs_pkey PRIMARY KEY (asset_pair_id, duration, range_position);
+
+
+--
+-- Name: asset_pair_2_smoothed_moving_averages asset_pair_2_smoothed_moving_averages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.asset_pair_2_smoothed_moving_averages
+    ADD CONSTRAINT asset_pair_2_smoothed_moving_averages_pkey PRIMARY KEY (asset_pair_id, duration, range_position, "interval");
+
+
+--
+-- Name: asset_pair_2_smoothed_trends asset_pair_2_smoothed_trends_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.asset_pair_2_smoothed_trends
+    ADD CONSTRAINT asset_pair_2_smoothed_trends_pkey PRIMARY KEY (asset_pair_id, duration, range_position);
 
 
 --
@@ -503,35 +691,11 @@ ALTER TABLE ONLY public.good_jobs
 
 
 --
--- Name: smoothed_trends smoothed_trends_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.smoothed_trends
-    ADD CONSTRAINT smoothed_trends_pkey PRIMARY KEY (ohlc_id);
-
-
---
--- Name: ohlcs ohlcs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.ohlcs
-    ADD CONSTRAINT ohlcs_pkey PRIMARY KEY (id);
-
-
---
 -- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
-
-
---
--- Name: smoothed_moving_averages smoothed_moving_averages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.smoothed_moving_averages
-    ADD CONSTRAINT smoothed_moving_averages_pkey PRIMARY KEY (ohlc_id, "interval");
 
 
 --
@@ -683,18 +847,61 @@ CREATE INDEX index_good_jobs_on_scheduled_at ON public.good_jobs USING btree (sc
 
 
 --
--- Name: index_ohlcs_on_asset_pair_id; Type: INDEX; Schema: public; Owner: -
+-- Name: asset_pair_1_ohlcs_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
 --
 
-CREATE INDEX index_ohlcs_on_asset_pair_id ON public.ohlcs USING btree (asset_pair_id);
+ALTER INDEX public.ohlcs_pkey ATTACH PARTITION public.asset_pair_1_ohlcs_pkey;
+
+
+--
+-- Name: asset_pair_1_smoothed_moving_averages_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.smoothed_moving_averages_pkey ATTACH PARTITION public.asset_pair_1_smoothed_moving_averages_pkey;
+
+
+--
+-- Name: asset_pair_1_smoothed_trends_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.smoothed_trends_pkey ATTACH PARTITION public.asset_pair_1_smoothed_trends_pkey;
+
+
+--
+-- Name: asset_pair_2_ohlcs_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.ohlcs_pkey ATTACH PARTITION public.asset_pair_2_ohlcs_pkey;
+
+
+--
+-- Name: asset_pair_2_smoothed_moving_averages_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.smoothed_moving_averages_pkey ATTACH PARTITION public.asset_pair_2_smoothed_moving_averages_pkey;
+
+
+--
+-- Name: asset_pair_2_smoothed_trends_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.smoothed_trends_pkey ATTACH PARTITION public.asset_pair_2_smoothed_trends_pkey;
 
 
 --
 -- Name: ohlcs fk_rails_053bf281dc; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.ohlcs
+ALTER TABLE public.ohlcs
     ADD CONSTRAINT fk_rails_053bf281dc FOREIGN KEY (asset_pair_id) REFERENCES public.asset_pairs(id);
+
+
+--
+-- Name: smoothed_trends fk_rails_2379cb27be; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE public.smoothed_trends
+    ADD CONSTRAINT fk_rails_2379cb27be FOREIGN KEY (asset_pair_id, duration, range_position) REFERENCES public.ohlcs(asset_pair_id, duration, range_position);
 
 
 --
@@ -706,19 +913,11 @@ ALTER TABLE public.trades
 
 
 --
--- Name: smoothed_moving_averages fk_rails_4a1da101c3; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: smoothed_moving_averages fk_rails_8983b830fb; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.smoothed_moving_averages
-    ADD CONSTRAINT fk_rails_4a1da101c3 FOREIGN KEY (ohlc_id) REFERENCES public.ohlcs(id);
-
-
---
--- Name: smoothed_trends fk_rails_58254639e3; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.smoothed_trends
-    ADD CONSTRAINT fk_rails_58254639e3 FOREIGN KEY (ohlc_id) REFERENCES public.ohlcs(id);
+ALTER TABLE public.smoothed_moving_averages
+    ADD CONSTRAINT fk_rails_8983b830fb FOREIGN KEY (asset_pair_id, duration, range_position) REFERENCES public.ohlcs(asset_pair_id, duration, range_position);
 
 
 --
@@ -730,11 +929,27 @@ ALTER TABLE ONLY public.active_storage_variant_records
 
 
 --
+-- Name: smoothed_moving_averages fk_rails_a68fdc006c; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE public.smoothed_moving_averages
+    ADD CONSTRAINT fk_rails_a68fdc006c FOREIGN KEY (asset_pair_id) REFERENCES public.asset_pairs(id);
+
+
+--
 -- Name: active_storage_attachments fk_rails_c3b3935057; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.active_storage_attachments
     ADD CONSTRAINT fk_rails_c3b3935057 FOREIGN KEY (blob_id) REFERENCES public.active_storage_blobs(id);
+
+
+--
+-- Name: smoothed_trends fk_rails_df50212b75; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE public.smoothed_trends
+    ADD CONSTRAINT fk_rails_df50212b75 FOREIGN KEY (asset_pair_id) REFERENCES public.asset_pairs(id);
 
 
 --
@@ -744,6 +959,7 @@ ALTER TABLE ONLY public.active_storage_attachments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240406151935'),
 ('20240406140027'),
 ('20240329105130'),
 ('20240328144026'),
