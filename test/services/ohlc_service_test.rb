@@ -13,7 +13,7 @@ class OhlcServiceTest < ActiveSupport::TestCase
     range = OhlcRangeValue.at(duration:, time: Time.current)
 
     Ohlc.create!(asset_pair:, high: 1, low: 2, open: 3, close: 4, volume: 1,
-                 duration:, start_at: range.begin)
+                 duration:, range_position: range.position)
 
     ohlc = OhlcService.call(asset_pair:, range: range.next)
 
@@ -23,7 +23,7 @@ class OhlcServiceTest < ActiveSupport::TestCase
     assert_equal ohlc.close, 4
     assert_equal ohlc.volume, 0
     assert_equal ohlc.duration, 'PT1H'
-    assert_equal ohlc.start_at, range.next.begin
+    assert_equal ohlc.range_position, range.next.position
   end
 
   test '.call, should create OHLC with trades in duration' do
@@ -52,7 +52,7 @@ class OhlcServiceTest < ActiveSupport::TestCase
 
     ohlc = OhlcService.call(asset_pair:, range:)
 
-    assert_equal 1.hour.ago.beginning_of_hour, ohlc.start_at
+    assert_equal range, ohlc.range
     assert_equal 'PT1H', ohlc.duration
     assert_equal 3, ohlc.open
     assert_equal 5, ohlc.high
@@ -66,8 +66,6 @@ class OhlcServiceTest < ActiveSupport::TestCase
     asset_pair = asset_pairs(:atomusd)
     range = OhlcRangeValue.at(duration: 'PT1H', time: 1.hour.ago)
 
-    ohlc = OhlcService.call(asset_pair:, range:)
-
-    assert_not ohlc
+    assert_nil OhlcService.call(asset_pair:, range:)
   end
 end

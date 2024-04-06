@@ -11,7 +11,7 @@ class SmoothedMovingAverageService
   def call
     return unless value
 
-    SmoothedMovingAverage.create!(id: [ohlc.id, interval], value:)
+    SmoothedMovingAverage.create!(id: ohlc.id, interval:, value:)
   end
 
   private
@@ -32,10 +32,13 @@ class SmoothedMovingAverageService
     last_hl2s.sum / interval
   end
 
-  def last_ohlc = ohlc.previous_ohlcs.first
-
   def last_smma
-    @last_smma ||= SmoothedMovingAverage.find_by(ohlc: last_ohlc, interval:)&.value
+    @last_smma ||= SmoothedMovingAverage.find_by(
+      asset_pair_id: ohlc.asset_pair_id,
+      duration: ohlc.duration,
+      range_position: ohlc.range_position - 1,
+      interval:
+    )&.value
   end
 
   def last_hl2s
