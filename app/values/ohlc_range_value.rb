@@ -18,7 +18,6 @@ class OhlcRangeValue < Range
   end
 
   def start_at = first
-  def end_ad = last
-
+  def end_at = last
   def next = self.class.new(position: position + 1, duration:)
 end
