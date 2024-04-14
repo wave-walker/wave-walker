@@ -13,7 +13,7 @@ class TriggerOhlcGenerationJob < ApplicationJob
   end
 
   def each_iteration(asset_pair)
-    Ohlc.durations.each_key do |duration|
+    Ohlc.durations.each do |duration|
       OhlcJob.perform_later(asset_pair:, duration:)
     end
   end

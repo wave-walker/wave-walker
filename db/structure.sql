@@ -10,26 +10,26 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: order_type; Type: TYPE; Schema: public; Owner: -
+-- Name: iso8601_duration; Type: TYPE; Schema: public; Owner: -
 --
 
-CREATE TYPE public.order_type AS ENUM (
-    'market',
-    'limit'
-);
-
-
---
--- Name: timeframe; Type: TYPE; Schema: public; Owner: -
---
-
-CREATE TYPE public.timeframe AS ENUM (
+CREATE TYPE public.iso8601_duration AS ENUM (
     'PT1H',
     'PT4H',
     'PT8H',
     'P1D',
     'P2D',
     'P1W'
+);
+
+
+--
+-- Name: order_type; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.order_type AS ENUM (
+    'market',
+    'limit'
 );
 
 
@@ -175,7 +175,7 @@ CREATE TABLE public.ar_internal_metadata (
 
 CREATE TABLE public.ohlcs (
     asset_pair_id bigint NOT NULL,
-    duration public.timeframe NOT NULL,
+    iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
     open double precision NOT NULL,
     high double precision NOT NULL,
@@ -194,7 +194,7 @@ PARTITION BY LIST (asset_pair_id);
 
 CREATE TABLE public.asset_pair_1_ohlcs (
     asset_pair_id bigint NOT NULL,
-    duration public.timeframe NOT NULL,
+    iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
     open double precision NOT NULL,
     high double precision NOT NULL,
@@ -212,7 +212,7 @@ CREATE TABLE public.asset_pair_1_ohlcs (
 
 CREATE TABLE public.smoothed_moving_averages (
     asset_pair_id bigint NOT NULL,
-    duration public.timeframe NOT NULL,
+    iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
     "interval" integer NOT NULL,
     value double precision NOT NULL,
@@ -227,7 +227,7 @@ PARTITION BY LIST (asset_pair_id);
 
 CREATE TABLE public.asset_pair_1_smoothed_moving_averages (
     asset_pair_id bigint NOT NULL,
-    duration public.timeframe NOT NULL,
+    iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
     "interval" integer NOT NULL,
     value double precision NOT NULL,
@@ -241,7 +241,7 @@ CREATE TABLE public.asset_pair_1_smoothed_moving_averages (
 
 CREATE TABLE public.smoothed_trends (
     asset_pair_id bigint NOT NULL,
-    duration public.timeframe NOT NULL,
+    iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
     fast_smma double precision NOT NULL,
     slow_smma double precision NOT NULL,
@@ -257,7 +257,7 @@ PARTITION BY LIST (asset_pair_id);
 
 CREATE TABLE public.asset_pair_1_smoothed_trends (
     asset_pair_id bigint NOT NULL,
-    duration public.timeframe NOT NULL,
+    iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
     fast_smma double precision NOT NULL,
     slow_smma double precision NOT NULL,
@@ -272,7 +272,7 @@ CREATE TABLE public.asset_pair_1_smoothed_trends (
 
 CREATE TABLE public.asset_pair_2_ohlcs (
     asset_pair_id bigint NOT NULL,
-    duration public.timeframe NOT NULL,
+    iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
     open double precision NOT NULL,
     high double precision NOT NULL,
@@ -290,7 +290,7 @@ CREATE TABLE public.asset_pair_2_ohlcs (
 
 CREATE TABLE public.asset_pair_2_smoothed_moving_averages (
     asset_pair_id bigint NOT NULL,
-    duration public.timeframe NOT NULL,
+    iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
     "interval" integer NOT NULL,
     value double precision NOT NULL,
@@ -304,7 +304,7 @@ CREATE TABLE public.asset_pair_2_smoothed_moving_averages (
 
 CREATE TABLE public.asset_pair_2_smoothed_trends (
     asset_pair_id bigint NOT NULL,
-    duration public.timeframe NOT NULL,
+    iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
     fast_smma double precision NOT NULL,
     slow_smma double precision NOT NULL,
@@ -575,7 +575,7 @@ ALTER TABLE ONLY public.ar_internal_metadata
 --
 
 ALTER TABLE ONLY public.ohlcs
-    ADD CONSTRAINT ohlcs_pkey PRIMARY KEY (asset_pair_id, duration, range_position);
+    ADD CONSTRAINT ohlcs_pkey PRIMARY KEY (asset_pair_id, iso8601_duration, range_position);
 
 
 --
@@ -583,7 +583,7 @@ ALTER TABLE ONLY public.ohlcs
 --
 
 ALTER TABLE ONLY public.asset_pair_1_ohlcs
-    ADD CONSTRAINT asset_pair_1_ohlcs_pkey PRIMARY KEY (asset_pair_id, duration, range_position);
+    ADD CONSTRAINT asset_pair_1_ohlcs_pkey PRIMARY KEY (asset_pair_id, iso8601_duration, range_position);
 
 
 --
@@ -591,7 +591,7 @@ ALTER TABLE ONLY public.asset_pair_1_ohlcs
 --
 
 ALTER TABLE ONLY public.smoothed_moving_averages
-    ADD CONSTRAINT smoothed_moving_averages_pkey PRIMARY KEY (asset_pair_id, duration, range_position, "interval");
+    ADD CONSTRAINT smoothed_moving_averages_pkey PRIMARY KEY (asset_pair_id, iso8601_duration, range_position, "interval");
 
 
 --
@@ -599,7 +599,7 @@ ALTER TABLE ONLY public.smoothed_moving_averages
 --
 
 ALTER TABLE ONLY public.asset_pair_1_smoothed_moving_averages
-    ADD CONSTRAINT asset_pair_1_smoothed_moving_averages_pkey PRIMARY KEY (asset_pair_id, duration, range_position, "interval");
+    ADD CONSTRAINT asset_pair_1_smoothed_moving_averages_pkey PRIMARY KEY (asset_pair_id, iso8601_duration, range_position, "interval");
 
 
 --
@@ -607,7 +607,7 @@ ALTER TABLE ONLY public.asset_pair_1_smoothed_moving_averages
 --
 
 ALTER TABLE ONLY public.smoothed_trends
-    ADD CONSTRAINT smoothed_trends_pkey PRIMARY KEY (asset_pair_id, duration, range_position);
+    ADD CONSTRAINT smoothed_trends_pkey PRIMARY KEY (asset_pair_id, iso8601_duration, range_position);
 
 
 --
@@ -615,7 +615,7 @@ ALTER TABLE ONLY public.smoothed_trends
 --
 
 ALTER TABLE ONLY public.asset_pair_1_smoothed_trends
-    ADD CONSTRAINT asset_pair_1_smoothed_trends_pkey PRIMARY KEY (asset_pair_id, duration, range_position);
+    ADD CONSTRAINT asset_pair_1_smoothed_trends_pkey PRIMARY KEY (asset_pair_id, iso8601_duration, range_position);
 
 
 --
@@ -623,7 +623,7 @@ ALTER TABLE ONLY public.asset_pair_1_smoothed_trends
 --
 
 ALTER TABLE ONLY public.asset_pair_2_ohlcs
-    ADD CONSTRAINT asset_pair_2_ohlcs_pkey PRIMARY KEY (asset_pair_id, duration, range_position);
+    ADD CONSTRAINT asset_pair_2_ohlcs_pkey PRIMARY KEY (asset_pair_id, iso8601_duration, range_position);
 
 
 --
@@ -631,7 +631,7 @@ ALTER TABLE ONLY public.asset_pair_2_ohlcs
 --
 
 ALTER TABLE ONLY public.asset_pair_2_smoothed_moving_averages
-    ADD CONSTRAINT asset_pair_2_smoothed_moving_averages_pkey PRIMARY KEY (asset_pair_id, duration, range_position, "interval");
+    ADD CONSTRAINT asset_pair_2_smoothed_moving_averages_pkey PRIMARY KEY (asset_pair_id, iso8601_duration, range_position, "interval");
 
 
 --
@@ -639,7 +639,7 @@ ALTER TABLE ONLY public.asset_pair_2_smoothed_moving_averages
 --
 
 ALTER TABLE ONLY public.asset_pair_2_smoothed_trends
-    ADD CONSTRAINT asset_pair_2_smoothed_trends_pkey PRIMARY KEY (asset_pair_id, duration, range_position);
+    ADD CONSTRAINT asset_pair_2_smoothed_trends_pkey PRIMARY KEY (asset_pair_id, iso8601_duration, range_position);
 
 
 --
@@ -901,7 +901,7 @@ ALTER TABLE public.ohlcs
 --
 
 ALTER TABLE public.smoothed_trends
-    ADD CONSTRAINT fk_rails_2379cb27be FOREIGN KEY (asset_pair_id, duration, range_position) REFERENCES public.ohlcs(asset_pair_id, duration, range_position);
+    ADD CONSTRAINT fk_rails_2379cb27be FOREIGN KEY (asset_pair_id, iso8601_duration, range_position) REFERENCES public.ohlcs(asset_pair_id, iso8601_duration, range_position);
 
 
 --
@@ -917,7 +917,7 @@ ALTER TABLE public.trades
 --
 
 ALTER TABLE public.smoothed_moving_averages
-    ADD CONSTRAINT fk_rails_8983b830fb FOREIGN KEY (asset_pair_id, duration, range_position) REFERENCES public.ohlcs(asset_pair_id, duration, range_position);
+    ADD CONSTRAINT fk_rails_8983b830fb FOREIGN KEY (asset_pair_id, iso8601_duration, range_position) REFERENCES public.ohlcs(asset_pair_id, iso8601_duration, range_position);
 
 
 --
@@ -959,6 +959,7 @@ ALTER TABLE public.smoothed_trends
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240414121401'),
 ('20240406151935'),
 ('20240406140027'),
 ('20240329105130'),

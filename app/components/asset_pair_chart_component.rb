@@ -67,5 +67,5 @@ class AssetPairChartComponent < ViewComponent::Base
 
   attr_reader :asset_pair, :duration
 
-  def ohlcs = Ohlc.where(asset_pair:, duration:).includes(:smoothed_trend).last(300)
+  def ohlcs = Ohlc.by_duration(duration).where(asset_pair:).includes(:smoothed_trend).last(300)
 end

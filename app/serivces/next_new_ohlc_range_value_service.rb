@@ -19,7 +19,7 @@ class NextNewOhlcRangeValueService
   attr_reader :asset_pair, :duration
 
   def last_ohlc
-    Ohlc.where(asset_pair:, duration:).last
+    Ohlc.where(asset_pair:).by_duration(duration).last
   end
 
   def first_trade

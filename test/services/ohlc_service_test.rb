@@ -9,7 +9,7 @@ class OhlcServiceTest < ActiveSupport::TestCase
 
   test '.create_from_trades, when no trades exists' do
     asset_pair = asset_pairs(:atomusd)
-    duration = 'PT1H'
+    duration = 1.hour
     range = OhlcRangeValue.at(duration:, time: Time.current)
 
     Ohlc.create!(asset_pair:, high: 1, low: 2, open: 3, close: 4, volume: 1,
@@ -22,7 +22,7 @@ class OhlcServiceTest < ActiveSupport::TestCase
     assert_equal ohlc.open, 4
     assert_equal ohlc.close, 4
     assert_equal ohlc.volume, 0
-    assert_equal ohlc.duration, 'PT1H'
+    assert_equal ohlc.duration, 1.hour
     assert_equal ohlc.range_position, range.next.position
   end
 
@@ -30,7 +30,7 @@ class OhlcServiceTest < ActiveSupport::TestCase
     freeze_time
 
     asset_pair = asset_pairs(:atomusd)
-    range = OhlcRangeValue.at(duration: 'PT1H', time: 1.hour.ago)
+    range = OhlcRangeValue.at(duration: 1.hour, time: 1.hour.ago)
 
     Trade.create!(id: [asset_pair.id, 1], price: 1, volume: 1, created_at: range.first - 1.second,
                   action: :buy, order_type: :limit, misc: '')
@@ -53,7 +53,7 @@ class OhlcServiceTest < ActiveSupport::TestCase
     ohlc = OhlcService.call(asset_pair:, range:)
 
     assert_equal range, ohlc.range
-    assert_equal 'PT1H', ohlc.duration
+    assert_equal 1.hour, ohlc.duration
     assert_equal 3, ohlc.open
     assert_equal 5, ohlc.high
     assert_equal 2, ohlc.low
@@ -64,7 +64,7 @@ class OhlcServiceTest < ActiveSupport::TestCase
 
   test 'should not create OHLC without trades in duration' do
     asset_pair = asset_pairs(:atomusd)
-    range = OhlcRangeValue.at(duration: 'PT1H', time: 1.hour.ago)
+    range = OhlcRangeValue.at(duration: 1.hour, time: 1.hour.ago)
 
     assert_nil OhlcService.call(asset_pair:, range:)
   end

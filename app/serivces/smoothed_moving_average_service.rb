@@ -33,9 +33,8 @@ class SmoothedMovingAverageService
   end
 
   def last_smma
-    @last_smma ||= SmoothedMovingAverage.find_by(
+    @last_smma ||= SmoothedMovingAverage.by_duration(ohlc.duration).find_by(
       asset_pair_id: ohlc.asset_pair_id,
-      duration: ohlc.duration,
       range_position: ohlc.range_position - 1,
       interval:
     )&.value

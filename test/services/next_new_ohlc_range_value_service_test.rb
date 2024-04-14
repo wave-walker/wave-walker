@@ -5,7 +5,7 @@ require 'test_helper'
 class NextNewOhlcRangeValueServiceTest < ActiveSupport::TestCase
   test '.call, returns OhlcRangeValue at first trade when no OHLCs are present' do
     asset_pair = asset_pairs(:atomusd)
-    duration = 'PT1H'
+    duration = 1.hour
     timestamp = 4.hours.ago
     PartitionService.call(asset_pair)
 
@@ -26,7 +26,7 @@ class NextNewOhlcRangeValueServiceTest < ActiveSupport::TestCase
 
   test '.call, returns the next OhlcRangeValue when OHLCs are present' do
     asset_pair = asset_pairs(:atomusd)
-    duration = 'PT1H'
+    duration = 1.hour
 
     ohlc_range = OhlcRangeValue.at(time: 3.hours.ago, duration:)
 

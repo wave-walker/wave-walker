@@ -19,12 +19,12 @@ class OhlcService
   attr_reader :asset_pair, :range
 
   def range_position = range.position
-  def duration = range.duration.iso8601
+  def duration = range.duration
   def trades = @trades ||= asset_pair.trades.where(created_at: range).load
   def open = trades.first&.price || previous_close
   def close = trades.last&.price || previous_close
   def high = trades.map(&:price).max || previous_close
   def low = trades.map(&:price).min || previous_close
   def volume = trades.map(&:volume).sum
-  def previous_close = Ohlc.where(asset_pair:, duration:).last&.close
+  def previous_close = Ohlc.where(asset_pair:).by_duration(duration).last&.close
 end

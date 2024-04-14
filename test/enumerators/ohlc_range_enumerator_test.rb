@@ -5,7 +5,7 @@ require 'test_helper'
 class OhlcRangeEnumeratorTest < ActiveSupport::TestCase
   test 'starts with the next new range' do
     asset_pair = asset_pairs(:atomusd)
-    duration = 'P1D'
+    duration = 1.day
     asset_pair.imported_until = Time.current
 
     start_range = OhlcRangeValue.at(duration:, time: 3.days.ago)
@@ -20,7 +20,7 @@ class OhlcRangeEnumeratorTest < ActiveSupport::TestCase
 
   test 'yield the attributes for the first iteration attributes' do
     asset_pair = asset_pairs(:atomusd)
-    duration = 'P1D'
+    duration = 1.day
     asset_pair.imported_until = Time.current
     cursor = OhlcRangeValue.at(duration:, time: 1.day.ago)
 
@@ -32,7 +32,7 @@ class OhlcRangeEnumeratorTest < ActiveSupport::TestCase
 
   test 'yield the attributes for the next iteration attributes' do
     asset_pair = asset_pairs(:atomusd)
-    duration = 'P1D'
+    duration = 1.day
     asset_pair.imported_until = Time.current
     cursor = OhlcRangeValue.at(duration:, time: 2.days.ago)
 
@@ -44,7 +44,7 @@ class OhlcRangeEnumeratorTest < ActiveSupport::TestCase
 
   test 'continues the range when the asset pairs imported until is not reached' do
     asset_pair = asset_pairs(:atomusd)
-    duration = 'P1D'
+    duration = 1.day
     asset_pair.imported_until = Time.current
     cursor = OhlcRangeValue.at(duration:, time: 2.days.ago)
 
@@ -55,7 +55,7 @@ class OhlcRangeEnumeratorTest < ActiveSupport::TestCase
 
   test 'stops when the range includes the asset pairs imported until' do
     asset_pair = asset_pairs(:atomusd)
-    duration = 'P1D'
+    duration = 1.day
     asset_pair.imported_until = Time.current
     cursor = OhlcRangeValue.at(duration:, time: Time.current)
 

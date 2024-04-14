@@ -11,8 +11,8 @@
         <%= @duration %>
       </summary>
       <ul dir="rtl">
-        <% Ohlc.durations.values.each do |duration| %>
-          <li><%= link_to(duration, asset_pair_path(@asset_pair, duration:)) %></li>
+        <% Ohlc.durations.map(&:iso8601).each do |iso8601_duration| %>
+          <li><%= link_to(iso8601_duration, asset_pair_path(@asset_pair, iso8601_duration:)) %></li>
         <% end %>
       </ul>
     </details>

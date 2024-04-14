@@ -4,8 +4,6 @@ class OhlcRangeValue < Range
   attr_reader :duration, :position
 
   def initialize(position:, duration:)
-    duration = ActiveSupport::Duration.parse(duration) unless duration.is_a?(ActiveSupport::Duration)
-
     @position = position
     @duration = duration
     seconds = position * duration.seconds
@@ -14,7 +12,6 @@ class OhlcRangeValue < Range
   end
 
   def self.at(time:, duration:)
-    duration = ActiveSupport::Duration.parse(duration) unless duration.is_a?(ActiveSupport::Duration)
     position = time.to_i / duration.seconds
 
     new(position:, duration:)
