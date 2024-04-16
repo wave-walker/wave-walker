@@ -6,7 +6,7 @@ class OhlcJob < ApplicationJob
 
   good_job_control_concurrency_with(
     total_limit: 1,
-    key: -> { "#{self.class.name}-#{arguments[0]}-#{arguments[1]}" }
+    key: -> { "#{self.class.name}-#{arguments[0].fetch(:asset_pair).id}-#{arguments[0].fetch(:duration)}" }
   )
 
   queue_as :default
