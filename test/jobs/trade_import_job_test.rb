@@ -86,7 +86,7 @@ class TradeImportJobTest < ActiveJob::TestCase
     trades = [Kraken::Trade.new(1, 2, 3, 's', 'l', 'foo bar', 1)]
     asset_pair = asset_pairs(:atomusd)
 
-    assert_changes -> { asset_pair.reload.imported_until }, to: Time.current do
+    assert_changes -> { asset_pair.reload.imported_until }, to: Time.zone.at(3) do
       TradeImportJob.new.each_iteration({ trades:, asset_pair: })
     end
   end
