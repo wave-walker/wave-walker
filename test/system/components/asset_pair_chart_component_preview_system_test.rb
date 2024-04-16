@@ -38,7 +38,7 @@ class AssetPairChartComponentSystemTest < ApplicationSystemTestCase
     scroll_to(element)
 
     Tempfile.open(['capture', '.png']) do |tempfile|
-      save_screenshot(tempfile.path)
+      save_screenshot(tempfile.path) # rubocop:disable Lint/Debugger
 
       Vips::Image.new_from_file(tempfile.path.to_s)
                  .crop(element.rect.x, 0, element.rect.width, element.rect.height)
