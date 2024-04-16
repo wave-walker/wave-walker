@@ -42,7 +42,7 @@ module WaveWalker
     config.good_job.enable_cron = true
     config.good_job.cron = {
       asset_pair_create_task: {
-        cron: '* */4 * * *',
+        cron: '0 */4 * * *',
         class: 'CreateKrakenAssetPairsJob',
         description: 'Creates new Kraken asset pairs.'
       },
