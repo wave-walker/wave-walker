@@ -246,7 +246,8 @@ CREATE TABLE public.smoothed_trends (
     fast_smma double precision NOT NULL,
     slow_smma double precision NOT NULL,
     trend public.trend NOT NULL,
-    created_at timestamp without time zone NOT NULL
+    created_at timestamp without time zone NOT NULL,
+    flip boolean NOT NULL
 )
 PARTITION BY LIST (asset_pair_id);
 
@@ -262,7 +263,8 @@ CREATE TABLE public.asset_pair_1_smoothed_trends (
     fast_smma double precision NOT NULL,
     slow_smma double precision NOT NULL,
     trend public.trend NOT NULL,
-    created_at timestamp without time zone NOT NULL
+    created_at timestamp without time zone NOT NULL,
+    flip boolean NOT NULL
 );
 
 
@@ -309,7 +311,8 @@ CREATE TABLE public.asset_pair_2_smoothed_trends (
     fast_smma double precision NOT NULL,
     slow_smma double precision NOT NULL,
     trend public.trend NOT NULL,
-    created_at timestamp without time zone NOT NULL
+    created_at timestamp without time zone NOT NULL,
+    flip boolean NOT NULL
 );
 
 
@@ -959,6 +962,7 @@ ALTER TABLE public.smoothed_trends
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240417144243'),
 ('20240414121401'),
 ('20240406151935'),
 ('20240406140027'),

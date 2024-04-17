@@ -10,7 +10,7 @@ class SmoothedTrendService
   def call
     ActiveRecord::Base.transaction do
       create_smmas
-      SmoothedTrend.create!(id: ohlc.id, fast_smma:, slow_smma:, trend:) if valid?
+      SmoothedTrend.create!(id: ohlc.id, fast_smma:, slow_smma:, trend:, flip: flip?) if valid?
     end
   end
 
@@ -38,4 +38,5 @@ class SmoothedTrendService
   def neutral_up? = (fast_smma < medium_fast_smma) == bullish?
   def neutral_down? = (medium_slow_smma < slow_smma) == bullish?
   def neutral? = neutral_up? || neutral_down?
+  def flip? = ohlc.previous_ohlcs.take.smoothed_trend&.trend != trend.to_s
 end

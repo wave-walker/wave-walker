@@ -1,0 +1,10 @@
+<div id='recent-flips'>
+  <h2>Recent trend flips (daily timeframe)</h2>
+  <ul>
+    <% @recently_fliped_smooth_trends.each do |smooth_trend| %>
+      <li>
+        <%= "#{l(smooth_trend.range.start_at.to_date)} #{smooth_trend.asset_pair.name} flipped to #{smooth_trend.trend}" -%>
+      </li>
+    <% end %>
+  </ul>
+ </div>

@@ -2,6 +2,7 @@
 
 class Ohlc < ApplicationRecord
   include DurationConcern
+  include RangeConcern
 
   belongs_to :asset_pair
 
@@ -13,9 +14,5 @@ class Ohlc < ApplicationRecord
   def previous_ohlcs
     self.class.where(range_position: ...range_position, asset_pair:, iso8601_duration:)
         .order(range_position: :desc)
-  end
-
-  def range
-    @range ||= OhlcRangeValue.new(duration:, position: range_position)
   end
 end
