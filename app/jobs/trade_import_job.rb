@@ -6,7 +6,7 @@ class TradeImportJob < ApplicationJob
 
   queue_as :default
 
-  retry_on Kraken::RateLimitExceeded, wait: 5.seconds, attempts: 10
+  retry_on Kraken::RateLimitExceeded, wait: 15.seconds, attempts: 10
 
   good_job_control_concurrency_with(total_limit: 1)
 
