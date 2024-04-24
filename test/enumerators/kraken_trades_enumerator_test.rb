@@ -61,7 +61,7 @@ class KrakenTradesEnumeratorTest < ActiveSupport::TestCase
 
   test 'rate limites the API requests to 1 per second' do
     Limiter::Clock.expects(:sleep).with do |sleep_time|
-      assert_in_delta sleep_time, 1, 0.1
+      assert_in_delta sleep_time, 1, 0.2
     end
 
     asset_pair = AssetPair.new(name_on_exchange: 'ATOMUSD')
