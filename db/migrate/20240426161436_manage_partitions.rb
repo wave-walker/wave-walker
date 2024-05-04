@@ -3,8 +3,8 @@
 class ManagePartitions < ActiveRecord::Migration[7.1]
   def up
     execute <<-SQL.squish
-      CREATE TABLE asset_pair_1_trades PARTITION OF trades FOR VALUES IN (1);
-      CREATE TABLE asset_pair_2_trades PARTITION OF trades FOR VALUES IN (2);
+      CREATE TABLE IF NOT EXISTS asset_pair_1_trades PARTITION OF trades FOR VALUES IN (1);
+      CREATE TABLE IF NOT EXISTS asset_pair_2_trades PARTITION OF trades FOR VALUES IN (2);
     SQL
 
     execute <<-SQL.squish
