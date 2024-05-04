@@ -63,6 +63,14 @@ class AssetPairChartComponent < ViewComponent::Base
     end
   end
 
+  def price_format
+    {
+      type: 'price',
+      precision: asset_pair.cost_decimals,
+      minMove: 1.0 / (10**asset_pair.cost_decimals)
+    }
+  end
+
   private
 
   attr_reader :asset_pair, :duration

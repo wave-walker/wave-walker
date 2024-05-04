@@ -27,7 +27,7 @@ module Kraken
     check_response(response)
 
     response.fetch('result').values.filter_map do |pair_params|
-      pair_params.slice('altname', 'quote', 'base') if pair_params['status'] == 'online'
+      pair_params.slice('altname', 'quote', 'base', 'cost_decimals') if pair_params['status'] == 'online'
     end
   end
 

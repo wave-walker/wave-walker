@@ -19,6 +19,7 @@ export default class extends Controller {
     volumeSeries: Array,
     smoothedTrendSlowSeries: Array,
     smoothedTrendFastSeries: Array,
+    priceFormat: Object
   }
 
   connect() {
@@ -28,6 +29,8 @@ export default class extends Controller {
     const smoothedTrendFast = this.chart.addLineSeries()
     const volumeSeries = this.chart.addHistogramSeries(volumeHistogramOptions)
     volumeSeries.priceScale().applyOptions(volumePriceScaleOptions);
+
+    ohlcSeries.applyOptions({ priceFormat: this.priceFormatValue })
 
     ohlcSeries.setData(this.ohlcSeriesValue);
     smoothedTrendSlow.setData(this.smoothedTrendSlowSeriesValue);

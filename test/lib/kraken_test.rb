@@ -3,6 +3,27 @@
 require 'test_helper'
 
 class KrakenTest < ActiveSupport::TestCase
+  class AssetPairsTest < ActiveSupport::TestCase
+    test 'returns the asset pairs' do
+      stub_request(:get, 'https://api.kraken.com/0/public/AssetPairs')
+        .to_return(
+          status: 200,
+          body: {
+            error: [],
+            result: {
+              'XXBTZEUR' => { altname: 'XXBTZEUR', base: 'XXBT', quote: 'ZEUR', cost_decimals: 2, status: 'online' },
+              'XXLMZEUR' => { altname: 'XXLMZEUR', base: 'XXLM', quote: 'ZEUR', cost_decimals: 3, status: 'offline' }
+            }
+          }.to_json,
+          headers: { 'Content-Type' => 'application/json' }
+        )
+
+      asset_pairs = Kraken.asset_pairs
+
+      assert_equal [{ 'altname' => 'XXBTZEUR', 'quote' => 'ZEUR', 'base' => 'XXBT', 'cost_decimals' => 2 }], asset_pairs
+    end
+  end
+
   class TradesTest < ActiveSupport::TestCase
     test 'too many request raise an error' do
       stub_request(:get, 'https://api.kraken.com/0/public/Trades?count=10000&pair=XXBTZEUR&since=0')

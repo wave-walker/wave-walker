@@ -3,7 +3,9 @@ atomusd:
   name: ATOMUSD
   name_on_exchange: ATOMUSD
   importing: true
+  cost_decimals: 6
 btcusd:
   id: 2
   name: BTCUSD
   name_on_exchange: XBTUSD
+  cost_decimals: 5

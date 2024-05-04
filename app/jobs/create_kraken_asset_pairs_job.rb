@@ -12,10 +12,7 @@ class CreateKrakenAssetPairsJob < ApplicationJob
       name = name_on_exchange.gsub('XBT', 'BTC')
 
       asset_pair = AssetPair.find_or_initialize_by(name_on_exchange:)
-      asset_pair.name = name
-      asset_pair.base = params['base']
-      asset_pair.quote = params['quote']
-      asset_pair.save!
+      asset_pair.update!(name:, **params.slice('base', 'quote', 'cost_decimals'))
     end
   end
 end

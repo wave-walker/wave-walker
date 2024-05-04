@@ -25,10 +25,11 @@ class CreateKrakenAssetPairsJobTest < ActiveJob::TestCase
   end
 
   test 'ignores asset that are not traded agains USD or BTC' do
-    Kraken.stubs(:asset_pairs).returns([
-                                         { 'altname' => 'ETHADA', 'base' => 'ADA', 'quote' => 'ETH' },
-                                         { 'altname' => 'ETHJPY', 'base' => 'JPY', 'quote' => 'ETH' }
-                                       ])
+    Kraken.stubs(:asset_pairs)
+          .returns([
+                     { 'altname' => 'ETHADA', 'base' => 'ADA', 'quote' => 'ETH', 'cost_decimals' => 2 },
+                     { 'altname' => 'ETHJPY', 'base' => 'JPY', 'quote' => 'ETH', 'cost_decimals' => 5 }
+                   ])
 
     assert_no_difference 'AssetPair.count' do
       CreateKrakenAssetPairsJob.perform_now
@@ -46,9 +47,10 @@ class CreateKrakenAssetPairsJobTest < ActiveJob::TestCase
   end
 
   def stub_asset_pairs_api
-    Kraken.stubs(:asset_pairs).returns([
-                                         { 'altname' => 'ETHXBT', 'base' => 'ETH', 'quote' => 'XXBT' },
-                                         { 'altname' => 'ETHUSD', 'base' => 'ETH', 'quote' => 'ZUSD' }
-                                       ])
+    Kraken.stubs(:asset_pairs)
+          .returns([
+                     { 'altname' => 'ETHXBT', 'base' => 'ETH', 'quote' => 'XXBT', 'cost_decimals' => 2 },
+                     { 'altname' => 'ETHUSD', 'base' => 'ETH', 'quote' => 'ZUSD', 'cost_decimals' => 5 }
+                   ])
   end
 end
