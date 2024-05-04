@@ -14,8 +14,6 @@ class OhlcJobTest < ActiveJob::TestCase
     asset_pair = asset_pairs(:atomusd)
     asset_pair.update!(imported_until: Time.current)
 
-    PartitionService.call(asset_pair)
-
     Trade.create!(
       id: [asset_pair.id, 1],
       price: 1, volume: 1, action: 'buy',

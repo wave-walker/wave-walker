@@ -5,10 +5,6 @@ require 'test_helper'
 class OhlcTest < ActiveSupport::TestCase
   include ActiveJob::TestHelper
 
-  setup do
-    PartitionService.call(asset_pairs(:atomusd))
-  end
-
   test '#previous_ohlcs, returns the previous ohlcs' do
     ohlc = ohlcs(:atom_2019_04_24) # rubocop:disable Naming/VariableNumber
 

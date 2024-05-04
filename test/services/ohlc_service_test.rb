@@ -3,10 +3,6 @@
 require 'test_helper'
 
 class OhlcServiceTest < ActiveSupport::TestCase
-  setup do
-    PartitionService.call(asset_pairs(:atomusd))
-  end
-
   test '.create_from_trades, when no trades exists' do
     asset_pair = asset_pairs(:atomusd)
     duration = 1.hour

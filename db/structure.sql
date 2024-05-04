@@ -54,6 +54,24 @@ CREATE TYPE public.trend AS ENUM (
 );
 
 
+--
+-- Name: create_partition_for_asset_pair(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.create_partition_for_asset_pair() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$ DECLARE asset_pair_id INTEGER; BEGIN asset_pair_id := NEW.id; EXECUTE 'CREATE TABLE IF NOT EXISTS asset_pair_' || asset_pair_id || '_trades PARTITION OF trades FOR VALUES IN (' || asset_pair_id || ')'; EXECUTE 'CREATE TABLE IF NOT EXISTS asset_pair_' || asset_pair_id || '_ohlcs PARTITION OF ohlcs FOR VALUES IN (' || asset_pair_id || ')'; EXECUTE 'CREATE TABLE IF NOT EXISTS asset_pair_' || asset_pair_id || '_smoothed_moving_averages PARTITION OF smoothed_moving_averages FOR VALUES IN (' || asset_pair_id || ')'; EXECUTE 'CREATE TABLE IF NOT EXISTS asset_pair_' || asset_pair_id || '_smoothed_trends PARTITION OF smoothed_trends FOR VALUES IN (' || asset_pair_id || ')'; RETURN NEW; END; $$;
+
+
+--
+-- Name: drop_partition_for_asset_pair(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.drop_partition_for_asset_pair() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$ DECLARE asset_pair_id INTEGER; BEGIN asset_pair_id := OLD.id; EXECUTE 'ALTER TABLE smoothed_trends DETACH PARTITION asset_pair_' || asset_pair_id || '_smoothed_trends' CASCADE; EXECUTE 'ALTER TABLE smoothed_moving_averages DETACH PARTITION asset_pair_' || asset_pair_id || '_smoothed_moving_averages' CASCADE; EXECUTE 'ALTER TABLE ohlcs DETACH PARTITION asset_pair_' || asset_pair_id || '_ohlcs' CASCADE; EXECUTE 'ALTER TABLE trades DETACH PARTITION asset_pair_' || asset_pair_id || '_trades' CASCADE; EXECUTE 'DROP TABLE IF EXISTS asset_pair_' || asset_pair_id || '_smoothed_trends' CASCADE; EXECUTE 'DROP TABLE IF EXISTS asset_pair_' || asset_pair_id || '_smoothed_moving_averages' CASCADE; EXECUTE 'DROP TABLE IF EXISTS asset_pair_' || asset_pair_id || '_ohlcs' CASCADE; EXECUTE 'DROP TABLE IF EXISTS asset_pair_' || asset_pair_id || '_trades' CASCADE; RETURN NEW; END; $$;
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -269,6 +287,39 @@ CREATE TABLE public.asset_pair_1_smoothed_trends (
 
 
 --
+-- Name: trades; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.trades (
+    id bigint NOT NULL,
+    asset_pair_id bigint NOT NULL,
+    price double precision NOT NULL,
+    volume double precision NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    action public.trade_action NOT NULL,
+    order_type public.order_type NOT NULL,
+    misc character varying NOT NULL
+)
+PARTITION BY LIST (asset_pair_id);
+
+
+--
+-- Name: asset_pair_1_trades; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.asset_pair_1_trades (
+    id bigint NOT NULL,
+    asset_pair_id bigint NOT NULL,
+    price double precision NOT NULL,
+    volume double precision NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    action public.trade_action NOT NULL,
+    order_type public.order_type NOT NULL,
+    misc character varying NOT NULL
+);
+
+
+--
 -- Name: asset_pair_2_ohlcs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -313,6 +364,22 @@ CREATE TABLE public.asset_pair_2_smoothed_trends (
     trend public.trend NOT NULL,
     created_at timestamp without time zone NOT NULL,
     flip boolean NOT NULL
+);
+
+
+--
+-- Name: asset_pair_2_trades; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.asset_pair_2_trades (
+    id bigint NOT NULL,
+    asset_pair_id bigint NOT NULL,
+    price double precision NOT NULL,
+    volume double precision NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    action public.trade_action NOT NULL,
+    order_type public.order_type NOT NULL,
+    misc character varying NOT NULL
 );
 
 
@@ -457,23 +524,6 @@ CREATE TABLE public.schema_migrations (
 
 
 --
--- Name: trades; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.trades (
-    id bigint NOT NULL,
-    asset_pair_id bigint NOT NULL,
-    price double precision NOT NULL,
-    volume double precision NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    action public.trade_action NOT NULL,
-    order_type public.order_type NOT NULL,
-    misc character varying NOT NULL
-)
-PARTITION BY LIST (asset_pair_id);
-
-
---
 -- Name: asset_pair_1_ohlcs; Type: TABLE ATTACH; Schema: public; Owner: -
 --
 
@@ -495,6 +545,13 @@ ALTER TABLE ONLY public.smoothed_trends ATTACH PARTITION public.asset_pair_1_smo
 
 
 --
+-- Name: asset_pair_1_trades; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.trades ATTACH PARTITION public.asset_pair_1_trades FOR VALUES IN ('1');
+
+
+--
 -- Name: asset_pair_2_ohlcs; Type: TABLE ATTACH; Schema: public; Owner: -
 --
 
@@ -513,6 +570,13 @@ ALTER TABLE ONLY public.smoothed_moving_averages ATTACH PARTITION public.asset_p
 --
 
 ALTER TABLE ONLY public.smoothed_trends ATTACH PARTITION public.asset_pair_2_smoothed_trends FOR VALUES IN ('2');
+
+
+--
+-- Name: asset_pair_2_trades; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.trades ATTACH PARTITION public.asset_pair_2_trades FOR VALUES IN ('2');
 
 
 --
@@ -624,6 +688,22 @@ ALTER TABLE ONLY public.asset_pair_1_smoothed_trends
 
 
 --
+-- Name: trades trades_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.trades
+    ADD CONSTRAINT trades_pkey PRIMARY KEY (asset_pair_id, id);
+
+
+--
+-- Name: asset_pair_1_trades asset_pair_1_trades_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.asset_pair_1_trades
+    ADD CONSTRAINT asset_pair_1_trades_pkey PRIMARY KEY (asset_pair_id, id);
+
+
+--
 -- Name: asset_pair_2_ohlcs asset_pair_2_ohlcs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -645,6 +725,14 @@ ALTER TABLE ONLY public.asset_pair_2_smoothed_moving_averages
 
 ALTER TABLE ONLY public.asset_pair_2_smoothed_trends
     ADD CONSTRAINT asset_pair_2_smoothed_trends_pkey PRIMARY KEY (asset_pair_id, iso8601_duration, range_position);
+
+
+--
+-- Name: asset_pair_2_trades asset_pair_2_trades_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.asset_pair_2_trades
+    ADD CONSTRAINT asset_pair_2_trades_pkey PRIMARY KEY (asset_pair_id, id);
 
 
 --
@@ -701,14 +789,6 @@ ALTER TABLE ONLY public.good_jobs
 
 ALTER TABLE ONLY public.schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
-
-
---
--- Name: trades trades_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.trades
-    ADD CONSTRAINT trades_pkey PRIMARY KEY (asset_pair_id, id);
 
 
 --
@@ -873,6 +953,13 @@ ALTER INDEX public.smoothed_trends_pkey ATTACH PARTITION public.asset_pair_1_smo
 
 
 --
+-- Name: asset_pair_1_trades_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.trades_pkey ATTACH PARTITION public.asset_pair_1_trades_pkey;
+
+
+--
 -- Name: asset_pair_2_ohlcs_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
 --
 
@@ -891,6 +978,27 @@ ALTER INDEX public.smoothed_moving_averages_pkey ATTACH PARTITION public.asset_p
 --
 
 ALTER INDEX public.smoothed_trends_pkey ATTACH PARTITION public.asset_pair_2_smoothed_trends_pkey;
+
+
+--
+-- Name: asset_pair_2_trades_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.trades_pkey ATTACH PARTITION public.asset_pair_2_trades_pkey;
+
+
+--
+-- Name: asset_pairs create_partition_for_asset_pair; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER create_partition_for_asset_pair AFTER INSERT ON public.asset_pairs FOR EACH ROW EXECUTE FUNCTION public.create_partition_for_asset_pair();
+
+
+--
+-- Name: asset_pairs drop_partition_for_asset_pair; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER drop_partition_for_asset_pair AFTER DELETE ON public.asset_pairs FOR EACH ROW EXECUTE FUNCTION public.drop_partition_for_asset_pair();
 
 
 --
@@ -964,6 +1072,7 @@ ALTER TABLE public.smoothed_trends
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240426161436'),
 ('20240425145649'),
 ('20240417144243'),
 ('20240414121401'),

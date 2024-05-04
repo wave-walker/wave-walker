@@ -17,7 +17,6 @@ class KrakenTradesEnumeratorTest < ActiveSupport::TestCase
 
   test 'continues import after the latest trade' do
     asset_pair = asset_pairs(:atomusd)
-    PartitionService.call(asset_pair)
 
     Trade.create!(
       id: [asset_pair.id, 1],

@@ -7,7 +7,6 @@ class NextNewOhlcRangeValueServiceTest < ActiveSupport::TestCase
     asset_pair = asset_pairs(:atomusd)
     duration = 1.hour
     timestamp = 4.hours.ago
-    PartitionService.call(asset_pair)
 
     Trade.create!(
       id: [asset_pair.id, 1],
