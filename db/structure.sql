@@ -395,9 +395,9 @@ CREATE TABLE public.asset_pairs (
     importing boolean DEFAULT false NOT NULL,
     name_on_exchange character varying NOT NULL,
     imported_until timestamp(6) without time zone,
-    quote character varying,
-    base character varying,
-    cost_decimals integer
+    quote character varying NOT NULL,
+    base character varying NOT NULL,
+    cost_decimals integer NOT NULL
 );
 
 
@@ -1073,6 +1073,7 @@ ALTER TABLE public.smoothed_trends
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240504162349'),
 ('20240504083915'),
 ('20240426161436'),
 ('20240425145649'),

@@ -24,7 +24,14 @@ class AssetPairTest < ActiveSupport::TestCase
     current_tables = ActiveRecord::Base.connection.tables.sort
 
     assert_changes -> { ActiveRecord::Base.connection.tables.sort - current_tables }, from: [], to: partitions do
-      AssetPair.create!(id: 999, name: 'FOOBAR', name_on_exchange: 'FOOBAR')
+      AssetPair.create!(
+        id: 999,
+        name: 'FOOBAR',
+        name_on_exchange: 'FOOBAR',
+        base: 'foo',
+        quote: 'bar',
+        cost_decimals: 8
+      )
     end
 
     assert_changes -> { ActiveRecord::Base.connection.tables.sort - current_tables }, from: partitions, to: [] do
