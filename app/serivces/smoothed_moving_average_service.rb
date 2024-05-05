@@ -18,7 +18,8 @@ class SmoothedMovingAverageService
 
   attr_reader :ohlc, :interval
 
-  def value = smma || sma
+  def decimals = ohlc.asset_pair.cost_decimals
+  def value = (smma || sma)&.round(decimals)
 
   def smma
     return unless last_smma

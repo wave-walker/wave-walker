@@ -24,4 +24,13 @@ class SmoothedMovingAverageServiceTest < ActiveSupport::TestCase
 
     assert_in_delta smma.value, 4.16778, 0.00001
   end
+
+  test '#create, rounds the values to the asset pairs cost decimals' do
+    ohlc = ohlcs(:atom_2019_04_27) # rubocop:disable Naming/VariableNumber
+    ohlc.asset_pair.update!(cost_decimals: 2)
+
+    smma = SmoothedMovingAverageService.call(ohlc:, interval: 5)
+
+    assert_equal smma.value, 4.17
+  end
 end

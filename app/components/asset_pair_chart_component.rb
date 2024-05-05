@@ -59,7 +59,7 @@ class AssetPairChartComponent < ViewComponent::Base
   def volume_series
     ohlcs.map do |ohlc|
       color = ohlc.open < ohlc.close ? 'green' : 'red'
-      { time: ohlc.range.end.to_i, value: ohlc.volume, color: }
+      { time: ohlc.range.end.to_i, value: ohlc.volume.to_f, color: }
     end
   end
 

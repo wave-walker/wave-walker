@@ -195,11 +195,11 @@ CREATE TABLE public.ohlcs (
     asset_pair_id bigint NOT NULL,
     iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
-    open double precision NOT NULL,
-    high double precision NOT NULL,
-    low double precision NOT NULL,
-    close double precision NOT NULL,
-    volume double precision NOT NULL,
+    open numeric NOT NULL,
+    high numeric NOT NULL,
+    low numeric NOT NULL,
+    close numeric NOT NULL,
+    volume numeric NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 )
@@ -214,11 +214,11 @@ CREATE TABLE public.asset_pair_1_ohlcs (
     asset_pair_id bigint NOT NULL,
     iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
-    open double precision NOT NULL,
-    high double precision NOT NULL,
-    low double precision NOT NULL,
-    close double precision NOT NULL,
-    volume double precision NOT NULL,
+    open numeric NOT NULL,
+    high numeric NOT NULL,
+    low numeric NOT NULL,
+    close numeric NOT NULL,
+    volume numeric NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -233,7 +233,7 @@ CREATE TABLE public.smoothed_moving_averages (
     iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
     "interval" integer NOT NULL,
-    value double precision NOT NULL,
+    value numeric NOT NULL,
     created_at timestamp without time zone NOT NULL
 )
 PARTITION BY LIST (asset_pair_id);
@@ -248,7 +248,7 @@ CREATE TABLE public.asset_pair_1_smoothed_moving_averages (
     iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
     "interval" integer NOT NULL,
-    value double precision NOT NULL,
+    value numeric NOT NULL,
     created_at timestamp without time zone NOT NULL
 );
 
@@ -261,8 +261,8 @@ CREATE TABLE public.smoothed_trends (
     asset_pair_id bigint NOT NULL,
     iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
-    fast_smma double precision NOT NULL,
-    slow_smma double precision NOT NULL,
+    fast_smma numeric NOT NULL,
+    slow_smma numeric NOT NULL,
     trend public.trend NOT NULL,
     created_at timestamp without time zone NOT NULL,
     flip boolean NOT NULL
@@ -278,8 +278,8 @@ CREATE TABLE public.asset_pair_1_smoothed_trends (
     asset_pair_id bigint NOT NULL,
     iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
-    fast_smma double precision NOT NULL,
-    slow_smma double precision NOT NULL,
+    fast_smma numeric NOT NULL,
+    slow_smma numeric NOT NULL,
     trend public.trend NOT NULL,
     created_at timestamp without time zone NOT NULL,
     flip boolean NOT NULL
@@ -293,8 +293,8 @@ CREATE TABLE public.asset_pair_1_smoothed_trends (
 CREATE TABLE public.trades (
     id bigint NOT NULL,
     asset_pair_id bigint NOT NULL,
-    price double precision NOT NULL,
-    volume double precision NOT NULL,
+    price numeric NOT NULL,
+    volume numeric NOT NULL,
     created_at timestamp without time zone NOT NULL,
     action public.trade_action NOT NULL,
     order_type public.order_type NOT NULL,
@@ -310,8 +310,8 @@ PARTITION BY LIST (asset_pair_id);
 CREATE TABLE public.asset_pair_1_trades (
     id bigint NOT NULL,
     asset_pair_id bigint NOT NULL,
-    price double precision NOT NULL,
-    volume double precision NOT NULL,
+    price numeric NOT NULL,
+    volume numeric NOT NULL,
     created_at timestamp without time zone NOT NULL,
     action public.trade_action NOT NULL,
     order_type public.order_type NOT NULL,
@@ -327,11 +327,11 @@ CREATE TABLE public.asset_pair_2_ohlcs (
     asset_pair_id bigint NOT NULL,
     iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
-    open double precision NOT NULL,
-    high double precision NOT NULL,
-    low double precision NOT NULL,
-    close double precision NOT NULL,
-    volume double precision NOT NULL,
+    open numeric NOT NULL,
+    high numeric NOT NULL,
+    low numeric NOT NULL,
+    close numeric NOT NULL,
+    volume numeric NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -346,7 +346,7 @@ CREATE TABLE public.asset_pair_2_smoothed_moving_averages (
     iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
     "interval" integer NOT NULL,
-    value double precision NOT NULL,
+    value numeric NOT NULL,
     created_at timestamp without time zone NOT NULL
 );
 
@@ -359,8 +359,8 @@ CREATE TABLE public.asset_pair_2_smoothed_trends (
     asset_pair_id bigint NOT NULL,
     iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
-    fast_smma double precision NOT NULL,
-    slow_smma double precision NOT NULL,
+    fast_smma numeric NOT NULL,
+    slow_smma numeric NOT NULL,
     trend public.trend NOT NULL,
     created_at timestamp without time zone NOT NULL,
     flip boolean NOT NULL
@@ -374,8 +374,8 @@ CREATE TABLE public.asset_pair_2_smoothed_trends (
 CREATE TABLE public.asset_pair_2_trades (
     id bigint NOT NULL,
     asset_pair_id bigint NOT NULL,
-    price double precision NOT NULL,
-    volume double precision NOT NULL,
+    price numeric NOT NULL,
+    volume numeric NOT NULL,
     created_at timestamp without time zone NOT NULL,
     action public.trade_action NOT NULL,
     order_type public.order_type NOT NULL,
@@ -1073,6 +1073,7 @@ ALTER TABLE public.smoothed_trends
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240505080719'),
 ('20240504162349'),
 ('20240504083915'),
 ('20240426161436'),
