@@ -13,6 +13,12 @@ const volumePriceScaleOptions = {
   },
 }
 
+function timeFormatter(seconds) {
+  const date = new Date(seconds * 1000)
+
+  return date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
+}
+
 export default class extends Controller {
   static values = {
     ohlcSeries: Array,
@@ -23,7 +29,7 @@ export default class extends Controller {
   }
 
   connect() {
-    this.chart = createChart(this.element)
+    this.chart = createChart(this.element, { localization: { timeFormatter: timeFormatter } })
     const ohlcSeries = this.chart.addCandlestickSeries()
     const smoothedTrendSlow = this.chart.addLineSeries()
     const smoothedTrendFast = this.chart.addLineSeries()
