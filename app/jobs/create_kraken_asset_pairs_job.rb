@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class CreateKrakenAssetPairsJob < ApplicationJob
-  queue_as :default
+  queue_as :low
 
   def perform
     Kraken.asset_pairs.each do |params|

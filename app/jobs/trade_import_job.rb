@@ -4,7 +4,7 @@ class TradeImportJob < ApplicationJob
   include GoodJob::ActiveJobExtensions::Concurrency
   include JobIteration::Iteration
 
-  queue_as :default
+  queue_as :critical
 
   retry_on Kraken::RateLimitExceeded, wait: 15.seconds, attempts: 10
 

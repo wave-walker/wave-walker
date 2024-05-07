@@ -3,7 +3,7 @@
 class TriggerOhlcGenerationJob < ApplicationJob
   include JobIteration::Iteration
 
-  queue_as :default
+  queue_as :low
 
   def build_enumerator(cursor:)
     enumerator_builder.active_record_on_records(
