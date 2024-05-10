@@ -19,6 +19,11 @@ Rails.application.configure do
       cron: '*/5 * * * *',
       class: 'TriggerOhlcGenerationJob',
       description: 'Schedual OHCL creation until the latest import.'
+    },
+    backtest_scheduling_task: {
+      cron: '0 */4 * * *',
+      class: 'BacktestSchedulerJob',
+      description: 'Schedual backtesting for all assets.'
     }
   }
 end

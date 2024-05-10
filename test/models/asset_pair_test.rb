@@ -13,6 +13,19 @@ class AssetPairTest < ActiveSupport::TestCase
     end
   end
 
+  test '#after_create, creates backtests for each timeframe' do
+    assert_changes 'Backtest.count', 6 do
+      AssetPair.create!(
+        name: 'FOOUSD',
+        name_on_exchange: 'FOOXDS',
+        importing: false,
+        base: 'FOO',
+        quote: 'ZUSD',
+        cost_decimals: 3
+      )
+    end
+  end
+
   test 'partition creation' do
     partitions = %w[
       asset_pair_999_ohlcs

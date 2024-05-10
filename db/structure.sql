@@ -44,6 +44,16 @@ CREATE TYPE public.trade_action AS ENUM (
 
 
 --
+-- Name: trade_type; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.trade_type AS ENUM (
+    'buy',
+    'sell'
+);
+
+
+--
 -- Name: trend; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -421,6 +431,39 @@ ALTER SEQUENCE public.asset_pairs_id_seq OWNED BY public.asset_pairs.id;
 
 
 --
+-- Name: backtest_trades; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.backtest_trades (
+    asset_pair_id bigint NOT NULL,
+    iso8601_duration public.iso8601_duration NOT NULL,
+    range_position bigint NOT NULL,
+    trade_type public.trade_action NOT NULL,
+    quantity numeric NOT NULL,
+    fee numeric NOT NULL,
+    price numeric NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: backtests; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.backtests (
+    asset_pair_id bigint NOT NULL,
+    iso8601_duration public.iso8601_duration NOT NULL,
+    last_range_position bigint DEFAULT 0 NOT NULL,
+    token_quantity numeric DEFAULT 0.0 NOT NULL,
+    usd_quantity numeric NOT NULL,
+    fee numeric DEFAULT 0.0 NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
 -- Name: good_job_batches; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -745,6 +788,22 @@ ALTER TABLE ONLY public.asset_pairs
 
 
 --
+-- Name: backtest_trades backtest_trades_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.backtest_trades
+    ADD CONSTRAINT backtest_trades_pkey PRIMARY KEY (asset_pair_id, iso8601_duration, range_position);
+
+
+--
+-- Name: backtests backtests_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.backtests
+    ADD CONSTRAINT backtests_pkey PRIMARY KEY (asset_pair_id, iso8601_duration);
+
+
+--
 -- Name: good_job_batches good_job_batches_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -832,6 +891,20 @@ CREATE UNIQUE INDEX index_asset_pairs_on_name ON public.asset_pairs USING btree 
 --
 
 CREATE UNIQUE INDEX index_asset_pairs_on_name_on_exchange ON public.asset_pairs USING btree (name_on_exchange);
+
+
+--
+-- Name: index_backtest_trades_on_asset_pair_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_backtest_trades_on_asset_pair_id ON public.backtest_trades USING btree (asset_pair_id);
+
+
+--
+-- Name: index_backtests_on_asset_pair_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_backtests_on_asset_pair_id ON public.backtests USING btree (asset_pair_id);
 
 
 --
@@ -1027,6 +1100,14 @@ ALTER TABLE public.trades
 
 
 --
+-- Name: backtests fk_rails_4c83ce810f; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.backtests
+    ADD CONSTRAINT fk_rails_4c83ce810f FOREIGN KEY (asset_pair_id) REFERENCES public.asset_pairs(id);
+
+
+--
 -- Name: smoothed_moving_averages fk_rails_8983b830fb; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1040,6 +1121,14 @@ ALTER TABLE public.smoothed_moving_averages
 
 ALTER TABLE ONLY public.active_storage_variant_records
     ADD CONSTRAINT fk_rails_993965df05 FOREIGN KEY (blob_id) REFERENCES public.active_storage_blobs(id);
+
+
+--
+-- Name: backtest_trades fk_rails_9b81f437e7; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.backtest_trades
+    ADD CONSTRAINT fk_rails_9b81f437e7 FOREIGN KEY (asset_pair_id) REFERENCES public.asset_pairs(id);
 
 
 --
@@ -1059,6 +1148,14 @@ ALTER TABLE ONLY public.active_storage_attachments
 
 
 --
+-- Name: backtest_trades fk_rails_d36505435c; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.backtest_trades
+    ADD CONSTRAINT fk_rails_d36505435c FOREIGN KEY (asset_pair_id, iso8601_duration, range_position) REFERENCES public.ohlcs(asset_pair_id, iso8601_duration, range_position);
+
+
+--
 -- Name: smoothed_trends fk_rails_df50212b75; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1073,6 +1170,8 @@ ALTER TABLE public.smoothed_trends
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240508150348'),
+('20240508150235'),
 ('20240505080719'),
 ('20240504162349'),
 ('20240504083915'),
