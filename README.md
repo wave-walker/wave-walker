@@ -98,3 +98,16 @@ EM.run do
   end
 end
 ```
+
+```
+Ohlc.find_each {|ohlc| SmoothedTrendService.call(ohlc) }
+```
+
+
+```
+smoothed_trends = SmoothedTrend.order(:range_position).reduce({}) {|o, t| o["atom#{t.range.first.strftime('%Y%m%sd')}"] = t.attributes.tap {|x| x[:fast_smma] = t.fast_smma.to_s }; o }.to_yaml
+```
+
+```
+File.open('test/fixtures/smoothed_trends.yml', 'w') { |file| file.write(smoothed_trends) }
+```

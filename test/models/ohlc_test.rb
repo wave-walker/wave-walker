@@ -6,9 +6,9 @@ class OhlcTest < ActiveSupport::TestCase
   include ActiveJob::TestHelper
 
   test '#previous_ohlcs, returns the previous ohlcs' do
-    ohlc = ohlcs(:atom_2019_04_24) # rubocop:disable Naming/VariableNumber
+    ohlc = ohlcs(:atom20221203)
 
-    assert_equal ohlc.previous_ohlcs, [ohlcs(:atom_2019_04_23), ohlcs(:atom_2019_04_22)] # rubocop:disable Naming/VariableNumber
+    assert_equal ohlc.previous_ohlcs, [ohlcs(:atom20221202), ohlcs(:atom20221201)]
   end
 
   test '#hl2' do

@@ -5,6 +5,10 @@ require 'application_system_test_case'
 class AssetPairChartComponentSystemTest < ApplicationSystemTestCase
   def test_asset_pair_chart
     asset_pair = asset_pairs(:atomusd)
+
+    Ohlc.where(asset_pair:).by_duration(1.day).order(:range_position)
+        .each { |ohlc| SmoothedTrendService.call(ohlc) }
+
     visit("/rails/view_components/asset_pair_chart_component/asset_pair_chart?asset_pair_id=#{asset_pair.id}")
 
     chart = find("#asset_pair_chard_#{asset_pair.id}").find('.tv-lightweight-charts')
