@@ -2,3 +2,4 @@ atom:
   asset_pair_id: 1
   iso8601_duration: 'P1D'
   usd_quantity: 10000
+  current_value: 10000

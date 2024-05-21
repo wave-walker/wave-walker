@@ -45,8 +45,9 @@ class BacktestServiceTest < ActiveSupport::TestCase
   test 'sells nothing when nothing is invested' do
     backtest = backtests(:atom)
     backtest.token_quantity = 0
+    ohlc = Ohlc.new(close: 100, range_position: 1)
 
-    smoothed_trends = [SmoothedTrend.new(trend: :bearish, flip: true, range_position: 1)]
+    smoothed_trends = [SmoothedTrend.new(trend: :bearish, flip: true, range_position: 1, ohlc:)]
 
     assert_no_changes 'BacktestTrade.count' do
       BacktestService.call(backtest:, smoothed_trends:)
@@ -56,8 +57,9 @@ class BacktestServiceTest < ActiveSupport::TestCase
   test 'buys nothing when no usd is available' do
     backtest = backtests(:atom)
     backtest.usd_quantity = 0
+    ohlc = Ohlc.new(close: 100, range_position: 1)
 
-    smoothed_trends = [SmoothedTrend.new(trend: :bullish, flip: true, range_position: 1)]
+    smoothed_trends = [SmoothedTrend.new(trend: :bullish, flip: true, range_position: 1, ohlc:)]
 
     assert_no_changes 'BacktestTrade.count' do
       BacktestService.call(backtest:, smoothed_trends:)
@@ -66,14 +68,31 @@ class BacktestServiceTest < ActiveSupport::TestCase
 
   test 'records the last backtest position' do
     backtest = backtests(:atom)
+    ohlc = Ohlc.new(close: 100, range_position: 5)
 
     smoothed_trends = [
       SmoothedTrend.new(range_position: 3),
       SmoothedTrend.new(range_position: 4),
-      SmoothedTrend.new(range_position: 5)
+      SmoothedTrend.new(range_position: 5, ohlc:)
     ]
 
     assert_changes 'backtest.reload.last_range_position', to: 5 do
+      BacktestService.call(backtest:, smoothed_trends:)
+    end
+  end
+
+  test 'records the current value of the backtest' do
+    backtest = backtests(:atom)
+    backtest.update!(usd_quantity: 5, token_quantity: 5)
+    ohlc = Ohlc.new(close: 100, range_position: 5)
+
+    smoothed_trends = [
+      SmoothedTrend.new(range_position: 3),
+      SmoothedTrend.new(range_position: 4),
+      SmoothedTrend.new(range_position: 5, ohlc:)
+    ]
+
+    assert_changes 'backtest.reload.current_value', to: 505 do
       BacktestService.call(backtest:, smoothed_trends:)
     end
   end

@@ -11,7 +11,7 @@ class BacktestService
   def call
     ActiveRecord::Base.transaction do
       BacktestTrade.insert_all(trades) # rubocop:disable Rails/SkipsModelValidations
-      backtest.update!(last_range_position:)
+      backtest.update!(last_range_position:, current_value:)
     end
   end
 
@@ -24,6 +24,8 @@ class BacktestService
   def iso8601_duration = backtest.iso8601_duration
   def base_trade_params = { asset_pair_id:, iso8601_duration: }
   def cost_decimals = backtest.asset_pair.cost_decimals
+  def last_price = smoothed_trends.last.ohlc.close
+  def current_value = backtest.usd_quantity + (backtest.token_quantity * last_price)
 
   def build_buy(ohlc)
     return if backtest.usd_quantity.zero?

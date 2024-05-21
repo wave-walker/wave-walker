@@ -10,7 +10,10 @@ class Backtest < ApplicationRecord
   has_many :smoothed_trends, query_constraints: %i[asset_pair_id iso8601_duration],
                              dependent: nil
 
-  before_save { self.usd_quantity = BACKTEST_FUND }
+  before_create do
+    self.usd_quantity  = BACKTEST_FUND
+    self.current_value = BACKTEST_FUND
+  end
 
   def new_smoothed_trends = smoothed_trends.where(range_position: next_range_position..)
 

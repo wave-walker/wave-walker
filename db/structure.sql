@@ -458,7 +458,8 @@ CREATE TABLE public.backtests (
     token_quantity numeric DEFAULT 0.0 NOT NULL,
     usd_quantity numeric NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    current_value numeric
 );
 
 
@@ -1169,6 +1170,7 @@ ALTER TABLE public.smoothed_trends
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240521160715'),
 ('20240521150441'),
 ('20240508150348'),
 ('20240508150235'),

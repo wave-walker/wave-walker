@@ -50,9 +50,15 @@ class BacktestTest < ActiveSupport::TestCase
     assert_equal smoothed_trends, backtest.new_smoothed_trends
   end
 
-  test '#usd_quantitiy, sets backtest funds to 10.000$' do
+  test '#usd_quantitiy, sets backtest funds to 10.000$ on creation' do
     backtest = Backtest.create!(asset_pair: asset_pairs(:btcusd), duration: 1.day)
 
     assert_equal backtest.usd_quantity, 10_000
+  end
+
+  test '#current_value, sets current value to the usd quantity on creation' do
+    backtest = Backtest.create!(asset_pair: asset_pairs(:btcusd), duration: 1.day)
+
+    assert_equal backtest.current_value, backtest.usd_quantity
   end
 end
