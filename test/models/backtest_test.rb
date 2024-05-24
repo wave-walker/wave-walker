@@ -61,4 +61,18 @@ class BacktestTest < ActiveSupport::TestCase
 
     assert_equal backtest.current_value, backtest.usd_quantity
   end
+
+  test '#percentage_change, should return the percentage change of the current value' do
+    backtest = backtests(:atom)
+
+    assert_equal backtest.percentage_change, 0
+
+    backtest.update(current_value: 12_345)
+
+    assert_equal backtest.percentage_change, 23.45
+
+    backtest.update(current_value: 9876)
+
+    assert_equal backtest.percentage_change, -1.24
+  end
 end

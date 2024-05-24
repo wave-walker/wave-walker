@@ -5,6 +5,7 @@ Rails.application.routes.draw do
 
   resource :asset_pair_import, only: %i[new create]
   resources :asset_pairs, only: %i[index show]
+  resources :backtests, only: %i[index]
 
   root 'dashboards#show'
 

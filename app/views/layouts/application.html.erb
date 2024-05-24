@@ -18,7 +18,11 @@
           <li><strong>TrendPulse</strong></li>
         </ul>
         <ul>
-          <% [['Dashboard', root_path], ['Asset Pairs', asset_pairs_path]].each do |name, path| %>
+          <% [
+               ['Dashboard', root_path],
+               ['Asset Pairs', asset_pairs_path],
+               ['Backtests', backtests_path]
+             ].each do |name, path| %>
             <li><%= link_to name, path, aria: { current: current_page?(path) ? 'page' : nil } %></li>
           <% end %>
         </ul>

@@ -16,6 +16,7 @@ class Backtest < ApplicationRecord
   end
 
   def new_smoothed_trends = smoothed_trends.where(range_position: next_range_position..)
+  def percentage_change = (current_value - BACKTEST_FUND) / BACKTEST_FUND * 100
 
   private
 
