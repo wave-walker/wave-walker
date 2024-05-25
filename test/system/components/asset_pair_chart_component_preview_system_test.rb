@@ -24,11 +24,13 @@ class AssetPairChartComponentSystemTest < ApplicationSystemTestCase
     create_screenshot(path:, element:) unless File.exist?(path) || ENV['OVERRIDE_SCREEN_CAPTURE']
 
     reference = Vips::Image.new_from_file(path.to_s, access: :sequential)
+                           .extract_band(0, n: 3)
 
     tempfile = Tempfile.new([caller, '.png'])
     create_screenshot(path: tempfile.path, element:)
 
     capture = Vips::Image.new_from_file(tempfile.path.to_s, access: :sequential)
+                         .extract_band(0, n: 3)
 
     diff_hist = (reference.hist_find.hist_norm - capture.hist_find.hist_norm)**2
     tempfile.unlink
