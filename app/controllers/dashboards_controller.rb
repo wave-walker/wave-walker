@@ -2,6 +2,6 @@
 
 class DashboardsController < ApplicationController
   def show
-    @recently_fliped_smooth_trends = SmoothedTrend.recent_daily_flips
+    @recently_fliped_smooth_trends = SmoothedTrend.recent_daily_flips.order(created_at: :desc)
   end
 end
