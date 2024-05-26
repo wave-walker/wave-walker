@@ -11,7 +11,7 @@ class VisitBacktestsTest < ApplicationSystemTestCase
 
     click_on 'Backtests'
 
-    assert_text 'Rank: 1 ATOMUSD (P1D) - $10,000.00 (0.000%)'
-    assert_text 'Rank: 2 BTCUSD (PT1H) - $0.00 (-100.000%)'
+    assert_text 'Rank: 1 ATOMUSD (1D) - $10,000.00 (0.000%)'
+    assert_text 'Rank: 2 BTCUSD (1H) - $0.00 (-100.000%)'
   end
 end

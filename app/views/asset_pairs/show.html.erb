@@ -8,11 +8,11 @@
   <nav>
     <details class="dropdown">
       <summary>
-        <%= @duration %>
+        <%= duration_to_timeframe(@duration) %>
       </summary>
       <ul dir="rtl">
-        <% Ohlc.durations.map(&:iso8601).each do |iso8601_duration| %>
-          <li><%= link_to(iso8601_duration, asset_pair_path(@asset_pair, iso8601_duration:)) %></li>
+        <% Ohlc.durations.each do |duration| %>
+          <li><%= link_to(duration_to_timeframe(duration), asset_pair_path(@asset_pair, iso8601_duration: duration.iso8601)) %></li>
         <% end %>
       </ul>
     </details>
