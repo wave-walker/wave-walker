@@ -7,6 +7,9 @@ class VisitBacktestsTest < ApplicationSystemTestCase
     Backtest.create!(asset_pair: asset_pairs(:btcusd), duration: 1.hour)
             .tap { |backtest| backtest.update!(current_value: 0) }
 
+    asset_pairs(:atomusd).import
+    asset_pairs(:btcusd).import
+
     visit '/'
 
     click_on 'Backtests'

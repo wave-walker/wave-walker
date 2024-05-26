@@ -2,6 +2,8 @@
 
 class BacktestsController < ApplicationController
   def index
-    @backtests = Backtest.order(current_value: :desc)
+    @backtests = Backtest.joins(:asset_pair)
+                         .merge(AssetPair.importing)
+                         .order(current_value: :desc)
   end
 end
