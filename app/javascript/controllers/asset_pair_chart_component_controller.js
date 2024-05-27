@@ -19,13 +19,49 @@ function timeFormatter(seconds) {
   return date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
 }
 
+class Datafeed {
+  constructor(url) {
+    this._url = url
+    this._nextRangePosition = null
+    this.slowTrends = []
+    this.fastTrends = []
+    this.volumes = []
+    this.candles = []
+  }
+
+  load = async () => {
+    if (this._all_loaded) { return }
+
+    const url = new URL(this._url)
+
+    if (this._nextRangePosition) {
+      url.searchParams.append('next_range_position', this._nextRangePosition)
+    }
+
+    const response = await fetch(url)
+    const data = await response.json()
+
+    if (!data.meta.nextRangePosition) {
+      this._all_loaded = true
+      return
+    }
+
+    this._nextRangePosition = data.meta.nextRangePosition
+    this.slowTrends = [...data.slowTrends, ...this.slowTrends]
+    this.fastTrends = [...data.fastTrends, ...this.fastTrends]
+    this.volumes = [...data.volumes, ...this.volumes]
+    this.candles = [...data.candles, ...this.candles]
+  }
+}
+
 export default class extends Controller {
   static values = {
     chartTicksUrl: String,
     priceFormat: Object
   }
 
-  connect() {
+  connect = async () => {
+    this.loadedRanges = []
     this.chart = createChart(this.element, { localization: { timeFormatter: timeFormatter } })
     this.ohlcSeries = this.chart.addCandlestickSeries()
     this.smoothedTrendSlow = this.chart.addLineSeries()
@@ -34,19 +70,22 @@ export default class extends Controller {
     this.volumeSeries.priceScale().applyOptions(volumePriceScaleOptions);
 
     this.ohlcSeries.applyOptions({ priceFormat: this.priceFormatValue })
-    this.loadData()
+    this.datafeed = new Datafeed(this.chartTicksUrlValue)
+    await this.load()
+    this.chart.timeScale().subscribeVisibleLogicalRangeChange(this.load)
   }
 
-  loadData = async () => {
-    const response = await fetch(this.chartTicksUrlValue)
-    const data = await response.json()
+  load = async (logicalRange) => {
+    if (this._loading || logicalRange && logicalRange.from > 10) { return }
+    this._loading = true
 
-    this.smoothedTrendSlow.setData(data.slowTrends);
-    this.smoothedTrendFast.setData(data.fastTrends);
-    this.volumeSeries.setData(data.volumes)
-    this.ohlcSeries.setData(data.candles)
+    await this.datafeed.load()
 
-    this.chart.timeScale().fitContent();
+    this.smoothedTrendSlow.setData(this.datafeed.slowTrends);
+    this.smoothedTrendFast.setData(this.datafeed.fastTrends);
+    this.volumeSeries.setData(this.datafeed.volumes);
+    this.ohlcSeries.setData(this.datafeed.candles);
+    this._loading = false
   }
 
   disconnect() {

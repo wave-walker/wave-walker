@@ -3,26 +3,45 @@
 require 'application_system_test_case'
 
 class AssetPairChartTest < ApplicationSystemTestCase
-  def test_asset_pair_chart
+  setup do
     asset_pair = asset_pairs(:atomusd)
 
     Ohlc.where(asset_pair:).by_duration(1.day).order(:range_position)
         .each { |ohlc| SmoothedTrendService.call(ohlc) }
 
     visit(root_path)
-
     click_on('Asset Pairs')
-    click_on(asset_pair.name)
-
-    chart = find("#asset_pair_chard_#{asset_pair.id}").find('.tv-lightweight-charts')
-
-    assert_element_is_unchanged(chart)
   end
 
-  def assert_element_is_unchanged(element) # rubocop:todo Metrics/MethodLength, Metrics/AbcSize
+  def test_asset_pair_chart
+    click_on('ATOMUSD')
+
+    chart = find('.tv-lightweight-charts')
+
+    assert_element_is_unchanged(chart, capture_name: 'chart')
+  end
+
+  def test_asset_pair_chart_scall_and_load_more_data
+    stub_const(ChartTicksController, :TICK_COUNT, 30) do
+      click_on('ATOMUSD')
+
+      chart = find('.tv-lightweight-charts')
+
+      assert_element_is_unchanged(chart, capture_name: 'before_scroll')
+
+      # 5th canvas is registering the mouse events
+      chart.all('canvas')[5].drag_to(chart)
+
+      assert_element_is_unchanged(chart, capture_name: 'after_scroll')
+    end
+  end
+
+  private
+
+  def assert_element_is_unchanged(element, capture_name:) # rubocop:todo Metrics/MethodLength, Metrics/AbcSize
     caller = caller_locations(1, 1)[0].label
 
-    path = Rails.root.join('test', 'screen_captures', self.class.name.underscore, "#{caller}.png")
+    path = Rails.root.join('test', 'screen_captures', self.class.name.underscore, "#{capture_name}-#{caller}.png")
 
     create_screenshot(path:, element:) unless File.exist?(path) || ENV['OVERRIDE_SCREEN_CAPTURE']
 

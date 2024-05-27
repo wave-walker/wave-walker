@@ -40,5 +40,5 @@ json.slowTrends do
 end
 
 json.meta do
-  json.last_range_position @ohlcs.last.range_position
+  json.nextRangePosition @ohlcs.any? ? @ohlcs.first.range_position - 1 : nil
 end

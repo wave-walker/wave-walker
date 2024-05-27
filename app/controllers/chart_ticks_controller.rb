@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
 class ChartTicksController < ApplicationController
+  TICK_COUNT = 300
+
   def index
     @ohlcs = Ohlc.by_duration(duration)
                  .includes(:smoothed_trend)
                  .where(asset_pair:)
-                 .last(300)
+
+    @ohlcs = @ohlcs.where(range_position: ...params[:next_range_position]) if params[:next_range_position].present?
+    @ohlcs = @ohlcs.last(TICK_COUNT)
   end
 
   private
