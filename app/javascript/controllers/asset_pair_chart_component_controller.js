@@ -21,27 +21,30 @@ function timeFormatter(seconds) {
 
 export default class extends Controller {
   static values = {
-    ohlcSeries: Array,
-    volumeSeries: Array,
-    smoothedTrendSlowSeries: Array,
-    smoothedTrendFastSeries: Array,
+    chartTicksUrl: String,
     priceFormat: Object
   }
 
   connect() {
     this.chart = createChart(this.element, { localization: { timeFormatter: timeFormatter } })
-    const ohlcSeries = this.chart.addCandlestickSeries()
-    const smoothedTrendSlow = this.chart.addLineSeries()
-    const smoothedTrendFast = this.chart.addLineSeries()
-    const volumeSeries = this.chart.addHistogramSeries(volumeHistogramOptions)
-    volumeSeries.priceScale().applyOptions(volumePriceScaleOptions);
+    this.ohlcSeries = this.chart.addCandlestickSeries()
+    this.smoothedTrendSlow = this.chart.addLineSeries()
+    this.smoothedTrendFast = this.chart.addLineSeries()
+    this.volumeSeries = this.chart.addHistogramSeries(volumeHistogramOptions)
+    this.volumeSeries.priceScale().applyOptions(volumePriceScaleOptions);
 
-    ohlcSeries.applyOptions({ priceFormat: this.priceFormatValue })
+    this.ohlcSeries.applyOptions({ priceFormat: this.priceFormatValue })
+    this.loadData()
+  }
 
-    ohlcSeries.setData(this.ohlcSeriesValue);
-    smoothedTrendSlow.setData(this.smoothedTrendSlowSeriesValue);
-    smoothedTrendFast.setData(this.smoothedTrendFastSeriesValue);
-    volumeSeries.setData(this.volumeSeriesValue)
+  loadData = async () => {
+    const response = await fetch(this.chartTicksUrlValue)
+    const data = await response.json()
+
+    this.smoothedTrendSlow.setData(data.slowTrends);
+    this.smoothedTrendFast.setData(data.fastTrends);
+    this.volumeSeries.setData(data.volumes)
+    this.ohlcSeries.setData(data.candles)
 
     this.chart.timeScale().fitContent();
   }

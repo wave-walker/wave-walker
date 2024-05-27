@@ -1,21 +1,38 @@
 <%= render 'breadcrumbs', crumbs: [
       link_to('Asset Pairs', asset_pairs_path),
-      @asset_pair.name
+      @asset_pair_presenter.name
     ] %>
 
-<%= tag.h1 @asset_pair.name %>
+<%= tag.h1 @asset_pair_presenter.name %>
 
-  <nav>
-    <details class="dropdown">
-      <summary>
-        <%= duration_to_timeframe(@duration) %>
-      </summary>
-      <ul dir="rtl">
-        <% Ohlc.durations.each do |duration| %>
-          <li><%= link_to(duration_to_timeframe(duration), asset_pair_path(@asset_pair, iso8601_duration: duration.iso8601)) %></li>
-        <% end %>
-      </ul>
-    </details>
-  </nav>
+<nav>
+  <details class="dropdown">
+    <summary>
+      <%= duration_to_timeframe(@asset_pair_presenter.duration) %>
+    </summary>
+    <ul dir="rtl">
+      <% Ohlc.durations.each do |duration| %>
+        <li>
+          <%= link_to(
+                duration_to_timeframe(duration),
+                asset_pair_path(
+                  @asset_pair_presenter.asset_pair,
+                  iso8601_duration: duration.iso8601
+                )
+              ) %>
+        </li>
+      <% end %>
+    </ul>
+  </details>
+</nav>
 
-  <%= render AssetPairChartComponent.new(asset_pair: @asset_pair, duration: @duration) %>
+<%= tag.div class: 'asset-pair-chart-component',
+            id: @asset_pair_presenter.chart_id,
+            data: {
+              controller: 'asset-pair-chart-component',
+              asset_pair_chart_component_price_format_value: @asset_pair_presenter.chart_price_format,
+              asset_pair_chart_component_chart_ticks_url_value: asset_pair_duration_chart_ticks_path(
+                @asset_pair_presenter.asset_pair,
+                @asset_pair_presenter.iso8601_duration
+              )
+            } %>
