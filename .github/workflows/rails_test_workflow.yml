@@ -46,7 +46,7 @@ jobs:
         run: bundle exec rails db:schema:load
 
       - name: Run rubocop
-        uses: reviewdog/action-rubocop@v2.11.1
+        uses: reviewdog/action-rubocop@v2.12.0
         with:
           skip_install: true
           use_bundler: true
