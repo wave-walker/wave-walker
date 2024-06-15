@@ -27,6 +27,7 @@ class Datafeed {
     this.fastTrends = []
     this.volumes = []
     this.candles = []
+    this.backtestTrades = []
   }
 
   load = async () => {
@@ -51,6 +52,7 @@ class Datafeed {
     this.fastTrends = [...data.fastTrends, ...this.fastTrends]
     this.volumes = [...data.volumes, ...this.volumes]
     this.candles = [...data.candles, ...this.candles]
+    this.backtestTrades = [...data.backtestTrades, ...this.backtestTrades]
   }
 }
 
@@ -64,6 +66,7 @@ export default class extends Controller {
     this.loadedRanges = []
     this.chart = createChart(this.element, { localization: { timeFormatter: timeFormatter } })
     this.ohlcSeries = this.chart.addCandlestickSeries()
+    this.backtestTrades = this.chart.addLineSeries({ color: 'transparent', lineWidth: 0, crossHairMarkerVisible: false })
     this.smoothedTrendSlow = this.chart.addLineSeries()
     this.smoothedTrendFast = this.chart.addLineSeries()
     this.volumeSeries = this.chart.addHistogramSeries(volumeHistogramOptions)
@@ -85,6 +88,8 @@ export default class extends Controller {
     this.smoothedTrendFast.setData(this.datafeed.fastTrends);
     this.volumeSeries.setData(this.datafeed.volumes);
     this.ohlcSeries.setData(this.datafeed.candles);
+    this.backtestTrades.setData(this.datafeed.backtestTrades.map(({ time, value }) => ({ time, value })));
+    this.backtestTrades.setMarkers(this.datafeed.backtestTrades);
     this._loading = false
   }
 

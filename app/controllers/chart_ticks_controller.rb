@@ -5,7 +5,7 @@ class ChartTicksController < ApplicationController
 
   def index
     @ohlcs = Ohlc.by_duration(duration)
-                 .includes(:smoothed_trend)
+                 .includes(:smoothed_trend, backtest_trade: :backtest)
                  .where(asset_pair:)
 
     @ohlcs = @ohlcs.where(range_position: ...params[:next_range_position]) if params[:next_range_position].present?

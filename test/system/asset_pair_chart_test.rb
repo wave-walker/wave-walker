@@ -9,6 +9,8 @@ class AssetPairChartTest < ApplicationSystemTestCase
     Ohlc.where(asset_pair:).by_duration(1.day).order(:range_position)
         .each { |ohlc| SmoothedTrendService.call(ohlc) }
 
+    BacktestJob.perform_now(backtests(:atom))
+
     visit(root_path)
     click_on('Asset Pairs')
   end

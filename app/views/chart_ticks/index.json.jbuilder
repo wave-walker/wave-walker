@@ -39,6 +39,27 @@ json.slowTrends do
   end
 end
 
+json.backtestTrades do
+  json.array!(@ohlcs.filter_map(&:backtest_trade)) do |trade|
+    json.value trade.price.to_f
+    json.time trade.range.end.to_i
+
+    position = "Position size: #{number_to_currency(trade.backtest.current_value)}"
+
+    if trade.buy?
+      json.position :belowBar
+      json.color :green
+      json.shape :arrowUp
+      json.text "BUY @ #{number_to_currency(trade.price)} #{position}"
+    else
+      json.position :aboveBar
+      json.color :red
+      json.shape :arrowDown
+      json.text "SELL @ #{number_to_currency(trade.price)} #{position}"
+    end
+  end
+end
+
 json.meta do
   json.nextRangePosition @ohlcs.any? ? @ohlcs.first.range_position - 1 : nil
 end
