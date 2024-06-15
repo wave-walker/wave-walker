@@ -1,4 +1,4 @@
-name: Rails Test Workflow
+name: Test and deploy (only main)
 
 on:
   push:
@@ -59,4 +59,23 @@ jobs:
 
       - name: Run tests
         run: bin/rails test:system
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    concurrency:
+      group: deploy
+      cancel-in-progress: false
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Cloning repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
+      - name: Push to dokku
+        uses: dokku/github-action@master
+        with:
+          branch: main
+          git_push_flags: -f
+          git_remote_url: ${{ secrets.DOKKU_GIT_URL }}
+          ssh_private_key: ${{ secrets.DOKKU_SSH_KEY }}
