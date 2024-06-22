@@ -2,7 +2,7 @@
 
 require 'application_system_test_case'
 
-class VisitBacktestsTest < ApplicationSystemTestCase
+class VisitBacktestResultsListTest < ApplicationSystemTestCase
   test 'shows backtests with ranke and gain' do
     Backtest.create!(asset_pair: asset_pairs(:btcusd), duration: 1.hour)
             .tap { |backtest| backtest.update!(current_value: 0) }

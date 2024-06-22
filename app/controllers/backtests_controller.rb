@@ -6,4 +6,8 @@ class BacktestsController < ApplicationController
                          .merge(AssetPair.importing)
                          .order(current_value: :desc)
   end
+
+  def show
+    @backtest = Backtest.includes(:backtest_trades).find(params.extract_value(:id))
+  end
 end

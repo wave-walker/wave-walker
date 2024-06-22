@@ -9,7 +9,7 @@ Rails.application.routes.draw do
       resources :chart_ticks, only: %i[index], defaults: { format: :json }
     end
   end
-  resources :backtests, only: %i[index]
+  resources :backtests, only: %i[index show]
 
   root 'dashboards#show'
 

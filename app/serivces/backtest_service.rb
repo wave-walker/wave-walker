@@ -10,7 +10,7 @@ class BacktestService
 
   def call
     ActiveRecord::Base.transaction do
-      BacktestTrade.insert_all(trades) # rubocop:disable Rails/SkipsModelValidations
+      BacktestTrade.insert_all!(trades) # rubocop:disable Rails/SkipsModelValidations
       backtest.update!(last_range_position:, current_value:)
     end
   end

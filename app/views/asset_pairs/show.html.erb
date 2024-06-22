@@ -1,14 +1,14 @@
 <%= render 'breadcrumbs', crumbs: [
       link_to('Asset Pairs', asset_pairs_path),
-      @asset_pair_presenter.name
+      @asset_pair.name
     ] %>
 
-<%= tag.h1 @asset_pair_presenter.name %>
+<%= tag.h1 @asset_pair.name %>
 
 <nav>
   <details class="dropdown">
     <summary>
-      <%= duration_to_timeframe(@asset_pair_presenter.duration) %>
+      <%= duration_to_timeframe(@duration) %>
     </summary>
     <ul dir="rtl">
       <% Ohlc.durations.each do |duration| %>
@@ -16,7 +16,7 @@
           <%= link_to(
                 duration_to_timeframe(duration),
                 asset_pair_path(
-                  @asset_pair_presenter.asset_pair,
+                  @asset_pair,
                   iso8601_duration: duration.iso8601
                 )
               ) %>
@@ -27,12 +27,19 @@
 </nav>
 
 <%= tag.div class: 'asset-pair-chart-component',
-            id: @asset_pair_presenter.chart_id,
             data: {
               controller: 'asset-pair-chart-component',
-              asset_pair_chart_component_price_format_value: @asset_pair_presenter.chart_price_format,
+              asset_pair_chart_component_price_format_value: {
+                type: 'price',
+                precision: @asset_pair.cost_decimals,
+                minMove: 1.0 / (10**@asset_pair.cost_decimals)
+              },
               asset_pair_chart_component_chart_ticks_url_value: asset_pair_duration_chart_ticks_url(
-                @asset_pair_presenter.asset_pair,
-                @asset_pair_presenter.iso8601_duration
+                @asset_pair,
+                @duration.iso8601
               )
             } %>
+
+<article>
+  <%= turbo_frame_tag dom_id(@backtest), src: backtest_path(@backtest), loading: 'lazy' %>
+</article>

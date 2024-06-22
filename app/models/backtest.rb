@@ -9,6 +9,10 @@ class Backtest < ApplicationRecord
 
   has_many :smoothed_trends, query_constraints: %i[asset_pair_id iso8601_duration],
                              dependent: nil
+  has_many :backtest_trades, -> { order(range_position: :desc) },
+           query_constraints: %i[asset_pair_id iso8601_duration],
+           dependent: nil,
+           inverse_of: :backtest
 
   before_create do
     self.usd_quantity  = BACKTEST_FUND

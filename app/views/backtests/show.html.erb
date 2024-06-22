@@ -1,0 +1,25 @@
+<%= turbo_frame_tag dom_id(@backtest) do %>
+  <header>Backtest</header>
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Date</th>
+        <th scope="col">Quantity</th>
+        <th scope="col">Price</th>
+        <th scope="col">Fee</th>
+        <th scope="col">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @backtest.backtest_trades.each do |backtest_trade| %>
+        <tr>
+          <td><%= l(backtest_trade.range.first, format: :table) %></td>
+          <td><%= number_with_delimiter(backtest_trade.quantity) %></td>
+          <td><%= number_to_currency(backtest_trade.price) %></td>
+          <td><%= number_to_currency(backtest_trade.fee) %></td>
+          <td><%= number_to_currency(backtest_trade.value) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
