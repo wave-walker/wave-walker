@@ -5,7 +5,7 @@ require 'test_helper'
 class BacktestServiceTest < ActiveSupport::TestCase
   test 'trades on a bullish trend flip' do
     ohlc = ohlcs(:atom20230101)
-    ohlc.close = 100
+    ohlc.update!(close: 100)
     backtest = backtests(:atom)
 
     smoothed_trend = SmoothedTrendService.call(ohlc)
@@ -20,11 +20,14 @@ class BacktestServiceTest < ActiveSupport::TestCase
     assert_equal trade.iso8601_duration, backtest.iso8601_duration
     assert_equal trade.range_position, ohlc.range_position
     assert_equal trade.trade_type, 'buy'
+    assert_equal trade.quantity, 96.078431
+    assert_equal trade.fee, 200
+    assert_equal trade.price, 102
   end
 
   test 'sells on a neutral trend flip' do
     ohlc = ohlcs(:atom20230101)
-    ohlc.close = 100
+    ohlc.update!(close: 100)
     backtest = backtests(:atom)
     backtest.update!(usd_quantity: 0, token_quantity: 1000)
 
@@ -40,6 +43,9 @@ class BacktestServiceTest < ActiveSupport::TestCase
     assert_equal trade.iso8601_duration, backtest.iso8601_duration
     assert_equal trade.range_position, ohlc.range_position
     assert_equal 'sell', trade.trade_type
+    assert_equal trade.quantity, 96_040
+    assert_equal trade.fee, 1960
+    assert_equal trade.price, 98
   end
 
   test 'sells nothing when nothing is invested' do

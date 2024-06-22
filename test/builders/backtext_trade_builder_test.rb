@@ -29,9 +29,9 @@ class BacktestTradeBuilderTest < ActiveSupport::TestCase
     assert_equal BacktestTradeBuilder.build(ohlc:, trade_type:, current_quantity:), {
       asset_pair_id: 1,
       iso8601_duration: 'P1D',
-      fee: 25.5,
-      quantity: 1249.5, # usd
-      price: 51,
+      fee: 24.5,
+      quantity: 1200.5, # usd
+      price: 49,
       trade_type: :sell,
       range_position: 19_358
     }

@@ -31,9 +31,14 @@ class BacktestTradeBuilder
   def asset_pair_id = ohlc.asset_pair_id
   def iso8601_duration = ohlc.iso8601_duration
   def range_position = ohlc.range_position
-  def price = ohlc.close * (1 + SLIPPAGE)
   def buy? = trade_type == :buy
   def cost_decimals = ohlc.asset_pair.cost_decimals
+
+  def price
+    return ohlc.close * (1 + SLIPPAGE) if buy?
+
+    ohlc.close * (1 - SLIPPAGE)
+  end
 
   def fee
     if buy?

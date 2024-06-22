@@ -41,7 +41,7 @@ class BacktestService
   def build_sell(ohlc)
     return if backtest.token_quantity.zero?
 
-    trade = BacktestTradeBuilder.build(ohlc:, trade_type: :sell, current_quantity: backtest.usd_quantity)
+    trade = BacktestTradeBuilder.build(ohlc:, trade_type: :sell, current_quantity: backtest.token_quantity)
 
     backtest.usd_quantity = trade.fetch(:quantity)
     backtest.token_quantity = 0
