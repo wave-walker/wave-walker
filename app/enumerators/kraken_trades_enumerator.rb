@@ -37,5 +37,8 @@ class KrakenTradesEnumerator
     self.cursor = response.fetch(:last)
 
     response.fetch(:trades)
+  rescue Kraken::InvalidAssetPair
+    asset_pair.update!(importing: false)
+    []
   end
 end

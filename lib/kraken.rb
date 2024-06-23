@@ -10,8 +10,9 @@ module Kraken
     end
   end
 
-  class RateLimitExceeded < StandardError; end
   class Error < StandardError; end
+  class RateLimitExceeded < Error; end
+  class InvalidAssetPair < Error; end
 
   def self.trades(pair:, since:)
     response = connection.get('public/Trades', pair:, since:, count: 10_000).body
@@ -42,6 +43,7 @@ module Kraken
   def self.check_response(response)
     errors = response.fetch('error')
     raise(RateLimitExceeded, errors.join(', ')) if errors.include?('EGeneral:Too many requests')
+    raise(InvalidAssetPair, errors.join(', ')) if errors.include?('EQuery:Invalid asset pair')
     raise(Error, errors.join(', ')) if errors.any?
   end
 

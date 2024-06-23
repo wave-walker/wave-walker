@@ -72,4 +72,14 @@ class KrakenTradesEnumeratorTest < ActiveSupport::TestCase
 
     KrakenTradesEnumerator.call(asset_pair, cursor: nil).to_a
   end
+
+  test 'stops import for removed assets' do
+    asset_pair = asset_pairs(:atomusd)
+    Kraken.expects(:trades).with(pair: 'ATOMUSD', since: 0)
+          .raises(Kraken::InvalidAssetPair)
+
+    assert_changes -> { asset_pair.reload.importing? }, to: false do
+      assert_empty KrakenTradesEnumerator.call(asset_pair, cursor: nil).to_a
+    end
+  end
 end

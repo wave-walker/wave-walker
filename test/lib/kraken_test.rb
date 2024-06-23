@@ -55,6 +55,21 @@ class KrakenTest < ActiveSupport::TestCase
       assert_equal 'Some unexpected happend!', error.message
     end
 
+    test 'invalid asset pair raise an error' do
+      stub_request(:get, 'https://api.kraken.com/0/public/Trades?count=10000&pair=FOOBAR&since=0')
+        .to_return(
+          status: 200,
+          body: { error: ['EQuery:Invalid asset pair'] }.to_json,
+          headers: { 'Content-Type' => 'application/json' }
+        )
+
+      error = assert_raises Kraken::InvalidAssetPair do
+        Kraken.trades(pair: 'FOOBAR', since: 0)
+      end
+
+      assert_equal 'EQuery:Invalid asset pair', error.message
+    end
+
     test 'returns the trades and the cursor position' do
       stub_request(:get, 'https://api.kraken.com/0/public/Trades?count=10000&pair=XXBTZEUR&since=0')
         .to_return(
