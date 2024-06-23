@@ -4,6 +4,8 @@ source 'https://rubygems.org'
 
 ruby '3.3.1'
 
+gem 'stackprof' # Load first for Sentry profiling
+
 gem 'bootsnap', require: false
 gem 'faraday'
 gem 'good_job'
@@ -17,6 +19,8 @@ gem 'rails', '~> 7.1.3'
 gem 'redis'
 gem 'ruby-limiter'
 gem 'ruby-vips'
+gem 'sentry-rails'
+gem 'sentry-ruby'
 gem 'stimulus-rails'
 gem 'turbo-rails'
 gem 'tzinfo-data', platforms: %i[windows jruby]
