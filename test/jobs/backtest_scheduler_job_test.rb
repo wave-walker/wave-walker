@@ -9,7 +9,7 @@ module Scheduler
       btc_backtest = Backtest.create!(
         asset_pair: asset_pairs(:btcusd),
         iso8601_duration: 'PT1H',
-        usd_quantity: 1000
+        usd_volume: 1000
       )
 
       BacktestSchedulerJob.perform_now

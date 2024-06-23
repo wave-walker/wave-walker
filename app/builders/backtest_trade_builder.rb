@@ -6,10 +6,10 @@ class BacktestTradeBuilder
 
   def self.build(**) = new(**).build
 
-  def initialize(ohlc:, trade_type:, current_quantity:)
+  def initialize(ohlc:, backtest:, action:)
     @ohlc = ohlc
-    @trade_type = trade_type
-    @current_quantity = current_quantity
+    @action = action
+    @backtest = backtest
   end
 
   def build
@@ -17,22 +17,27 @@ class BacktestTradeBuilder
       asset_pair_id:,
       iso8601_duration:,
       fee:,
-      quantity:,
+      volume:,
       price:,
-      trade_type:,
+      action:,
       range_position:
     }
   end
 
   private
 
-  attr_reader :ohlc, :trade_type, :current_quantity
+  attr_reader :ohlc, :action, :backtest
 
   def asset_pair_id = ohlc.asset_pair_id
   def iso8601_duration = ohlc.iso8601_duration
   def range_position = ohlc.range_position
-  def buy? = trade_type == :buy
-  def cost_decimals = ohlc.asset_pair.cost_decimals
+  def buy? = action == :buy
+  def cost_decimals = backtest.asset_pair.cost_decimals
+  def usd_volume = backtest.usd_volume
+  def token_volume = backtest.token_volume
+  # TODO: This must be rounded by the token decimal
+  def volume = (totoal_volume * (1 - FEE)).round(cost_decimals)
+  def fee = (totoal_volume * price * FEE).round(cost_decimals)
 
   def price
     return ohlc.close * (1 + SLIPPAGE) if buy?
@@ -40,19 +45,11 @@ class BacktestTradeBuilder
     ohlc.close * (1 - SLIPPAGE)
   end
 
-  def fee
+  def totoal_volume
     if buy?
-      current_quantity * FEE
+      usd_volume / price
     else
-      current_quantity * FEE * price
-    end.round(cost_decimals)
-  end
-
-  def quantity
-    if buy?
-      current_quantity * (1 - FEE) / price
-    else
-      current_quantity * price * (1 - FEE)
-    end.round(cost_decimals)
+      token_volume
+    end
   end
 end

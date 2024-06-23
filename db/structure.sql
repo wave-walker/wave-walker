@@ -44,16 +44,6 @@ CREATE TYPE public.trade_action AS ENUM (
 
 
 --
--- Name: trade_type; Type: TYPE; Schema: public; Owner: -
---
-
-CREATE TYPE public.trade_type AS ENUM (
-    'buy',
-    'sell'
-);
-
-
---
 -- Name: trend; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -438,8 +428,8 @@ CREATE TABLE public.backtest_trades (
     asset_pair_id bigint NOT NULL,
     iso8601_duration public.iso8601_duration NOT NULL,
     range_position bigint NOT NULL,
-    trade_type public.trade_action NOT NULL,
-    quantity numeric NOT NULL,
+    action public.trade_action NOT NULL,
+    volume numeric NOT NULL,
     fee numeric NOT NULL,
     price numeric NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
@@ -455,8 +445,8 @@ CREATE TABLE public.backtests (
     asset_pair_id bigint NOT NULL,
     iso8601_duration public.iso8601_duration NOT NULL,
     last_range_position bigint DEFAULT 0 NOT NULL,
-    token_quantity numeric DEFAULT 0.0 NOT NULL,
-    usd_quantity numeric NOT NULL,
+    token_volume numeric DEFAULT 0.0 NOT NULL,
+    usd_volume numeric NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     current_value numeric
@@ -1170,6 +1160,7 @@ ALTER TABLE public.smoothed_trends
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240623022510'),
 ('20240521160715'),
 ('20240521150441'),
 ('20240508150348'),

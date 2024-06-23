@@ -15,7 +15,7 @@ class Backtest < ApplicationRecord
            inverse_of: :backtest
 
   before_create do
-    self.usd_quantity  = BACKTEST_FUND
+    self.usd_volume    = BACKTEST_FUND
     self.current_value = BACKTEST_FUND
   end
 

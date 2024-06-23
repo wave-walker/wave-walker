@@ -4,7 +4,8 @@
     <thead>
       <tr>
         <th scope="col">Date</th>
-        <th scope="col">Quantity</th>
+        <th scope="col">Action</th>
+        <th scope="col">Volume</th>
         <th scope="col">Price</th>
         <th scope="col">Fee</th>
         <th scope="col">Value</th>
@@ -14,7 +15,8 @@
       <% @backtest.backtest_trades.each do |backtest_trade| %>
         <tr>
           <td><%= l(backtest_trade.range.first, format: :table) %></td>
-          <td><%= number_with_delimiter(backtest_trade.quantity) %></td>
+          <td><%= backtest_trade.action.to_s.upcase %></td>
+          <td><%= number_with_delimiter(backtest_trade.volume) %></td>
           <td><%= number_to_currency(backtest_trade.price) %></td>
           <td><%= number_to_currency(backtest_trade.fee) %></td>
           <td><%= number_to_currency(backtest_trade.value) %></td>

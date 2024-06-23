@@ -25,39 +25,33 @@ class BacktestService
   def base_trade_params = { asset_pair_id:, iso8601_duration: }
   def cost_decimals = backtest.asset_pair.cost_decimals
   def last_price = smoothed_trends.last.ohlc.close
-  def current_value = backtest.usd_quantity + (backtest.token_quantity * last_price)
+  def current_value = backtest.usd_volume + (backtest.token_volume * last_price)
 
-  def build_buy(ohlc)
-    return if backtest.usd_quantity.zero?
+  def build_trade(smoothed_trend) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+    return if backtest.token_volume.zero? && smoothed_trend.neutral?
+    return if backtest.usd_volume.zero? && smoothed_trend.bullish?
 
-    trade = BacktestTradeBuilder.build(ohlc:, trade_type: :buy, current_quantity: backtest.usd_quantity)
+    action = smoothed_trend.bullish? ? :buy : :sell
+    ohlc = smoothed_trend.ohlc
 
-    backtest.usd_quantity = 0
-    backtest.token_quantity = trade.fetch(:quantity)
+    BacktestTradeBuilder.build(ohlc:, backtest:, action:).tap do |trade_params|
+      price, volume = trade_params.values_at(:price, :volume)
 
-    trade
-  end
-
-  def build_sell(ohlc)
-    return if backtest.token_quantity.zero?
-
-    trade = BacktestTradeBuilder.build(ohlc:, trade_type: :sell, current_quantity: backtest.token_quantity)
-
-    backtest.usd_quantity = trade.fetch(:quantity)
-    backtest.token_quantity = 0
-
-    trade
+      if smoothed_trend.bullish?
+        backtest.usd_volume   = 0
+        backtest.token_volume = volume
+      else
+        backtest.token_volume = 0
+        backtest.usd_volume   = volume * price
+      end
+    end
   end
 
   def trades
     smoothed_trends.filter(&:flip?).filter_map do |smoothed_trend|
-      ohlc = smoothed_trend.ohlc
+      next unless smoothed_trend.bullish? || smoothed_trend.neutral?
 
-      if smoothed_trend.bullish?
-        build_buy(ohlc)
-      elsif smoothed_trend.neutral?
-        build_sell(ohlc)
-      end
+      build_trade(smoothed_trend)
     end
   end
 end

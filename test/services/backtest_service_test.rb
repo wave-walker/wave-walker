@@ -19,8 +19,8 @@ class BacktestServiceTest < ActiveSupport::TestCase
     assert_equal trade.asset_pair_id, backtest.asset_pair_id
     assert_equal trade.iso8601_duration, backtest.iso8601_duration
     assert_equal trade.range_position, ohlc.range_position
-    assert_equal trade.trade_type, 'buy'
-    assert_equal trade.quantity, 96.078431
+    assert_equal trade.action, 'buy'
+    assert_equal trade.volume, 96.078431
     assert_equal trade.fee, 200
     assert_equal trade.price, 102
   end
@@ -29,7 +29,7 @@ class BacktestServiceTest < ActiveSupport::TestCase
     ohlc = ohlcs(:atom20230101)
     ohlc.update!(close: 100)
     backtest = backtests(:atom)
-    backtest.update!(usd_quantity: 0, token_quantity: 1000)
+    backtest.update!(usd_volume: 0, token_volume: 1000)
 
     smoothed_trend = SmoothedTrendService.call(ohlc)
     smoothed_trend.update!(trend: :neutral, flip: true)
@@ -42,15 +42,15 @@ class BacktestServiceTest < ActiveSupport::TestCase
     assert_equal trade.asset_pair_id, backtest.asset_pair_id
     assert_equal trade.iso8601_duration, backtest.iso8601_duration
     assert_equal trade.range_position, ohlc.range_position
-    assert_equal 'sell', trade.trade_type
-    assert_equal trade.quantity, 96_040
+    assert_equal 'sell', trade.action
+    assert_equal trade.volume, 980
     assert_equal trade.fee, 1960
     assert_equal trade.price, 98
   end
 
   test 'sells nothing when nothing is invested' do
     backtest = backtests(:atom)
-    backtest.token_quantity = 0
+    backtest.token_volume = 0
     ohlc = Ohlc.new(close: 100, range_position: 1)
 
     smoothed_trends = [SmoothedTrend.new(trend: :bearish, flip: true, range_position: 1, ohlc:)]
@@ -62,7 +62,7 @@ class BacktestServiceTest < ActiveSupport::TestCase
 
   test 'buys nothing when no usd is available' do
     backtest = backtests(:atom)
-    backtest.usd_quantity = 0
+    backtest.usd_volume = 0
     ohlc = Ohlc.new(close: 100, range_position: 1)
 
     smoothed_trends = [SmoothedTrend.new(trend: :bullish, flip: true, range_position: 1, ohlc:)]
@@ -89,7 +89,7 @@ class BacktestServiceTest < ActiveSupport::TestCase
 
   test 'records the current value of the backtest' do
     backtest = backtests(:atom)
-    backtest.update!(usd_quantity: 5, token_quantity: 5)
+    backtest.update!(usd_volume: 5, token_volume: 5)
     ohlc = Ohlc.new(close: 100, range_position: 5)
 
     smoothed_trends = [

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PartitionTradeAnalysisByAssetPairs < ActiveRecord::Migration[7.1]
-  def up # rubocop:disable Metrics/AbcSize
+  def up
     drop_table :smoothed_trends
     drop_table :smoothed_moving_averages
     drop_table :ohlcs
@@ -73,7 +73,7 @@ class PartitionTradeAnalysisByAssetPairs < ActiveRecord::Migration[7.1]
     SQL
   end
 
-  def down # rubocop:disable Metrics/AbcSize
+  def down
     drop_table :smoothed_trends
     drop_table :smoothed_moving_averages
     drop_table :ohlcs

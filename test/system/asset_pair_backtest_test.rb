@@ -22,7 +22,7 @@ class AssetPairBacktestTest < ApplicationSystemTestCase
 
     scroll_to(find('footer'))
 
-    assert_text('2023-03-08 00:00:00 9,913.950796 $10.73 $202.33 $106,152.22')
-    assert_text('2023-01-07 00:00:00 942.999346 $10.39 $200.00 $9,600.00')
+    assert_text('2023-03-08 00:00:00 SELL 924.139359 $10.73 $202.33 $9,913.95')
+    assert_text('2023-01-07 00:00:00 BUY 942.999346 $10.39 $200.00 $9,800.00')
   end
 end
