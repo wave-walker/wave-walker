@@ -26,3 +26,7 @@ Metrics/MethodLength:
 Metrics/AbcSize:
   Exclude:
     - 'db/migrate/*'
+
+Layout/LineLength:
+  Exclude:
+    - 'db/migrate/*'
