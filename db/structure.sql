@@ -491,7 +491,8 @@ CREATE TABLE public.good_job_executions (
     error text,
     error_event smallint,
     error_backtrace text[],
-    process_id uuid
+    process_id uuid,
+    duration interval
 );
 
 
@@ -1186,6 +1187,7 @@ ALTER TABLE public.smoothed_trends
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240706065400'),
 ('20240623115062'),
 ('20240623115061'),
 ('20240623115060'),
