@@ -77,8 +77,8 @@ class BacktestServiceTest < ActiveSupport::TestCase
     ohlc = Ohlc.new(close: 100, range_position: 5)
 
     smoothed_trends = [
-      SmoothedTrend.new(range_position: 3),
-      SmoothedTrend.new(range_position: 4),
+      SmoothedTrend.new(range_position: 3, ohlc: Ohlc.new(range_position: 3)),
+      SmoothedTrend.new(range_position: 4, ohlc: Ohlc.new(range_position: 4)),
       SmoothedTrend.new(range_position: 5, ohlc:)
     ]
 
@@ -93,8 +93,8 @@ class BacktestServiceTest < ActiveSupport::TestCase
     ohlc = Ohlc.new(close: 100, range_position: 5)
 
     smoothed_trends = [
-      SmoothedTrend.new(range_position: 3),
-      SmoothedTrend.new(range_position: 4),
+      SmoothedTrend.new(range_position: 3, ohlc: Ohlc.new(range_position: 3)),
+      SmoothedTrend.new(range_position: 4, ohlc: Ohlc.new(range_position: 4)),
       SmoothedTrend.new(range_position: 5, ohlc:)
     ]
 

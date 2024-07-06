@@ -13,6 +13,8 @@ class Ohlc < ApplicationRecord
                            dependent: :restrict_with_exception,
                            inverse_of: :ohlc
 
+  scope :analyzed, -> { joins(:smoothed_trend) }
+
   def hl2 = (high + low) / 2
 
   def previous_ohlcs

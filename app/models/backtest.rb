@@ -9,6 +9,12 @@ class Backtest < ApplicationRecord
 
   has_many :smoothed_trends, foreign_key: %i[asset_pair_id iso8601_duration],
                              dependent: nil, inverse_of: false
+  has_many :analysed_ohlcs, -> { analized },
+           foreign_key: %i[asset_pair_id iso8601_duration],
+           class_name: 'Ohlc',
+           inverse_of: false,
+           dependent: nil
+
   has_many :backtest_trades, -> { order(range_position: :desc) },
            foreign_key: %i[asset_pair_id iso8601_duration],
            dependent: nil,
