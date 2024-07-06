@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.configure do
+  config.good_job.preserve_job_records = true
   config.good_job.enable_cron = true
   config.good_job.queues = '+critical,default,low'
 
