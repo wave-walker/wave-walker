@@ -7,10 +7,10 @@ class Backtest < ApplicationRecord
 
   belongs_to :asset_pair
 
-  has_many :smoothed_trends, query_constraints: %i[asset_pair_id iso8601_duration],
-                             dependent: nil
+  has_many :smoothed_trends, foreign_key: %i[asset_pair_id iso8601_duration],
+                             dependent: nil, inverse_of: false
   has_many :backtest_trades, -> { order(range_position: :desc) },
-           query_constraints: %i[asset_pair_id iso8601_duration],
+           foreign_key: %i[asset_pair_id iso8601_duration],
            dependent: nil,
            inverse_of: :backtest
 

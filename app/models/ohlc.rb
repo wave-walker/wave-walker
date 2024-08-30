@@ -6,10 +6,12 @@ class Ohlc < ApplicationRecord
 
   belongs_to :asset_pair
 
-  has_one :smoothed_trend, query_constraints: %i[asset_pair_id iso8601_duration range_position],
-                           dependent: :restrict_with_exception
-  has_one :backtest_trade, query_constraints: %i[asset_pair_id iso8601_duration range_position],
-                           dependent: :restrict_with_exception
+  has_one :smoothed_trend, foreign_key: %i[asset_pair_id iso8601_duration range_position],
+                           dependent: :restrict_with_exception,
+                           inverse_of: :ohlc
+  has_one :backtest_trade, foreign_key: %i[asset_pair_id iso8601_duration range_position],
+                           dependent: :restrict_with_exception,
+                           inverse_of: :ohlc
 
   def hl2 = (high + low) / 2
 

@@ -1187,6 +1187,9 @@ ALTER TABLE public.smoothed_trends
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240830150260'),
+('20240830150259'),
+('20240830150258'),
 ('20240706065400'),
 ('20240623115062'),
 ('20240623115061'),
