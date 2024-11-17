@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
-Rails.application.configure do
+Rails.application.configure do # rubocop:disable Metrics/BlockLength
+  return if Rails.env.test?
+
+  config.active_job.queue_adapter = :good_job
+
   config.good_job.preserve_job_records = true
   config.good_job.enable_cron = true
   config.good_job.queues = '+critical,default,low'
