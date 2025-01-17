@@ -280,7 +280,7 @@ GEM
       rubocop (>= 1.52.0, < 2.0)
       rubocop-ast (>= 1.31.1, < 2.0)
     ruby-limiter (2.3.0)
-    ruby-lsp (0.23.5)
+    ruby-lsp (0.23.6)
       language_server-protocol (~> 3.17.0)
       prism (>= 1.2, < 2.0)
       rbs (>= 3, < 4)
@@ -305,7 +305,7 @@ GEM
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
     smart_properties (1.17.0)
-    sorbet-runtime (0.5.11751)
+    sorbet-runtime (0.5.11763)
     stackprof (0.2.26)
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
