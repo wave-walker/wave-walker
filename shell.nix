@@ -2,7 +2,7 @@
 
 pkgs.mkShell {
   buildInputs = with pkgs; [
-    ruby_3_3
+    ruby_3_4
     postgresql_16
     libffi
     openssl
@@ -20,7 +20,7 @@ pkgs.mkShell {
     export BUNDLE_PATH=$PWD/.bundle
     export GEM_HOME=$PWD/.bundle
     export PATH=$PWD/.bundle/bin:$PATH
-    export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath (with pkgs; [ vips ])};
+    export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath (with pkgs; [ vips libyaml postgresql_16 ])};
     export RUBY_YJIT_ENABLE=1;
 
   '';
