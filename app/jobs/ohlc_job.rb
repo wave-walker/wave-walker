@@ -12,7 +12,7 @@ class OhlcJob < ApplicationJob
   queue_as :default
 
   def build_enumerator(attr, cursor:)
-    OhlcRangeEnumerator.call(**attr, cursor:)
+    enumerator_builder.wrap(self, OhlcRangeEnumerator.call(**attr, cursor:))
   end
 
   def each_iteration(range, attr)
