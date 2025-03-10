@@ -38,5 +38,8 @@ module WaveWalker
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
     config.active_record.schema_format = :sql
+    # Since the hole application is authorized behind the proxy
+    # no extra authorization is required.
+    config.mission_control.jobs.http_basic_auth_enabled = false
   end
 end

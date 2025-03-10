@@ -13,5 +13,5 @@ Rails.application.routes.draw do
 
   root 'dashboards#show'
 
-  mount GoodJob::Engine => 'good_job'
+  mount MissionControl::Jobs::Engine, at: '/jobs'
 end

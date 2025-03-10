@@ -1,0 +1,15 @@
+production: &default
+  asset_pair_create_task:
+    schedule: "0 */4 * * *"
+    class: CreateKrakenAssetPairsJob
+  asset_pair_sync_task:
+    schedule: "*/5 * * * *"
+    class: TradeImportJob
+  schedual_ohlc_generation_task:
+    schedule: "*/5 * * * *"
+    class: TriggerOhlcGenerationJob
+  backtest_scheduling_task:
+    schedule: "0 */4 * * *"
+    class: BacktestSchedulerJob
+development:
+  <<: *default

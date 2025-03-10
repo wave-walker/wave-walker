@@ -24,10 +24,10 @@ class BacktestJobTest < ActiveJob::TestCase
     end
   end
 
-  test '#good_job_concurrency_key, is unique for asset pair and duration' do
+  test '#concurrency_key, is unique for asset pair and duration' do
     backtest = backtests(:atom)
     job = BacktestJob.perform_later(backtest)
 
-    assert_equal 'BacktestJob-1-P1D', job.good_job_concurrency_key
+    assert_equal 'BacktestJob/Backtest/1/P1D', job.concurrency_key
   end
 end

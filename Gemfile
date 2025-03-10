@@ -8,10 +8,10 @@ gem 'stackprof' # Load first for Sentry profiling
 
 gem 'bootsnap', require: false
 gem 'faraday'
-gem 'good_job'
 gem 'importmap-rails'
 gem 'jbuilder'
 gem 'job-iteration'
+gem 'mission_control-jobs'
 gem 'pg'
 gem 'propshaft'
 gem 'puma'
@@ -21,6 +21,7 @@ gem 'ruby-limiter'
 gem 'ruby-vips'
 gem 'sentry-rails'
 gem 'sentry-ruby'
+gem 'solid_queue'
 gem 'stimulus-rails'
 gem 'turbo-rails'
 gem 'tzinfo-data', platforms: %i[windows jruby]

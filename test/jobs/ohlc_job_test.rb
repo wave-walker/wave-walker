@@ -3,11 +3,11 @@
 require 'test_helper'
 
 class OhlcJobTest < ActiveJob::TestCase
-  test '#good_job_concurrency_key, is unique for asset pair and duration' do
+  test '#concurrency_key, is unique for asset pair and duration' do
     asset_pair = asset_pairs(:atomusd)
     job = OhlcJob.perform_later(asset_pair:, duration: 1.hour)
 
-    assert_equal "OhlcJob-#{asset_pair.id}-3600", job.good_job_concurrency_key
+    assert_equal "OhlcJob/#{asset_pair.id}-3600", job.concurrency_key
   end
 
   test '#perform, creates the inital OHLC' do

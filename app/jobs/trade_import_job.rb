@@ -1,14 +1,13 @@
 # frozen_string_literal: true
 
 class TradeImportJob < ApplicationJob
-  include GoodJob::ActiveJobExtensions::Concurrency
   include JobIteration::Iteration
 
   queue_as :critical
 
   retry_on Kraken::RateLimitExceeded, wait: 15.seconds, attempts: 10
 
-  good_job_control_concurrency_with(total_limit: 1)
+  limits_concurrency key: :trade_import
 
   def build_enumerator(cursor:)
     enumerator_builder.nested(
