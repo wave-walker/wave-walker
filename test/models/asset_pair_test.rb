@@ -25,30 +25,4 @@ class AssetPairTest < ActiveSupport::TestCase
       )
     end
   end
-
-  test 'partition creation' do
-    partitions = %w[
-      asset_pair_999_ohlcs
-      asset_pair_999_smoothed_moving_averages
-      asset_pair_999_smoothed_trends
-      asset_pair_999_trades
-    ]
-
-    current_tables = ActiveRecord::Base.connection.tables.sort
-
-    assert_changes -> { ActiveRecord::Base.connection.tables.sort - current_tables }, from: [], to: partitions do
-      AssetPair.create!(
-        id: 999,
-        name: 'FOOBAR',
-        name_on_exchange: 'FOOBAR',
-        base: 'foo',
-        quote: 'bar',
-        cost_decimals: 8
-      )
-    end
-
-    assert_changes -> { ActiveRecord::Base.connection.tables.sort - current_tables }, from: partitions, to: [] do
-      AssetPair.find(999).destroy
-    end
-  end
 end

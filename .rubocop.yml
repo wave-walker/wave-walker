@@ -12,6 +12,8 @@ AllCops:
     - node_modules/**/*
     - tmp/**/*
     - vendor/**/*
+    - db/schema.rb
+    - db/queue_schema.rb
 
 Style/Documentation:
   Enabled: false
