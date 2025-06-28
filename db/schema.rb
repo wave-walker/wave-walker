@@ -10,16 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_08_161752) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_28_060517) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
-
-  # Custom types defined in this database.
-  # Note that some types may not work with other database engines. Be careful if changing database.
-  create_enum "iso8601_duration", ["PT1H", "PT4H", "PT8H", "P1D", "P2D", "P1W"]
-  create_enum "order_type", ["market", "limit"]
-  create_enum "trade_action", ["buy", "sell"]
-  create_enum "trend", ["bearish", "neutral", "bullish"]
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -65,20 +58,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_08_161752) do
 
   create_table "backtest_trades", primary_key: ["asset_pair_id", "iso8601_duration", "range_position"], force: :cascade do |t|
     t.bigint "asset_pair_id", null: false
-    t.enum "iso8601_duration", null: false, enum_type: "iso8601_duration"
+    t.string "iso8601_duration", null: false
     t.bigint "range_position", null: false
-    t.enum "action", null: false, enum_type: "trade_action"
+    t.string "action", null: false
     t.decimal "volume", null: false
     t.decimal "fee", null: false
     t.decimal "price", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["asset_pair_id"], name: "index_backtest_trades_on_asset_pair_id"
+    t.check_constraint "action::text = ANY (ARRAY['buy'::character varying, 'sell'::character varying]::text[])"
+    t.check_constraint "iso8601_duration::text = ANY (ARRAY['PT1H'::character varying, 'PT4H'::character varying, 'PT8H'::character varying, 'P1D'::character varying, 'P2D'::character varying, 'P1W'::character varying]::text[])"
   end
 
   create_table "backtests", primary_key: ["asset_pair_id", "iso8601_duration"], force: :cascade do |t|
     t.bigint "asset_pair_id", null: false
-    t.enum "iso8601_duration", null: false, enum_type: "iso8601_duration"
+    t.string "iso8601_duration", null: false
     t.bigint "last_range_position", default: 0, null: false
     t.decimal "token_volume", default: "0.0", null: false
     t.decimal "usd_volume", null: false
@@ -86,11 +81,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_08_161752) do
     t.datetime "updated_at", null: false
     t.decimal "current_value"
     t.index ["asset_pair_id"], name: "index_backtests_on_asset_pair_id"
+    t.check_constraint "iso8601_duration::text = ANY (ARRAY['PT1H'::character varying, 'PT4H'::character varying, 'PT8H'::character varying, 'P1D'::character varying, 'P2D'::character varying, 'P1W'::character varying]::text[])"
   end
 
   create_table "ohlcs", primary_key: ["asset_pair_id", "iso8601_duration", "range_position"], force: :cascade do |t|
     t.bigint "asset_pair_id", null: false
-    t.enum "iso8601_duration", null: false, enum_type: "iso8601_duration"
+    t.string "iso8601_duration", null: false
     t.bigint "range_position", null: false
     t.decimal "open", null: false
     t.decimal "high", null: false
@@ -99,26 +95,30 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_08_161752) do
     t.decimal "volume", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.check_constraint "iso8601_duration::text = ANY (ARRAY['PT1H'::character varying, 'PT4H'::character varying, 'PT8H'::character varying, 'P1D'::character varying, 'P2D'::character varying, 'P1W'::character varying]::text[])"
   end
 
   create_table "smoothed_moving_averages", primary_key: ["asset_pair_id", "iso8601_duration", "range_position", "interval"], force: :cascade do |t|
     t.bigint "asset_pair_id", null: false
-    t.enum "iso8601_duration", null: false, enum_type: "iso8601_duration"
+    t.string "iso8601_duration", null: false
     t.bigint "range_position", null: false
-    t.integer "interval", null: false
+    t.string "interval", null: false
     t.decimal "value", null: false
     t.datetime "created_at", precision: nil, null: false
+    t.check_constraint "iso8601_duration::text = ANY (ARRAY['PT1H'::character varying, 'PT4H'::character varying, 'PT8H'::character varying, 'P1D'::character varying, 'P2D'::character varying, 'P1W'::character varying]::text[])"
   end
 
   create_table "smoothed_trends", primary_key: ["asset_pair_id", "iso8601_duration", "range_position"], force: :cascade do |t|
     t.bigint "asset_pair_id", null: false
-    t.enum "iso8601_duration", null: false, enum_type: "iso8601_duration"
+    t.string "iso8601_duration", null: false
     t.bigint "range_position", null: false
     t.decimal "fast_smma", null: false
     t.decimal "slow_smma", null: false
-    t.enum "trend", null: false, enum_type: "trend"
+    t.string "trend", null: false
     t.datetime "created_at", precision: nil, null: false
     t.boolean "flip", null: false
+    t.check_constraint "iso8601_duration::text = ANY (ARRAY['PT1H'::character varying, 'PT4H'::character varying, 'PT8H'::character varying, 'P1D'::character varying, 'P2D'::character varying, 'P1W'::character varying]::text[])"
+    t.check_constraint "trend::text = ANY (ARRAY['bearish'::character varying, 'neutral'::character varying, 'bullish'::character varying]::text[])"
   end
 
   create_table "trades", primary_key: ["asset_pair_id", "id"], force: :cascade do |t|
@@ -127,9 +127,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_08_161752) do
     t.decimal "price", null: false
     t.decimal "volume", null: false
     t.datetime "created_at", precision: nil, null: false
-    t.enum "action", null: false, enum_type: "trade_action"
-    t.enum "order_type", null: false, enum_type: "order_type"
+    t.string "action", null: false
+    t.string "order_type", null: false
     t.string "misc", null: false
+    t.check_constraint "action::text = ANY (ARRAY['buy'::character varying, 'sell'::character varying]::text[])"
+    t.check_constraint "order_type::text = ANY (ARRAY['market'::character varying, 'limit'::character varying]::text[])"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
