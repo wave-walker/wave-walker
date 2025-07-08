@@ -201,7 +201,6 @@ GEM
     parser (3.3.8.0)
       ast (~> 2.4.1)
       racc
-    pg (1.5.9)
     pp (0.6.2)
       prettyprint
     prettyprint (0.2.0)
@@ -326,6 +325,8 @@ GEM
       fugit (~> 1.11.0)
       railties (>= 7.1)
       thor (~> 1.3.1)
+    sqlite3 (2.7.2-x86_64-darwin)
+    sqlite3 (2.7.2-x86_64-linux-gnu)
     stackprof (0.2.27)
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
@@ -377,7 +378,6 @@ DEPENDENCIES
   job-iteration
   mission_control-jobs
   mocha
-  pg
   propshaft
   puma
   rails (~> 8.0)
@@ -392,6 +392,7 @@ DEPENDENCIES
   sentry-rails
   sentry-ruby
   solid_queue
+  sqlite3
   stackprof
   stimulus-rails
   turbo-rails

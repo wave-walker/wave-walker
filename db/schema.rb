@@ -10,10 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_28_060517) do
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "pg_catalog.plpgsql"
-
+ActiveRecord::Schema[8.0].define(version: 2025_07_08_230414) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -67,8 +64,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_28_060517) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["asset_pair_id"], name: "index_backtest_trades_on_asset_pair_id"
-    t.check_constraint "action::text = ANY (ARRAY['buy'::character varying, 'sell'::character varying]::text[])"
-    t.check_constraint "iso8601_duration::text = ANY (ARRAY['PT1H'::character varying, 'PT4H'::character varying, 'PT8H'::character varying, 'P1D'::character varying, 'P2D'::character varying, 'P1W'::character varying]::text[])"
+    t.check_constraint "action IN ('buy', 'sell')"
+    t.check_constraint "iso8601_duration IN ('PT1H', 'PT4H', 'PT8H', 'P1D', 'P2D', 'P1W')"
   end
 
   create_table "backtests", primary_key: ["asset_pair_id", "iso8601_duration"], force: :cascade do |t|
@@ -81,7 +78,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_28_060517) do
     t.datetime "updated_at", null: false
     t.decimal "current_value"
     t.index ["asset_pair_id"], name: "index_backtests_on_asset_pair_id"
-    t.check_constraint "iso8601_duration::text = ANY (ARRAY['PT1H'::character varying, 'PT4H'::character varying, 'PT8H'::character varying, 'P1D'::character varying, 'P2D'::character varying, 'P1W'::character varying]::text[])"
+    t.check_constraint "iso8601_duration IN ('PT1H', 'PT4H', 'PT8H', 'P1D', 'P2D', 'P1W')"
   end
 
   create_table "ohlcs", primary_key: ["asset_pair_id", "iso8601_duration", "range_position"], force: :cascade do |t|
@@ -95,7 +92,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_28_060517) do
     t.decimal "volume", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.check_constraint "iso8601_duration::text = ANY (ARRAY['PT1H'::character varying, 'PT4H'::character varying, 'PT8H'::character varying, 'P1D'::character varying, 'P2D'::character varying, 'P1W'::character varying]::text[])"
+    t.check_constraint "iso8601_duration IN ('PT1H', 'PT4H', 'PT8H', 'P1D', 'P2D', 'P1W')"
   end
 
   create_table "smoothed_moving_averages", primary_key: ["asset_pair_id", "iso8601_duration", "range_position", "interval"], force: :cascade do |t|
@@ -105,7 +102,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_28_060517) do
     t.string "interval", null: false
     t.decimal "value", null: false
     t.datetime "created_at", precision: nil, null: false
-    t.check_constraint "iso8601_duration::text = ANY (ARRAY['PT1H'::character varying, 'PT4H'::character varying, 'PT8H'::character varying, 'P1D'::character varying, 'P2D'::character varying, 'P1W'::character varying]::text[])"
+    t.check_constraint "iso8601_duration IN ('PT1H', 'PT4H', 'PT8H', 'P1D', 'P2D', 'P1W')"
   end
 
   create_table "smoothed_trends", primary_key: ["asset_pair_id", "iso8601_duration", "range_position"], force: :cascade do |t|
@@ -117,8 +114,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_28_060517) do
     t.string "trend", null: false
     t.datetime "created_at", precision: nil, null: false
     t.boolean "flip", null: false
-    t.check_constraint "iso8601_duration::text = ANY (ARRAY['PT1H'::character varying, 'PT4H'::character varying, 'PT8H'::character varying, 'P1D'::character varying, 'P2D'::character varying, 'P1W'::character varying]::text[])"
-    t.check_constraint "trend::text = ANY (ARRAY['bearish'::character varying, 'neutral'::character varying, 'bullish'::character varying]::text[])"
+    t.check_constraint "iso8601_duration IN ('PT1H', 'PT4H', 'PT8H', 'P1D', 'P2D', 'P1W')"
+    t.check_constraint "trend IN ('bearish', 'neutral', 'bullish')"
   end
 
   create_table "trades", primary_key: ["asset_pair_id", "id"], force: :cascade do |t|
@@ -130,8 +127,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_28_060517) do
     t.string "action", null: false
     t.string "order_type", null: false
     t.string "misc", null: false
-    t.check_constraint "action::text = ANY (ARRAY['buy'::character varying, 'sell'::character varying]::text[])"
-    t.check_constraint "order_type::text = ANY (ARRAY['market'::character varying, 'limit'::character varying]::text[])"
+    t.check_constraint "action IN ('buy', 'sell')"
+    t.check_constraint "order_type IN ('market', 'limit')"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
