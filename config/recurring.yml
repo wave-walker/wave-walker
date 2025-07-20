@@ -1,4 +1,4 @@
-production: &default
+default: &default
   asset_pair_create_task:
     schedule: "0 */4 * * *"
     class: CreateKrakenAssetPairsJob
@@ -11,5 +11,12 @@ production: &default
   backtest_scheduling_task:
     schedule: "0 */4 * * *"
     class: BacktestSchedulerJob
+
 development:
   <<: *default
+
+production:
+  <<: *default
+  clear_solid_queue_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    schedule: every hour at minute 12
