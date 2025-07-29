@@ -1,4 +1,4 @@
-@import url("https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css");
+@import url("https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.lime.min.css");
 
 /* Hide spinner on <html> tag on Turbolinks page transitions */
 html[aria-busy=true]::before {
