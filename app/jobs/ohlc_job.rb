@@ -3,7 +3,8 @@
 class OhlcJob < ApplicationJob
   include JobIteration::Iteration
 
-  limits_concurrency key: ->(**attr) { "#{attr.fetch(:asset_pair).id}-#{attr.fetch(:duration)}" }
+  limits_concurrency key: ->(**attr) { "#{attr.fetch(:asset_pair).id}-#{attr.fetch(:duration)}" },
+                     on_conflict: :discard
 
   queue_as :default
 

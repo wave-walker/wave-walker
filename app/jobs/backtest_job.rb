@@ -3,7 +3,7 @@
 class BacktestJob < ApplicationJob
   include JobIteration::Iteration
 
-  limits_concurrency key: ->(backtest) { backtest }
+  limits_concurrency key: ->(backtest) { backtest }, on_conflict: :discard
 
   queue_as :default
 

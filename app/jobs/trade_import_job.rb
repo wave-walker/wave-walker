@@ -7,7 +7,7 @@ class TradeImportJob < ApplicationJob
 
   retry_on Kraken::RateLimitExceeded, wait: 15.seconds, attempts: 10
 
-  limits_concurrency key: :trade_import
+  limits_concurrency key: :trade_import, on_conflict: :discard
 
   def build_enumerator(cursor:)
     enumerator_builder.nested(
