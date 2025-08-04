@@ -11,7 +11,7 @@ class Backtest < ApplicationRecord
                              dependent: nil, inverse_of: false
   has_many :backtest_trades, -> { order(range_position: :desc) },
            foreign_key: %i[asset_pair_id iso8601_duration],
-           dependent: nil,
+           dependent: :destroy,
            inverse_of: :backtest
 
   before_create do
