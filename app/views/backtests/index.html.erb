@@ -1,3 +1,5 @@
+<%= button_to 'Reset all backtests', reset_backtests_path %>
+
 <% @backtests.each.with_index(1) do |backtest, index| %>
   <p>Rank: <%= index -%> <%= backtest.asset_pair.name -%> (<%= duration_to_timeframe(backtest.duration) -%>) - <%= number_to_currency(backtest.current_value) %> (<%= number_to_percentage(backtest.percentage_change) %>)</p>
 <% end %>

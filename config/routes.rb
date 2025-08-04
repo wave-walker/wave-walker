@@ -10,6 +10,7 @@ Rails.application.routes.draw do
     end
   end
   resources :backtests, only: %i[index show]
+  resources :reset_backtests, only: :create
 
   root 'dashboards#show'
 

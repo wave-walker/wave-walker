@@ -11,6 +11,13 @@ class AssetPair < ApplicationRecord
 
   def import = update!(importing: true)
 
+  def reset_backtests
+    ActiveRecord::Base.transaction do
+      backtests.destroy_all
+      create_backtests
+    end
+  end
+
   private
 
   def create_backtests
