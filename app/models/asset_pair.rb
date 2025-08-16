@@ -10,6 +10,7 @@ class AssetPair < ApplicationRecord
   scope :pending, -> { where(importing: false) }
 
   def import = update!(importing: true)
+  def disable_import = update!(importing: false)
 
   def reset_backtests
     ActiveRecord::Base.transaction do

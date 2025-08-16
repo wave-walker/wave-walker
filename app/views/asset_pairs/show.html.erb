@@ -40,6 +40,11 @@
               )
             } %>
 
+
+<article>
+  <%= button_to 'Stop tracking', asset_pair_import_path, params: { asset_pair_id: @asset_pair.id }, method: :delete %>
+</article>
+
 <article>
   <%= turbo_frame_tag dom_id(@backtest), src: backtest_path(@backtest), loading: 'lazy' %>
 </article>
