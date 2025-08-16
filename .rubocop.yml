@@ -1,4 +1,4 @@
-require:
+plugins:
   - rubocop-capybara
   - rubocop-rails
 
@@ -14,6 +14,8 @@ AllCops:
     - vendor/**/*
     - db/schema.rb
     - db/queue_schema.rb
+    - db/cable_schema.rb
+    - db/cache_schema.rb
 
 Style/Documentation:
   Enabled: false
