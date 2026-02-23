@@ -4,7 +4,7 @@ class PartitionTrades < ActiveRecord::Migration[7.1]
   def up
     drop_table :trades
 
-    execute <<-SQL.squish
+    execute <<~SQL.squish
       CREATE SEQUENCE trades_id_seq
         START WITH 1
         INCREMENT BY 1

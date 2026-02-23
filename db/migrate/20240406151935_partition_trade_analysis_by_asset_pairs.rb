@@ -51,7 +51,7 @@ class PartitionTradeAnalysisByAssetPairs < ActiveRecord::Migration[7.1]
     add_foreign_key :smoothed_trends, :ohlcs, column: %i[asset_pair_id duration range_position],
                                               primary_key: %i[asset_pair_id duration range_position]
 
-    execute <<-SQL.squish
+    execute <<~SQL.squish
       CREATE TABLE asset_pair_1_ohlcs
         PARTITION OF ohlcs
         FOR VALUES IN (1);

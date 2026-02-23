@@ -2,12 +2,12 @@
 
 class ManagePartitions < ActiveRecord::Migration[7.1]
   def up
-    execute <<-SQL.squish
+    execute <<~SQL.squish
       CREATE TABLE IF NOT EXISTS asset_pair_1_trades PARTITION OF trades FOR VALUES IN (1);
       CREATE TABLE IF NOT EXISTS asset_pair_2_trades PARTITION OF trades FOR VALUES IN (2);
     SQL
 
-    execute <<-SQL.squish
+    execute <<~SQL.squish
       CREATE FUNCTION create_partition_for_asset_pair()
       RETURNS TRIGGER AS $$
       DECLARE
@@ -23,7 +23,7 @@ class ManagePartitions < ActiveRecord::Migration[7.1]
       $$ LANGUAGE plpgsql;
     SQL
 
-    execute <<-SQL.squish
+    execute <<~SQL.squish
       CREATE FUNCTION drop_partition_for_asset_pair()
       RETURNS TRIGGER AS $$
       DECLARE
@@ -43,13 +43,13 @@ class ManagePartitions < ActiveRecord::Migration[7.1]
       $$ LANGUAGE plpgsql;
     SQL
 
-    execute <<-SQL.squish
+    execute <<~SQL.squish
       CREATE TRIGGER create_partition_for_asset_pair
       AFTER INSERT ON asset_pairs
       FOR EACH ROW EXECUTE FUNCTION create_partition_for_asset_pair();
     SQL
 
-    execute <<-SQL.squish
+    execute <<~SQL.squish
       CREATE TRIGGER drop_partition_for_asset_pair
       AFTER DELETE ON asset_pairs
       FOR EACH ROW EXECUTE FUNCTION drop_partition_for_asset_pair();
@@ -57,7 +57,7 @@ class ManagePartitions < ActiveRecord::Migration[7.1]
   end
 
   def down
-    execute <<-SQL.squish
+    execute <<~SQL.squish
       DROP TABLE asset_pair_1_trades;
       DROP TABLE asset_pair_2_trades;
       DROP TRIGGER create_partition_for_asset_pair ON asset_pairs;

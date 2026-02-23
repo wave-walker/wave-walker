@@ -6,7 +6,7 @@ class RemoveAssetsSequence < ActiveRecord::Migration[7.1]
   end
 
   def down
-    execute <<-SQL.squish
+    execute <<~SQL.squish
       CREATE SEQUENCE trades_id_seq
         START WITH 1
         INCREMENT BY 1
