@@ -8,6 +8,10 @@ class AssetPair < ApplicationRecord
 
   scope :importing, -> { where(importing: true) }
   scope :pending, -> { where(importing: false) }
+  scope :usd, -> { where(quote: 'ZUSD') }
+  scope :missing_on_exchange, -> { where.not(missing_on_exchange_at: nil) }
+
+  def missing_on_exchange? = missing_on_exchange_at.present?
 
   def import = update!(importing: true)
   def disable_import = update!(importing: false)

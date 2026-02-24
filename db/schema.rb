@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_08_230414) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_23_174500) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -49,8 +49,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_08_230414) do
     t.string "quote", null: false
     t.string "base", null: false
     t.integer "cost_decimals", null: false
+    t.datetime "missing_on_exchange_at"
     t.index ["name"], name: "index_asset_pairs_on_name", unique: true
     t.index ["name_on_exchange"], name: "index_asset_pairs_on_name_on_exchange", unique: true
+    t.index ["missing_on_exchange_at"], name: "index_asset_pairs_on_missing_on_exchange_at"
   end
 
   create_table "backtest_trades", primary_key: ["asset_pair_id", "iso8601_duration", "range_position"], force: :cascade do |t|
