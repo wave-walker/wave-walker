@@ -7,7 +7,7 @@ class BacktestSchedulerJob < ApplicationJob
 
   def build_enumerator(cursor:)
     enumerator_builder.active_record_on_records(
-      Backtest.all,
+      Backtest.joins(:asset_pair).merge(AssetPair.importing),
       cursor:
     )
   end

@@ -10,6 +10,7 @@ btcusd:
   id: 2
   name: BTCUSD
   name_on_exchange: XBTUSD
+  importing: false
   base: XXBT
   quote: ZUSD
   cost_decimals: 5

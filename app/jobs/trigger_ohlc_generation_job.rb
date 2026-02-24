@@ -7,7 +7,7 @@ class TriggerOhlcGenerationJob < ApplicationJob
 
   def build_enumerator(cursor:)
     enumerator_builder.active_record_on_records(
-      AssetPair.where.not(imported_until: nil),
+      AssetPair.importing.where.not(imported_until: nil),
       cursor:
     )
   end

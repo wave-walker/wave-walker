@@ -7,6 +7,7 @@
     <thead>
       <tr>
         <th scope="col">Name</th>
+        <th scope="col">Status</th>
         <th scope="col">???</th>
         <th scope="col">???</th>
       </tr>
@@ -15,6 +16,13 @@
       <% @asset_pairs.each do |asset_pair| %>
         <tr>
           <th scope="row"><%= link_to asset_pair.name, asset_pair_path(asset_pair) -%></th>
+          <td>
+            <% if asset_pair.missing_on_exchange? %>
+              Missing on exchange
+            <% else %>
+              Active
+            <% end %>
+          </td>
           <td>???</td>
           <td>???</td>
         </tr>

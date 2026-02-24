@@ -11,6 +11,7 @@ module Scheduler
         iso8601_duration: 'PT1H',
         usd_volume: 1000
       )
+      asset_pairs(:btcusd).update!(importing: true)
 
       BacktestSchedulerJob.perform_now
 

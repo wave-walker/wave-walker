@@ -10,26 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_08_230414) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_23_174500) do
   create_table "active_storage_attachments", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "record_type", null: false
-    t.bigint "record_id", null: false
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
   create_table "active_storage_blobs", force: :cascade do |t|
-    t.string "key", null: false
-    t.string "filename", null: false
-    t.string "content_type"
-    t.text "metadata"
-    t.string "service_name", null: false
     t.bigint "byte_size", null: false
     t.string "checksum"
+    t.string "content_type"
     t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
@@ -40,29 +40,31 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_08_230414) do
   end
 
   create_table "asset_pairs", force: :cascade do |t|
-    t.string "name", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.boolean "importing", default: false, null: false
-    t.string "name_on_exchange", null: false
-    t.datetime "imported_until"
-    t.string "quote", null: false
     t.string "base", null: false
     t.integer "cost_decimals", null: false
+    t.datetime "created_at", null: false
+    t.datetime "imported_until"
+    t.boolean "importing", default: false, null: false
+    t.datetime "missing_on_exchange_at"
+    t.string "name", null: false
+    t.string "name_on_exchange", null: false
+    t.string "quote", null: false
+    t.datetime "updated_at", null: false
+    t.index ["missing_on_exchange_at"], name: "index_asset_pairs_on_missing_on_exchange_at"
     t.index ["name"], name: "index_asset_pairs_on_name", unique: true
     t.index ["name_on_exchange"], name: "index_asset_pairs_on_name_on_exchange", unique: true
   end
 
   create_table "backtest_trades", primary_key: ["asset_pair_id", "iso8601_duration", "range_position"], force: :cascade do |t|
-    t.bigint "asset_pair_id", null: false
-    t.string "iso8601_duration", null: false
-    t.bigint "range_position", null: false
     t.string "action", null: false
-    t.decimal "volume", null: false
-    t.decimal "fee", null: false
-    t.decimal "price", null: false
+    t.bigint "asset_pair_id", null: false
     t.datetime "created_at", null: false
+    t.decimal "fee", null: false
+    t.string "iso8601_duration", null: false
+    t.decimal "price", null: false
+    t.bigint "range_position", null: false
     t.datetime "updated_at", null: false
+    t.decimal "volume", null: false
     t.index ["asset_pair_id"], name: "index_backtest_trades_on_asset_pair_id"
     t.check_constraint "action IN ('buy', 'sell')"
     t.check_constraint "iso8601_duration IN ('PT1H', 'PT4H', 'PT8H', 'P1D', 'P2D', 'P1W')"
@@ -70,63 +72,63 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_08_230414) do
 
   create_table "backtests", primary_key: ["asset_pair_id", "iso8601_duration"], force: :cascade do |t|
     t.bigint "asset_pair_id", null: false
+    t.datetime "created_at", null: false
+    t.decimal "current_value"
     t.string "iso8601_duration", null: false
     t.bigint "last_range_position", default: 0, null: false
     t.decimal "token_volume", default: "0.0", null: false
-    t.decimal "usd_volume", null: false
-    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.decimal "current_value"
+    t.decimal "usd_volume", null: false
     t.index ["asset_pair_id"], name: "index_backtests_on_asset_pair_id"
     t.check_constraint "iso8601_duration IN ('PT1H', 'PT4H', 'PT8H', 'P1D', 'P2D', 'P1W')"
   end
 
   create_table "ohlcs", primary_key: ["asset_pair_id", "iso8601_duration", "range_position"], force: :cascade do |t|
     t.bigint "asset_pair_id", null: false
-    t.string "iso8601_duration", null: false
-    t.bigint "range_position", null: false
-    t.decimal "open", null: false
-    t.decimal "high", null: false
-    t.decimal "low", null: false
     t.decimal "close", null: false
-    t.decimal "volume", null: false
     t.datetime "created_at", null: false
+    t.decimal "high", null: false
+    t.string "iso8601_duration", null: false
+    t.decimal "low", null: false
+    t.decimal "open", null: false
+    t.bigint "range_position", null: false
     t.datetime "updated_at", null: false
+    t.decimal "volume", null: false
     t.check_constraint "iso8601_duration IN ('PT1H', 'PT4H', 'PT8H', 'P1D', 'P2D', 'P1W')"
   end
 
   create_table "smoothed_moving_averages", primary_key: ["asset_pair_id", "iso8601_duration", "range_position", "interval"], force: :cascade do |t|
     t.bigint "asset_pair_id", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.string "interval", null: false
     t.string "iso8601_duration", null: false
     t.bigint "range_position", null: false
-    t.string "interval", null: false
     t.decimal "value", null: false
-    t.datetime "created_at", precision: nil, null: false
     t.check_constraint "iso8601_duration IN ('PT1H', 'PT4H', 'PT8H', 'P1D', 'P2D', 'P1W')"
   end
 
   create_table "smoothed_trends", primary_key: ["asset_pair_id", "iso8601_duration", "range_position"], force: :cascade do |t|
     t.bigint "asset_pair_id", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.decimal "fast_smma", null: false
+    t.boolean "flip", null: false
     t.string "iso8601_duration", null: false
     t.bigint "range_position", null: false
-    t.decimal "fast_smma", null: false
     t.decimal "slow_smma", null: false
     t.string "trend", null: false
-    t.datetime "created_at", precision: nil, null: false
-    t.boolean "flip", null: false
     t.check_constraint "iso8601_duration IN ('PT1H', 'PT4H', 'PT8H', 'P1D', 'P2D', 'P1W')"
     t.check_constraint "trend IN ('bearish', 'neutral', 'bullish')"
   end
 
   create_table "trades", primary_key: ["asset_pair_id", "id"], force: :cascade do |t|
-    t.bigint "id", null: false
+    t.string "action", null: false
     t.bigint "asset_pair_id", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.bigint "id", null: false
+    t.string "misc", null: false
+    t.string "order_type", null: false
     t.decimal "price", null: false
     t.decimal "volume", null: false
-    t.datetime "created_at", precision: nil, null: false
-    t.string "action", null: false
-    t.string "order_type", null: false
-    t.string "misc", null: false
     t.check_constraint "action IN ('buy', 'sell')"
     t.check_constraint "order_type IN ('market', 'limit')"
   end

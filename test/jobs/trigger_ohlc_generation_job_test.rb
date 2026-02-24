@@ -7,7 +7,7 @@ class TriggerOhlcGenerationJobTest < ActiveJob::TestCase
     atomusd = asset_pairs(:atomusd)
     btcusd = asset_pairs(:btcusd)
     atomusd.update!(imported_until: Time.current)
-    btcusd.update!(imported_until: Time.current)
+    btcusd.update!(imported_until: Time.current, importing: true)
 
     TriggerOhlcGenerationJob.perform_now
 
