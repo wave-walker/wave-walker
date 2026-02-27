@@ -57,7 +57,7 @@ class SmoothedTrendSeriveTest < ActiveSupport::TestCase
     assert_equal 'neutral', SmoothedTrendService.call(ohlc).trend
   end
 
-  test 'flips to bullish to neutral and then to bearish with price action' do # rubocop:disable Metrics/BlockLength
+  test 'flips to bullish to neutral and then to bearish with price action' do
     asset_pair = asset_pairs(:atomusd)
 
     29.times do |i|
