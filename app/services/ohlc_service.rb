@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
 class OhlcService
-  def self.call(**) = new(**).call
+  def self.call(asset_pair:, ranges:)
+    ranges.filter_map do |range|
+      new(asset_pair:, range:).call
+    end
+  end
 
   def initialize(asset_pair:, range:)
     @asset_pair = asset_pair

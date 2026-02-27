@@ -38,9 +38,9 @@ class OhlcJobTest < ActiveJob::TestCase
     asset_pair = AssetPair.new
     ohlc = Ohlc.new
 
-    OhlcService.stubs(:call).with(range:, asset_pair:).returns(ohlc)
+    OhlcService.stubs(:call).with(ranges: [range], asset_pair:).returns([ohlc])
     SmoothedTrendService.expects(:call).with(ohlc)
 
-    OhlcJob.new.each_iteration(range, { asset_pair: })
+    OhlcJob.new.each_iteration([range], { asset_pair: })
   end
 end

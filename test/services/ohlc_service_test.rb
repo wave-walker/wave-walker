@@ -3,7 +3,30 @@
 require 'test_helper'
 
 class OhlcServiceTest < ActiveSupport::TestCase
-  test '.create_from_trades, when no trades exists' do
+  test '.call, should create a ....' do
+    asset_pair = asset_pairs(:atomusd)
+    duration = 1.hour
+
+    Trade.create!(id: [asset_pair.id, 1], price: 1, volume: 1, created_at: 3.hours.ago,
+                  action: :buy, order_type: :limit, misc: '')
+    Trade.create!(id: [asset_pair.id, 2], price: 1, volume: 1, created_at: 2.hours.ago,
+                  action: :buy, order_type: :limit, misc: '')
+    Trade.create!(id: [asset_pair.id, 3], price: 1, volume: 1, created_at: 1.hour.ago,
+                  action: :buy, order_type: :limit, misc: '')
+
+    ranges = [
+      OhlcRangeValue.at(duration:, time: 3.hours.ago),
+      OhlcRangeValue.at(duration:, time: 2.hours.ago),
+      OhlcRangeValue.at(duration:, time: 1.hour.ago)
+    ]
+
+    assert_changes 'Ohlc.by_duration(duration).count', to: 3 do
+      OhlcService.call(asset_pair:, ranges:)
+    end
+  end
+
+  # TODO: Consider hl2 for OHLC without trades.
+  test '.call, should use the last close to create the OHLC when no trades are in range' do
     asset_pair = asset_pairs(:atomusd)
     duration = 1.hour
     range = OhlcRangeValue.at(duration:, time: Time.current)
@@ -11,7 +34,7 @@ class OhlcServiceTest < ActiveSupport::TestCase
     Ohlc.create!(asset_pair:, high: 1, low: 2, open: 3, close: 4, volume: 1,
                  duration:, range_position: range.position)
 
-    ohlc = OhlcService.call(asset_pair:, range: range.next)
+    ohlc = OhlcService.call(asset_pair:, ranges: [range.next]).first
 
     assert_equal ohlc.high, 4
     assert_equal ohlc.low, 4
@@ -46,7 +69,7 @@ class OhlcServiceTest < ActiveSupport::TestCase
     Trade.create!(id: [asset_pair.id, 6], price: 6, volume: 6, created_at: range.end,
                   action: :buy, order_type: :limit, misc: '')
 
-    ohlc = OhlcService.call(asset_pair:, range:)
+    ohlc = OhlcService.call(asset_pair:, ranges: [range]).first
 
     assert_equal range, ohlc.range
     assert_equal 1.hour, ohlc.duration
@@ -62,6 +85,6 @@ class OhlcServiceTest < ActiveSupport::TestCase
     asset_pair = asset_pairs(:atomusd)
     range = OhlcRangeValue.at(duration: 1.hour, time: 1.hour.ago)
 
-    assert_nil OhlcService.call(asset_pair:, range:)
+    assert_empty OhlcService.call(asset_pair:, ranges: [range])
   end
 end
