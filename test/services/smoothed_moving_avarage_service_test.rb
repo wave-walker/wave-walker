@@ -33,4 +33,22 @@ class SmoothedMovingAverageServiceTest < ActiveSupport::TestCase
 
     assert_equal smma.value, 10.15
   end
+
+  test '#create, persists with composite key columns' do
+    ohlc = ohlcs(:atom20221206)
+
+    SmoothedMovingAverageService.call(ohlc:, interval: 5)
+
+    smma = SmoothedMovingAverage.find_by!(
+      asset_pair_id: ohlc.asset_pair_id,
+      iso8601_duration: ohlc.iso8601_duration,
+      range_position: ohlc.range_position,
+      interval: 5
+    )
+
+    assert_equal smma.asset_pair_id, ohlc.asset_pair_id
+    assert_equal smma.iso8601_duration, ohlc.iso8601_duration
+    assert_equal smma.range_position, ohlc.range_position
+    assert_equal smma.interval, 5
+  end
 end

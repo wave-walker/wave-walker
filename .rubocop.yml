@@ -26,6 +26,10 @@ Rails/CreateTableWithTimestamps:
 Metrics/MethodLength:
   Exclude:
     - 'db/migrate/*'
+
+Metrics/BlockLength:
+  Exclude:
+    - 'test/**/*'
   
 Metrics/AbcSize:
   Exclude:

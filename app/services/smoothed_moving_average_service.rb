@@ -11,7 +11,13 @@ class SmoothedMovingAverageService
   def call
     return unless value
 
-    SmoothedMovingAverage.create!(id: ohlc.id, interval:, value:)
+    SmoothedMovingAverage.create!(
+      asset_pair_id: ohlc.asset_pair_id,
+      iso8601_duration: ohlc.iso8601_duration,
+      range_position: ohlc.range_position,
+      interval:,
+      value:
+    )
   end
 
   private
