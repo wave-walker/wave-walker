@@ -31,7 +31,7 @@ class CreateKrakenAssetPairsJob < ApplicationJob
       .where.not(name_on_exchange: name_on_exchange_set)
       .where(missing_on_exchange_at: nil)
       .find_each do |asset_pair|
-        asset_pair.update!(missing_on_exchange_at: Time.current, importing: false)
+      asset_pair.update!(missing_on_exchange_at: Time.current, importing: false)
     end
   end
 
