@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_23_174500) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_23_222400) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -100,7 +100,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_23_174500) do
   create_table "smoothed_moving_averages", primary_key: ["asset_pair_id", "iso8601_duration", "range_position", "interval"], force: :cascade do |t|
     t.bigint "asset_pair_id", null: false
     t.datetime "created_at", precision: nil, null: false
-    t.string "interval", null: false
+    t.integer "interval", null: false
     t.string "iso8601_duration", null: false
     t.bigint "range_position", null: false
     t.decimal "value", null: false
