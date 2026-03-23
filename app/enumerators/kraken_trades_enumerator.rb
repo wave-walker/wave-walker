@@ -6,7 +6,7 @@ class KrakenTradesEnumerator
   def self.call(asset_pair, cursor:) = new(asset_pair, cursor:).to_enum(:each).lazy
 
   # Kraken allows 1 request per second. Allowing 50 requests ensures staying
-  # staying under the rate limit.
+  # under the rate limit.
   limit_method :load_trades, rate: 50, balanced: true
 
   def initialize(asset_pair, cursor:)
@@ -16,11 +16,15 @@ class KrakenTradesEnumerator
 
   def each
     loop do
-      trades = load_trades
-      break if trades.empty?
+      response = load_trades
+      self.cursor = response.cursor
 
-      yield({ asset_pair:, trades: }, cursor)
+      yield({ asset_pair:, trades: response.trades }, cursor)
+
+      break if response.last_page?
     end
+  rescue Kraken::InvalidAssetPair
+    asset_pair.update!(importing: false)
   end
 
   private
@@ -33,12 +37,6 @@ class KrakenTradesEnumerator
   end
 
   def load_trades
-    response = Kraken.trades(pair: asset_pair.name_on_exchange, since: cursor)
-    self.cursor = response.fetch(:last)
-
-    response.fetch(:trades)
-  rescue Kraken::InvalidAssetPair
-    asset_pair.update!(importing: false)
-    []
+    Kraken.trades(pair: asset_pair.name_on_exchange, since: cursor)
   end
 end

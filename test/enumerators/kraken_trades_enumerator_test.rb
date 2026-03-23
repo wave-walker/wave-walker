@@ -10,7 +10,7 @@ class KrakenTradesEnumeratorTest < ActiveSupport::TestCase
   test 'request the first trades if latest trade is not present' do
     asset_pair = AssetPair.new(name_on_exchange: 'ATOMUSD')
     Kraken.expects(:trades).with(pair: 'ATOMUSD', since: 0)
-          .returns({ trades: [], last: 1 })
+          .returns(Kraken::TradesResponse.new([], 1))
 
     KrakenTradesEnumerator.call(asset_pair, cursor: nil).first
   end
@@ -26,7 +26,7 @@ class KrakenTradesEnumeratorTest < ActiveSupport::TestCase
     )
 
     Kraken.expects(:trades).with(pair: 'ATOMUSD', since: 1234)
-          .returns({ trades: [], last: 1 })
+          .returns(Kraken::TradesResponse.new([], 1))
 
     KrakenTradesEnumerator.call(asset_pair, cursor: nil).first
   end
@@ -36,10 +36,10 @@ class KrakenTradesEnumeratorTest < ActiveSupport::TestCase
 
     asset_pair = AssetPair.new(name_on_exchange: 'ATOMUSD')
     Kraken.expects(:trades).with(pair: 'ATOMUSD', since: 0)
-          .returns({ trades: %i[trade_a trade_b], last: 3 })
+          .returns(Kraken::TradesResponse.new(Array.new(Kraken::TRADE_PAGE_SIZE), 1000))
 
-    Kraken.expects(:trades).with(pair: 'ATOMUSD', since: 3)
-          .returns({ trades: [], last: 4 })
+    Kraken.expects(:trades).with(pair: 'ATOMUSD', since: 1000)
+          .returns(Kraken::TradesResponse.new(%i[trade_a trade_b], 1002))
 
     KrakenTradesEnumerator.call(asset_pair, cursor: nil).to_a
   end
@@ -51,7 +51,7 @@ class KrakenTradesEnumeratorTest < ActiveSupport::TestCase
     cursor = 2
 
     Kraken.expects(:trades).with(pair: 'ATOMUSD', since: 0)
-          .returns({ trades:, last: cursor })
+          .returns(Kraken::TradesResponse.new(trades, cursor))
 
     trades_yield = KrakenTradesEnumerator.call(asset_pair, cursor: nil).first
     assert_equal trades_yield[0], { asset_pair:, trades: }
@@ -65,10 +65,10 @@ class KrakenTradesEnumeratorTest < ActiveSupport::TestCase
 
     asset_pair = AssetPair.new(name_on_exchange: 'ATOMUSD')
     Kraken.stubs(:trades).with(pair: 'ATOMUSD', since: 0)
-          .returns({ trades: %i[trade_a trade_b], last: 3 })
+          .returns(Kraken::TradesResponse.new(Array.new(1000), 1000))
 
-    Kraken.stubs(:trades).with(pair: 'ATOMUSD', since: 3)
-          .returns({ trades: [], last: 4 })
+    Kraken.stubs(:trades).with(pair: 'ATOMUSD', since: 1000)
+          .returns(Kraken::TradesResponse.new(Array.new(999), 1003))
 
     KrakenTradesEnumerator.call(asset_pair, cursor: nil).to_a
   end

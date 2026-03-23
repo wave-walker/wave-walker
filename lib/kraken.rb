@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module Kraken
+  TRADE_PAGE_SIZE = 1000
+
   Trade = Struct.new(:price, :volume, :created_at, :action, :order_type, :misc, :id) do
     def initialize(*)
       super
@@ -10,17 +12,23 @@ module Kraken
     end
   end
 
+  TradesResponse = Struct.new(:trades, :cursor) do
+    def last_page?
+      trades.count != TRADE_PAGE_SIZE
+    end
+  end
+
   class Error < StandardError; end
   class RateLimitExceeded < Error; end
   class InvalidAssetPair < Error; end
 
   def self.trades(pair:, since:)
-    response = connection.get('public/Trades', pair:, since:, count: 10_000).body
+    response = connection.get('public/Trades', pair:, since:, count: 1000).body
     check_response(response)
 
     trades = response.dig('result', pair).map { |trade_params| Trade.new(*trade_params) }
 
-    { trades:, last: response.dig('result', 'last') }
+    TradesResponse.new(trades, response.dig('result', 'last'))
   end
 
   def self.asset_pairs

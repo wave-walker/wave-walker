@@ -13,8 +13,8 @@ class TradeImportJobTest < ActiveJob::TestCase
   test '#perform, should import trades for all imorting asset_pairs' do
     asset_pairs(:btcusd).update!(importing: true)
 
-    Kraken.expects(:trades).with(pair: 'ATOMUSD', since: 0).returns(trades: [], last: 1)
-    Kraken.expects(:trades).with(pair: 'XBTUSD', since: 0).returns(trades: [], last: 1)
+    Kraken.expects(:trades).with(pair: 'ATOMUSD', since: 0).returns(Kraken::TradesResponse.new([], 1))
+    Kraken.expects(:trades).with(pair: 'XBTUSD', since: 0).returns(Kraken::TradesResponse.new([], 1))
 
     TradeImportJob.perform_now
   end
@@ -23,8 +23,7 @@ class TradeImportJobTest < ActiveJob::TestCase
     asset_pair = asset_pairs(:atomusd)
     trades = [Kraken::Trade.new(1, 2, 3, 's', 'l', 'foo bar', 7)]
 
-    Kraken.expects(:trades).with(pair: 'ATOMUSD', since: 0).returns(trades:, last: 1)
-    Kraken.expects(:trades).with(pair: 'ATOMUSD', since: 1).returns(trades: [], last: 2)
+    Kraken.expects(:trades).with(pair: 'ATOMUSD', since: 0).returns(Kraken::TradesResponse.new(trades, 1))
 
     assert_changes(-> { asset_pair.trades.count }, 1) { TradeImportJob.perform_now }
 
