@@ -3,8 +3,10 @@
 class AssetPair < ApplicationRecord
   has_many :trades, dependent: :restrict_with_error
   has_many :backtests, dependent: :destroy
+  has_many :strategy_backtests, dependent: :destroy
 
   after_create :create_backtests
+  after_create :create_strategy_backtests
 
   scope :importing, -> { where(importing: true) }
   scope :pending, -> { where(importing: false) }
@@ -23,6 +25,13 @@ class AssetPair < ApplicationRecord
     end
   end
 
+  def reset_strategy_backtests
+    ActiveRecord::Base.transaction do
+      strategy_backtests.destroy_all
+      create_strategy_backtests
+    end
+  end
+
   private
 
   def create_backtests
@@ -31,6 +40,18 @@ class AssetPair < ApplicationRecord
         asset_pair: self,
         duration:
       )
+    end
+  end
+
+  def create_strategy_backtests
+    Strategy.find_each do |strategy|
+      Ohlc.durations.each do |duration|
+        StrategyBacktest.create!(
+          strategy:,
+          asset_pair: self,
+          duration:
+        )
+      end
     end
   end
 end

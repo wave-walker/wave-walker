@@ -1,0 +1,6 @@
+atom_daily:
+  strategy_id: 1
+  asset_pair_id: 1
+  iso8601_duration: 'P1D'
+  usd_volume: 10000
+  current_value: 10000

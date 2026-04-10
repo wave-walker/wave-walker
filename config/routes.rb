@@ -12,6 +12,10 @@ Rails.application.routes.draw do
   resources :backtests, only: %i[index show]
   resources :reset_backtests, only: :create
 
+  resources :strategies, only: %i[index show]
+  resources :strategy_backtests, only: %i[index show]
+  resources :reset_strategy_backtests, only: :create
+
   root 'dashboards#show'
 
   mount MissionControl::Jobs::Engine, at: '/jobs'

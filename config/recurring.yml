@@ -11,6 +11,9 @@ default: &default
   backtest_scheduling_task:
     schedule: "0 */4 * * *"
     class: BacktestSchedulerJob
+  strategy_backtest_scheduling_task:
+    schedule: "0 */4 * * *"
+    class: StrategyBacktestSchedulerJob
 
 development:
   <<: *default

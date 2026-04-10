@@ -1,0 +1,39 @@
+<h1><%= @strategy.name %></h1>
+
+<article class="component">
+  <dl>
+    <dt>Fast Interval</dt><dd><%= @strategy.fast_interval %></dd>
+    <dt>Slow Interval</dt><dd><%= @strategy.slow_interval %></dd>
+    <dt>Entry On</dt><dd><%= @strategy.entry_on %></dd>
+    <dt>Exit On</dt><dd><%= @strategy.exit_on %></dd>
+    <dt>Slippage</dt><dd><%= number_to_percentage(@strategy.slippage * 100, precision: 1) %></dd>
+    <dt>Fee</dt><dd><%= number_to_percentage(@strategy.fee * 100, precision: 1) %></dd>
+  </dl>
+</article>
+
+<article class="component">
+  <h2>Results by Asset Pair / Duration</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Rank</th>
+        <th scope="col">Pair</th>
+        <th scope="col">Duration</th>
+        <th scope="col">Current Value</th>
+        <th scope="col">Change</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @strategy_backtests.each.with_index(1) do |sb, index| %>
+        <tr>
+          <td><%= index %></td>
+          <td><%= sb.asset_pair.name %></td>
+          <td><%= duration_to_timeframe(sb.duration) %></td>
+          <td><%= number_to_currency(sb.current_value) %></td>
+          <td><%= number_to_percentage(sb.percentage_change, precision: 2) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</article>

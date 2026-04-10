@@ -1,0 +1,9 @@
+default:
+  id: 1
+  name: "Default Strategy"
+  fast_interval: 16
+  slow_interval: 28
+  entry_on: "bullish"
+  exit_on: "neutral_or_bearish"
+  slippage: 0.02
+  fee: 0.02

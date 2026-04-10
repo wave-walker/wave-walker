@@ -1,0 +1,32 @@
+<h1>Strategies</h1>
+
+<article class="component">
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Fast Interval</th>
+        <th scope="col">Slow Interval</th>
+        <th scope="col">Entry On</th>
+        <th scope="col">Exit On</th>
+        <th scope="col">Slippage</th>
+        <th scope="col">Fee</th>
+        <th scope="col">Backtests</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @strategies.each do |strategy| %>
+        <tr>
+          <th scope="row"><%= link_to strategy.name, strategy_path(strategy) %></th>
+          <td><%= strategy.fast_interval %></td>
+          <td><%= strategy.slow_interval %></td>
+          <td><%= strategy.entry_on %></td>
+          <td><%= strategy.exit_on %></td>
+          <td><%= number_to_percentage(strategy.slippage * 100, precision: 1) %></td>
+          <td><%= number_to_percentage(strategy.fee * 100, precision: 1) %></td>
+          <td><%= strategy.strategy_backtests.count %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</article>

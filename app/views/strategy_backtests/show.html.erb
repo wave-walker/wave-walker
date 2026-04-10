@@ -1,0 +1,31 @@
+<%= turbo_frame_tag dom_id(@strategy_backtest) do %>
+  <header>
+    Strategy Backtest: <%= @strategy_backtest.strategy.name %> &mdash;
+    <%= @strategy_backtest.asset_pair.name %> (<%= duration_to_timeframe(@strategy_backtest.duration) %>)
+  </header>
+
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Date</th>
+        <th scope="col">Action</th>
+        <th scope="col">Volume</th>
+        <th scope="col">Price</th>
+        <th scope="col">Fee</th>
+        <th scope="col">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @strategy_backtest.strategy_backtest_trades.each do |trade| %>
+        <tr>
+          <td><%= l(trade.range.first, format: :table) %></td>
+          <td><%= trade.action.to_s.upcase %></td>
+          <td><%= number_with_delimiter(trade.volume) %></td>
+          <td><%= number_to_currency(trade.price) %></td>
+          <td><%= number_to_currency(trade.fee) %></td>
+          <td><%= number_to_currency(trade.value) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

@@ -43,4 +43,38 @@ class AssetPairTest < ActiveSupport::TestCase
       )
     end
   end
+
+  test '#after_create, creates strategy_backtests for each strategy and timeframe' do
+    strategies(:default) # ensure at least one strategy exists
+
+    assert_changes 'StrategyBacktest.count', 6 do
+      AssetPair.create!(
+        name: 'FOOUSD',
+        name_on_exchange: 'FOOXDS',
+        importing: false,
+        base: 'FOO',
+        quote: 'ZUSD',
+        cost_decimals: 3
+      )
+    end
+  end
+
+  test '#reset_strategy_backtests resets strategy_backtests to BACKTEST_FUND' do
+    asset_pair = AssetPair.create!(
+      name: 'FOOUSD',
+      name_on_exchange: 'FOOXDS',
+      importing: false,
+      base: 'FOO',
+      quote: 'ZUSD',
+      cost_decimals: 3
+    )
+
+    strategies(:default) # ensure fixture strategy exists
+    asset_pair.strategy_backtests.update_all(usd_volume: 0) # rubocop:disable Rails/SkipsModelValidations
+    asset_pair.reset_strategy_backtests
+
+    asset_pair.reload.strategy_backtests.each do |sb|
+      assert_equal Backtest::BACKTEST_FUND, sb.usd_volume
+    end
+  end
 end
