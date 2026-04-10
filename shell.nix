@@ -4,7 +4,7 @@
 
 pkgs.mkShell {
   buildInputs = with pkgs; [
-    ruby_3_4
+    ruby_4_0
     libffi
     openssl
     libxml2
