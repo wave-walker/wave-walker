@@ -7,7 +7,7 @@ class CreateStrategyBacktests < ActiveRecord::Migration[8.1]
       t.references :asset_pair,  null: false, foreign_key: true
       t.string     :iso8601_duration, null: false
       t.bigint     :last_range_position, null: false, default: 0
-      t.decimal    :usd_volume,   null: false
+      t.decimal    :usd_volume,   null: false, default: 10_000
       t.decimal    :token_volume, null: false, default: 0.0
       t.decimal    :current_value
 

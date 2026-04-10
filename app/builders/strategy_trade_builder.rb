@@ -3,12 +3,12 @@
 class StrategyTradeBuilder
   def self.build(**) = new(**).build
 
-  def initialize(ohlc:, strategy_backtest:, action:, slippage:, fee:)
+  def initialize(ohlc:, strategy_backtest:, action:, slippage:, fee_rate:)
     @ohlc               = ohlc
     @strategy_backtest  = strategy_backtest
     @action             = action
     @slippage           = slippage
-    @fee_rate           = fee
+    @fee_rate           = fee_rate
   end
 
   def build

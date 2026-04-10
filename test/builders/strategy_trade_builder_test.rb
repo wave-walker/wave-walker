@@ -13,8 +13,8 @@ class StrategyTradeBuilderTest < ActiveSupport::TestCase
       token_volume: 0
     )
 
-    # slippage=0.02, fee=0.02 (same as BacktestTradeBuilder defaults)
-    result = StrategyTradeBuilder.build(ohlc:, strategy_backtest:, action: :buy, slippage: 0.02, fee: 0.02)
+    # slippage=0.02, fee_rate=0.02 (same as BacktestTradeBuilder defaults)
+    result = StrategyTradeBuilder.build(ohlc:, strategy_backtest:, action: :buy, slippage: 0.02, fee_rate: 0.02)
 
     assert_equal :buy,       result[:action]
     assert_equal 102,        result[:price]
@@ -35,7 +35,7 @@ class StrategyTradeBuilderTest < ActiveSupport::TestCase
       token_volume: 25.0
     )
 
-    result = StrategyTradeBuilder.build(ohlc:, strategy_backtest:, action: :sell, slippage: 0.02, fee: 0.02)
+    result = StrategyTradeBuilder.build(ohlc:, strategy_backtest:, action: :sell, slippage: 0.02, fee_rate: 0.02)
 
     assert_equal :sell,   result[:action]
     assert_equal 147,     result[:price]
@@ -53,7 +53,7 @@ class StrategyTradeBuilderTest < ActiveSupport::TestCase
       token_volume: 0
     )
 
-    result = StrategyTradeBuilder.build(ohlc:, strategy_backtest:, action: :buy, slippage: 0.01, fee: 0.01)
+    result = StrategyTradeBuilder.build(ohlc:, strategy_backtest:, action: :buy, slippage: 0.01, fee_rate: 0.01)
 
     assert_equal 101,       result[:price] # 100 * (1 + 0.01)
     assert_in_delta 9.801,  result[:volume], 0.001  # (1000/101) * (1-0.01)

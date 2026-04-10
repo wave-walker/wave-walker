@@ -9,6 +9,7 @@ class StrategiesController < ApplicationController
     @strategy = Strategy.find(params[:id])
     @strategy_backtests = @strategy.strategy_backtests
                                    .joins(:asset_pair)
+                                   .includes(:asset_pair)
                                    .order(current_value: :desc)
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_10_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_10_215520) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -137,13 +137,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_10_000003) do
 
   create_table "strategy_backtest_trades", primary_key: ["strategy_id", "asset_pair_id", "iso8601_duration", "range_position"], force: :cascade do |t|
     t.string "action", null: false
-    t.integer "asset_pair_id", null: false
+    t.bigint "asset_pair_id"
     t.datetime "created_at", null: false
     t.decimal "fee", null: false
     t.string "iso8601_duration", null: false
     t.decimal "price", null: false
     t.bigint "range_position", null: false
-    t.integer "strategy_id", null: false
+    t.bigint "strategy_id"
     t.datetime "updated_at", null: false
     t.decimal "volume", null: false
     t.index ["asset_pair_id"], name: "index_strategy_backtest_trades_on_asset_pair_id"
@@ -153,15 +153,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_10_000003) do
   end
 
   create_table "strategy_backtests", primary_key: ["strategy_id", "asset_pair_id", "iso8601_duration"], force: :cascade do |t|
-    t.integer "asset_pair_id", null: false
+    t.bigint "asset_pair_id"
     t.datetime "created_at", null: false
     t.decimal "current_value"
     t.string "iso8601_duration", null: false
     t.bigint "last_range_position", default: 0, null: false
-    t.integer "strategy_id", null: false
+    t.bigint "strategy_id"
     t.decimal "token_volume", default: "0.0", null: false
     t.datetime "updated_at", null: false
-    t.decimal "usd_volume", null: false
+    t.decimal "usd_volume", default: "10000.0", null: false
     t.index ["asset_pair_id"], name: "index_strategy_backtests_on_asset_pair_id"
     t.index ["strategy_id"], name: "index_strategy_backtests_on_strategy_id"
     t.check_constraint "iso8601_duration IN ('PT1H', 'PT4H', 'PT8H', 'P1D', 'P2D', 'P1W')"

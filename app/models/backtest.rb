@@ -3,7 +3,9 @@
 class Backtest < ApplicationRecord
   include DurationConcern
 
-  BACKTEST_FUND = 10_000
+  # BACKTEST_FUND is defined on ApplicationRecord and inherited by all models.
+  # Re-exported here so existing references to Backtest::BACKTEST_FUND continue to work.
+  BACKTEST_FUND = ApplicationRecord::BACKTEST_FUND
 
   belongs_to :asset_pair
 

@@ -6,9 +6,14 @@ class StrategyBacktestService
   def initialize(strategy_backtest:, smoothed_trends:)
     @strategy_backtest = strategy_backtest
     @smoothed_trends   = smoothed_trends
+    @smma_cache        = {}
   end
 
   def call
+    return if smoothed_trends.empty?
+
+    preload_smma_cache
+
     ActiveRecord::Base.transaction do
       trades = build_trades
       StrategyBacktestTrade.insert_all!(trades) unless trades.empty? # rubocop:disable Rails/SkipsModelValidations
@@ -18,7 +23,7 @@ class StrategyBacktestService
 
   private
 
-  attr_reader :strategy_backtest, :smoothed_trends
+  attr_reader :strategy_backtest, :smoothed_trends, :smma_cache
 
   def strategy         = strategy_backtest.strategy
   def asset_pair_id    = strategy_backtest.asset_pair_id
@@ -47,12 +52,21 @@ class StrategyBacktestService
   end
 
   def smma_value(smoothed_trend, interval)
-    SmoothedMovingAverage.find_by(
-      asset_pair_id: smoothed_trend.asset_pair_id,
-      iso8601_duration: smoothed_trend.iso8601_duration,
-      range_position: smoothed_trend.range_position,
-      interval: interval.to_s
-    )&.value
+    smma_cache[[smoothed_trend.range_position, interval.to_s]]
+  end
+
+  def preload_smma_cache
+    range_positions = smoothed_trends.map(&:range_position)
+    intervals       = [strategy.fast_interval.to_s, strategy.slow_interval.to_s]
+
+    SmoothedMovingAverage
+      .where(
+        asset_pair_id:,
+        iso8601_duration:,
+        range_position: range_positions,
+        interval: intervals
+      )
+      .find_each { |smma| smma_cache[[smma.range_position, smma.interval]] = smma.value }
   end
 
   # --- Entry / exit decision ---
@@ -105,7 +119,7 @@ class StrategyBacktestService
       strategy_backtest:,
       action:,
       slippage: strategy.slippage,
-      fee: strategy.fee
+      fee_rate: strategy.fee
     ).tap do |trade_params|
       price, volume = trade_params.values_at(:price, :volume)
 
@@ -119,6 +133,9 @@ class StrategyBacktestService
     end
   end
 
+  # Order-dependent: each call to build_trade mutates strategy_backtest.usd_volume /
+  # token_volume so that subsequent iterations see the updated portfolio state.
+  # smoothed_trends must be ordered by range_position ascending.
   def build_trades
     smoothed_trends.filter_map do |smoothed_trend|
       signal = signal_for(smoothed_trend)

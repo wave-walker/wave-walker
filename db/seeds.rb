@@ -41,7 +41,9 @@ interval_pairs.each do |intervals|
         s.fee           = costs[:fee]
       end
 
-      # Ensure strategy_backtests exist for every active asset pair × duration
+      # AssetPair#after_create normally creates strategy_backtests for all existing
+      # strategies. This block handles the inverse: when a new strategy is seeded,
+      # it back-fills backtests for asset pairs that already exist.
       AssetPair.importing.find_each do |asset_pair|
         Ohlc.durations.each do |duration|
           StrategyBacktest.find_or_create_by!(

@@ -13,18 +13,22 @@ class StrategyBacktest < ApplicationRecord
            dependent: :destroy,
            inverse_of: :strategy_backtest
 
+  # The scoped lambda filters by iso8601_duration at the instance level.
+  # Note: this scope does NOT apply when using joins/includes on this association
+  # because Rails evaluates it per-instance. new_smoothed_trends relies on
+  # the instance-level scope; use that method rather than the association directly.
   has_many :smoothed_trends, ->(sb) { where(iso8601_duration: sb.iso8601_duration) },
            foreign_key: :asset_pair_id,
            primary_key: :asset_pair_id,
            dependent: nil, inverse_of: false
 
   before_create do
-    self.usd_volume    = Backtest::BACKTEST_FUND
-    self.current_value = Backtest::BACKTEST_FUND
+    self.usd_volume    = BACKTEST_FUND
+    self.current_value = BACKTEST_FUND
   end
 
   def new_smoothed_trends = smoothed_trends.where(range_position: next_range_position..)
-  def percentage_change = (current_value - Backtest::BACKTEST_FUND) / Backtest::BACKTEST_FUND * 100
+  def percentage_change = (current_value - BACKTEST_FUND) / BACKTEST_FUND * 100
 
   private
 

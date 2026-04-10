@@ -14,6 +14,9 @@ default: &default
   strategy_backtest_scheduling_task:
     schedule: "0 */4 * * *"
     class: StrategyBacktestSchedulerJob
+  ensure_smma_intervals_scheduling_task:
+    schedule: "0 1-23/4 * * *"
+    class: EnsureSmmaIntervalsSchedulerJob
 
 development:
   <<: *default

@@ -1,26 +1,29 @@
-<%= button_to 'Reset all strategy backtests', reset_strategy_backtests_path %>
+<%= button_to 'Reset all strategy backtests', reset_strategy_backtests_path,
+             data: { turbo_confirm: 'This will delete all strategy backtest trade history. Are you sure?' } %>
 
-<table>
-  <thead>
-    <tr>
-      <th scope="col">Rank</th>
-      <th scope="col">Strategy</th>
-      <th scope="col">Pair</th>
-      <th scope="col">Duration</th>
-      <th scope="col">Current Value</th>
-      <th scope="col">Change</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @strategy_backtests.each.with_index(1) do |sb, index| %>
+<article class="component">
+  <table>
+    <thead>
       <tr>
-        <td><%= index %></td>
-        <td><%= link_to sb.strategy.name, strategy_path(sb.strategy) %></td>
-        <td><%= sb.asset_pair.name %></td>
-        <td><%= duration_to_timeframe(sb.duration) %></td>
-        <td><%= link_to number_to_currency(sb.current_value), strategy_backtest_path(sb) %></td>
-        <td><%= number_to_percentage(sb.percentage_change, precision: 2) %></td>
+        <th scope="col">Rank</th>
+        <th scope="col">Strategy</th>
+        <th scope="col">Pair</th>
+        <th scope="col">Duration</th>
+        <th scope="col">Current Value</th>
+        <th scope="col">Change</th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% @strategy_backtests.each.with_index(1) do |sb, index| %>
+        <tr>
+          <td><%= index %></td>
+          <td><%= link_to sb.strategy.name, strategy_path(sb.strategy) %></td>
+          <td><%= sb.asset_pair.name %></td>
+          <td><%= duration_to_timeframe(sb.duration) %></td>
+          <td><%= link_to number_to_currency(sb.current_value), strategy_backtest_path(sb) %></td>
+          <td><%= number_to_percentage(sb.percentage_change, precision: 2) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</article>
