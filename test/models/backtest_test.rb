@@ -4,15 +4,13 @@ require 'test_helper'
 
 class BacktestTest < ActiveSupport::TestCase
   test 'smoothed_trends, should retrun associated smoothed_trends' do
-    smoothed_trends = [
-      SmoothedTrendService.call(ohlcs(:atom20230101)),
-      SmoothedTrendService.call(ohlcs(:atom20230102)),
-      SmoothedTrendService.call(ohlcs(:atom20230103))
-    ]
+    ohlcs = [ohlcs(:atom20230101), ohlcs(:atom20230102), ohlcs(:atom20230103)]
+
+    SmoothedTrendService.call(ohlcs)
 
     backtest = backtests(:atom)
 
-    assert_equal smoothed_trends, backtest.smoothed_trends
+    assert_equal ohlcs.map(&:smoothed_trend), backtest.smoothed_trends
   end
 
   test 'backtest_results, should not retrun unrelated smoothed_trends' do
@@ -28,8 +26,7 @@ class BacktestTest < ActiveSupport::TestCase
       range_position: 1, open: 1, high: 1, low: 1, close: 1, volume: 1
     )
 
-    SmoothedTrendService.call(ohlc_h1)
-    SmoothedTrendService.call(btc_ohlc)
+    SmoothedTrendService.call([ohlc_h1, btc_ohlc])
 
     backtest = backtests(:atom)
 
@@ -37,17 +34,16 @@ class BacktestTest < ActiveSupport::TestCase
   end
 
   test 'new_smoothed_trends, should return untested smoothed_trends' do
-    backtested_trend = SmoothedTrendService.call(ohlcs(:atom20230101))
+    SmoothedTrendService.call([ohlcs(:atom20230101)])
+    backtested_trend = ohlcs(:atom20230101).smoothed_trend
 
-    smoothed_trends = [
-      SmoothedTrendService.call(ohlcs(:atom20230102)),
-      SmoothedTrendService.call(ohlcs(:atom20230103))
-    ]
+    ohlcs = [ohlcs(:atom20230102), ohlcs(:atom20230103)]
+    SmoothedTrendService.call(ohlcs)
 
     backtest = backtests(:atom)
     backtest.update(last_range_position: backtested_trend.range_position)
 
-    assert_equal smoothed_trends, backtest.new_smoothed_trends
+    assert_equal ohlcs.map(&:smoothed_trend), backtest.new_smoothed_trends
   end
 
   test '#usd_quantitiy, sets backtest funds to 10.000$ on creation' do

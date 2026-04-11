@@ -8,7 +8,8 @@ class BacktestServiceTest < ActiveSupport::TestCase
     ohlc.update!(close: 100)
     backtest = backtests(:atom)
 
-    smoothed_trend = SmoothedTrendService.call(ohlc)
+    SmoothedTrendService.call([ohlc])
+    smoothed_trend = ohlc.smoothed_trend
     smoothed_trend.update!(trend: :bullish, flip: true)
 
     assert_changes 'BacktestTrade.count', to: 1 do
@@ -31,7 +32,8 @@ class BacktestServiceTest < ActiveSupport::TestCase
     backtest = backtests(:atom)
     backtest.update!(usd_volume: 0, token_volume: 1000)
 
-    smoothed_trend = SmoothedTrendService.call(ohlc)
+    SmoothedTrendService.call([ohlc])
+    smoothed_trend = ohlc.smoothed_trend
     smoothed_trend.update!(trend: :neutral, flip: true)
 
     assert_changes 'BacktestTrade.count', to: 1 do

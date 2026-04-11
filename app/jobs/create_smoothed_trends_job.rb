@@ -19,6 +19,6 @@ class CreateSmoothedTrendsJob < ApplicationJob
   end
 
   def each_iteration(ohlcs, _attr)
-    ohlcs.each { |ohlc| SmoothedTrendService.call(ohlc) }
+    SmoothedTrendService.call(ohlcs)
   end
 end

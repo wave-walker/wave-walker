@@ -44,8 +44,8 @@ class CreateSmoothedTrendsJobTest < ActiveJob::TestCase
       flip: false
     )
 
-    SmoothedTrendService.expects(:call).with(ohlc_without_trend).once
-    SmoothedTrendService.expects(:call).with(ohlc_with_trend).never
+    SmoothedTrendService.expects(:call).with([ohlc_without_trend]).once
+    SmoothedTrendService.expects(:call).with([ohlc_with_trend]).never
 
     CreateSmoothedTrendsJob.perform_now(asset_pair:, duration: ohlc_with_trend.duration)
   end
