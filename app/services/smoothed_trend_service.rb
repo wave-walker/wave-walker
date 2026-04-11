@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class SmoothedTrendService
-  def self.call(ohlc) = new(ohlc).call
+  def self.call(ohlcs)
+    ohlcs.each { new(it).call }
+  end
 
   def initialize(ohlc)
     @ohlc = ohlc

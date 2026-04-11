@@ -7,7 +7,7 @@ class AssetPairBacktestTest < ApplicationSystemTestCase
     asset_pair = asset_pairs(:atomusd)
 
     Ohlc.where(asset_pair:).by_duration(1.day).order(:range_position)
-        .each { |ohlc| SmoothedTrendService.call(ohlc) }
+        .then { SmoothedTrendService.call(it) }
 
     BacktestJob.perform_now(backtests(:atom))
 
