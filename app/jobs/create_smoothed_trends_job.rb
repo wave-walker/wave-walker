@@ -13,10 +13,10 @@ class CreateSmoothedTrendsJob < ApplicationJob
     duration = attr.fetch(:duration)
 
     base_scope = Ohlc
-      .where(asset_pair: asset_pair)
-      .by_duration(duration)
-      .without_smoothed_trend
-      .with_complete_smmas(SmoothedMovingAverage::INTERVALS)
+                 .where(asset_pair: asset_pair)
+                 .by_duration(duration)
+                 .without_smoothed_trend
+                 .with_complete_smmas(SmoothedMovingAverage::INTERVALS)
 
     enumerator_builder.active_record_on_batches(base_scope, cursor:)
   end

@@ -23,7 +23,7 @@ class SmoothedTrendService
         medium_slow_smma = values[25]
 
         trend = compute_trend(fast_smma, slow_smma, medium_fast_smma, medium_slow_smma)
-        flip = compute_flip(ohlc, trend, trend_cache)
+        flip = flip?(ohlc, trend, trend_cache)
         trend_cache[[ohlc.asset_pair_id, ohlc.iso8601_duration, ohlc.range_position]] = trend.to_s
 
         trend_attrs << {
@@ -68,20 +68,21 @@ class SmoothedTrendService
       asset_pair_id: first.asset_pair_id,
       iso8601_duration: first.iso8601_duration,
       range_position: (first.range_position - 1)..(last.range_position - 1)
-    ).each_with_object({}) do |st, cache|
-      cache[[st.asset_pair_id, st.iso8601_duration, st.range_position]] = st.trend
+    ).to_h do |st|
+      [[st.asset_pair_id, st.iso8601_duration, st.range_position], st.trend]
     end
   end
 
   private_class_method def self.compute_trend(fast_smma, slow_smma, medium_fast_smma, medium_slow_smma)
     bullish = fast_smma > slow_smma
 
-    return :neutral if (fast_smma < medium_fast_smma) == bullish || (medium_slow_smma < slow_smma) == bullish
+    return :neutral if [(fast_smma < medium_fast_smma), (medium_slow_smma < slow_smma)].include?(bullish)
     return :bullish if bullish
+
     :bearish
   end
 
-  private_class_method def self.compute_flip(ohlc, trend, trend_cache)
+  private_class_method def self.flip?(ohlc, trend, trend_cache)
     previous_trend = trend_cache[[ohlc.asset_pair_id, ohlc.iso8601_duration, ohlc.range_position - 1]]
     previous_trend != trend.to_s
   end

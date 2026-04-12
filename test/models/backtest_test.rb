@@ -38,16 +38,16 @@ class BacktestTest < ActiveSupport::TestCase
   end
 
   test 'new_smoothed_trends, should return untested smoothed_trends' do
-    ohlc_01 = ohlcs(:atom20230101)
-    ohlc_02 = ohlcs(:atom20230102)
-    ohlc_03 = ohlcs(:atom20230103)
+    ohlc_a = ohlcs(:atom20230101)
+    ohlc_b = ohlcs(:atom20230102)
+    ohlc_c = ohlcs(:atom20230103)
 
     # Create SMMAs first, then trends
-    CreateSmoothedMovingAveragesService.call([ohlc_01], SmoothedMovingAverage::INTERVALS)
-    SmoothedTrendService.call([ohlc_01])
-    backtested_trend = ohlc_01.smoothed_trend
+    CreateSmoothedMovingAveragesService.call([ohlc_a], SmoothedMovingAverage::INTERVALS)
+    SmoothedTrendService.call([ohlc_a])
+    backtested_trend = ohlc_a.smoothed_trend
 
-    ohlcs_list = [ohlc_02, ohlc_03]
+    ohlcs_list = [ohlc_b, ohlc_c]
     CreateSmoothedMovingAveragesService.call(ohlcs_list, SmoothedMovingAverage::INTERVALS)
     SmoothedTrendService.call(ohlcs_list)
 

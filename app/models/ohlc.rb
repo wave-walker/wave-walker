@@ -6,11 +6,12 @@ class Ohlc < ApplicationRecord
 
   belongs_to :asset_pair
 
-has_one :smoothed_trend, foreign_key: %i[asset_pair_id iso8601_duration range_position],
+  has_one :smoothed_trend, foreign_key: %i[asset_pair_id iso8601_duration range_position],
                            dependent: :restrict_with_exception,
                            inverse_of: :ohlc
   has_many :smoothed_moving_averages, foreign_key: %i[asset_pair_id iso8601_duration range_position],
-                                       dependent: :restrict_with_exception
+                                      dependent: :restrict_with_exception,
+                                      inverse_of: false
   has_one :backtest_trade, foreign_key: %i[asset_pair_id iso8601_duration range_position],
                            dependent: :restrict_with_exception,
                            inverse_of: :ohlc

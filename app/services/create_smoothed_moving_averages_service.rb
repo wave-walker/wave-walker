@@ -23,13 +23,16 @@ class CreateSmoothedMovingAveragesService
       end
     end
 
-    SmoothedMovingAverage.upsert_all(attrs, unique_by: %i[asset_pair_id iso8601_duration range_position interval]) if attrs.any?
+    return unless attrs.any?
+
+    SmoothedMovingAverage.upsert_all(attrs,
+                                     unique_by: %i[asset_pair_id iso8601_duration range_position
+                                                   interval])
   end
 
   private_class_method def self.compute_smma(ohlc, interval, cache)
     decimals = ohlc.asset_pair.cost_decimals
-    value = (calculate_smma(ohlc, interval, cache) || calculate_sma(ohlc, interval))&.round(decimals)
-    value
+    (calculate_smma(ohlc, interval, cache) || calculate_sma(ohlc, interval))&.round(decimals)
   end
 
   private_class_method def self.calculate_smma(ohlc, interval, cache)

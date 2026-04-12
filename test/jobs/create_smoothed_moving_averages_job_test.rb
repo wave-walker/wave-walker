@@ -44,7 +44,7 @@ class CreateSmoothedMovingAveragesJobTest < ActiveJob::TestCase
     asset_pair = asset_pairs(:atomusd)
 
     # Create OHLCs without SMMAs at high positions
-    ohlc_without_1 = Ohlc.create!(
+    ohlc_without_smma_a = Ohlc.create!(
       asset_pair: asset_pair,
       duration: 1.day,
       range_position: 9_000_000,
@@ -55,7 +55,7 @@ class CreateSmoothedMovingAveragesJobTest < ActiveJob::TestCase
       volume: 1000
     )
 
-    ohlc_without_2 = Ohlc.create!(
+    ohlc_without_smma_b = Ohlc.create!(
       asset_pair: asset_pair,
       duration: 1.day,
       range_position: 9_000_001,
@@ -73,8 +73,8 @@ class CreateSmoothedMovingAveragesJobTest < ActiveJob::TestCase
                        .where(smoothed_moving_averages: { asset_pair_id: nil })
                        .distinct
 
-    assert_includes query_result, ohlc_without_1
-    assert_includes query_result, ohlc_without_2
+    assert_includes query_result, ohlc_without_smma_a
+    assert_includes query_result, ohlc_without_smma_b
   end
 
   test '#perform, enqueues CreateSmoothedTrendsJob on complete' do

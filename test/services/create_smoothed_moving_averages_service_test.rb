@@ -107,7 +107,7 @@ class CreateSmoothedMovingAveragesServiceTest < ActiveSupport::TestCase
     CreateSmoothedMovingAveragesService.call([initial_ohlcs.last], intervals)
 
     # Get the reference value
-    reference_smma = SmoothedMovingAverage.find_by!(
+    SmoothedMovingAverage.find_by!(
       asset_pair_id: asset_pair.id,
       iso8601_duration: 'P1D',
       range_position: 28,
@@ -115,7 +115,7 @@ class CreateSmoothedMovingAveragesServiceTest < ActiveSupport::TestCase
     )
 
     # Create 2 more OHLCs
-    ohlc_29 = Ohlc.create!(
+    ohlc_twenty_nine = Ohlc.create!(
       asset_pair: asset_pair,
       duration: 1.day,
       range_position: 29,
@@ -126,7 +126,7 @@ class CreateSmoothedMovingAveragesServiceTest < ActiveSupport::TestCase
       volume: 1000
     )
 
-    ohlc_30 = Ohlc.create!(
+    ohlc_thirty = Ohlc.create!(
       asset_pair: asset_pair,
       duration: 1.day,
       range_position: 30,
@@ -138,29 +138,29 @@ class CreateSmoothedMovingAveragesServiceTest < ActiveSupport::TestCase
     )
 
     # Process both new OHLCs
-    CreateSmoothedMovingAveragesService.call([ohlc_29, ohlc_30], intervals)
+    CreateSmoothedMovingAveragesService.call([ohlc_twenty_nine, ohlc_thirty], intervals)
 
-    # Verify ohlc_30's SMMA uses ohlc_29's SMMA (sequential within batch)
-    smma_29 = SmoothedMovingAverage.find_by!(
+    # Verify ohlc_thirty's SMMA uses ohlc_twenty_nine's SMMA (sequential within batch)
+    smma_twenty_nine = SmoothedMovingAverage.find_by!(
       asset_pair_id: asset_pair.id,
       iso8601_duration: 'P1D',
       range_position: 29,
       interval: 8
     )
 
-    smma_30 = SmoothedMovingAverage.find_by!(
+    smma_thirty = SmoothedMovingAverage.find_by!(
       asset_pair_id: asset_pair.id,
       iso8601_duration: 'P1D',
       range_position: 30,
       interval: 8
     )
 
-    # Calculate expected: ((smma_29 * 7) + hl2_30) / 8
-    hl2_30 = (ohlc_30.high + ohlc_30.low) / 2
-    expected = ((smma_29.value * 7) + hl2_30) / 8
+    # Calculate expected: ((smma_twenty_nine * 7) + hl2_thirty) / 8
+    hl2_thirty = (ohlc_thirty.high + ohlc_thirty.low) / 2
+    expected = ((smma_twenty_nine.value * 7) + hl2_thirty) / 8
     expected = expected.round(asset_pair.cost_decimals)
 
-    assert_in_delta smma_30.value, expected, 0.00001
+    assert_in_delta smma_thirty.value, expected, 0.00001
   end
 
   test '#call, upserts and overrides existing SMMAs' do
