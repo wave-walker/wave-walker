@@ -3,7 +3,7 @@
 require 'test_helper'
 
 class SmoothedTrendSeriveTest < ActiveSupport::TestCase
-  test 'returns nothing if insufficent data is avalible' do
+  test 'returns nothing if insufficient data is available (no SMMAs)' do
     asset_pair = asset_pairs(:atomusd)
 
     ohlcs = (1..28).map do |i|
@@ -27,6 +27,9 @@ class SmoothedTrendSeriveTest < ActiveSupport::TestCase
     ohlcs << bullish_ohlc = Ohlc.create!(asset_pair:, duration: 1.day, range_position: 29, open: 29, high: 30, low: 29,
                                          close: 30, volume: 1)
 
+    # Create SMMAs first
+    CreateSmoothedMovingAveragesService.call(ohlcs)
+
     SmoothedTrendService.call(ohlcs)
 
     assert_equal 'bullish', bullish_ohlc.smoothed_trend.trend
@@ -42,6 +45,9 @@ class SmoothedTrendSeriveTest < ActiveSupport::TestCase
 
     ohlcs << bearish_ohlc = Ohlc.create!(asset_pair:, duration: 1.day, range_position: 29, open: 1, high: 1, low: 0,
                                          close: 0, volume: 1)
+
+    # Create SMMAs first
+    CreateSmoothedMovingAveragesService.call(ohlcs)
 
     SmoothedTrendService.call(ohlcs)
 
@@ -59,9 +65,31 @@ class SmoothedTrendSeriveTest < ActiveSupport::TestCase
     ohlcs << neutral_ohlc = Ohlc.create!(asset_pair:, duration: 1.day, range_position: 29, open: 1, high: 1, low: 1,
                                          close: 1, volume: 1)
 
+    # Create SMMAs first
+    CreateSmoothedMovingAveragesService.call(ohlcs)
+
     SmoothedTrendService.call(ohlcs)
 
     assert_equal 'neutral', neutral_ohlc.smoothed_trend.trend
+  end
+
+  test 'creates trend records in bulk for valid ohlcs with existing SMMAs' do
+    asset_pair = asset_pairs(:atomusd)
+
+    ohlcs = (0...29).map do |i|
+      Ohlc.create!(asset_pair:, duration: 1.day, range_position: i, open: i, high: i + 1, low: i, close: i + 1,
+                   volume: 1)
+    end
+
+    # Create SMMAs first (done by CreateSmoothedMovingAveragesService)
+    assert_difference 'SmoothedMovingAverage.count' => 4 do
+      CreateSmoothedMovingAveragesService.call([ohlcs.last])
+    end
+
+    # Now create trends (only trends, no SMMAs)
+    assert_difference 'SmoothedTrend.count' => 1 do
+      SmoothedTrendService.call([ohlcs.last])
+    end
   end
 
   test 'flips to bullish to neutral and then to bearish with price action' do
@@ -87,6 +115,9 @@ class SmoothedTrendSeriveTest < ActiveSupport::TestCase
                                           close: 5, volume: 1)
     ohlcs << bearish_ohlc = Ohlc.create!(asset_pair:, duration: 1.day, range_position: 53, open: 5, high: 5, low: 4,
                                          close: 4, volume: 1)
+
+    # Create SMMAs first
+    CreateSmoothedMovingAveragesService.call(ohlcs)
 
     SmoothedTrendService.call(ohlcs)
 

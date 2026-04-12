@@ -30,7 +30,7 @@ class OhlcJobTest < ActiveJob::TestCase
 
     assert_difference 'Ohlc.count', 2 do
       assert_enqueued_with(
-        job: CreateSmoothedTrendsJob,
+        job: CreateSmoothedMovingAveragesJob,
         args: [{ asset_pair:, duration: 1.hour }]
       ) do
         OhlcJob.perform_now(asset_pair:, duration: 1.hour)
@@ -47,7 +47,7 @@ class OhlcJobTest < ActiveJob::TestCase
     OhlcService.stubs(:call)
 
     assert_enqueued_with(
-      job: CreateSmoothedTrendsJob,
+      job: CreateSmoothedMovingAveragesJob,
       args: [{ asset_pair:, duration: 1.hour }]
     ) do
       OhlcJob.perform_now(asset_pair:, duration: 1.hour)

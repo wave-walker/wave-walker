@@ -10,7 +10,7 @@ class OhlcJob < ApplicationJob
 
   on_complete do
     attr = arguments.first
-    CreateSmoothedTrendsJob.perform_later(
+    CreateSmoothedMovingAveragesJob.perform_later(
       asset_pair: attr.fetch(:asset_pair),
       duration: attr.fetch(:duration)
     )

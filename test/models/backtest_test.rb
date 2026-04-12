@@ -4,13 +4,15 @@ require 'test_helper'
 
 class BacktestTest < ActiveSupport::TestCase
   test 'smoothed_trends, should retrun associated smoothed_trends' do
-    ohlcs = [ohlcs(:atom20230101), ohlcs(:atom20230102), ohlcs(:atom20230103)]
+    ohlcs_list = [ohlcs(:atom20230101), ohlcs(:atom20230102), ohlcs(:atom20230103)]
 
-    SmoothedTrendService.call(ohlcs)
+    # Create SMMAs first, then trends
+    CreateSmoothedMovingAveragesService.call(ohlcs_list)
+    SmoothedTrendService.call(ohlcs_list)
 
     backtest = backtests(:atom)
 
-    assert_equal ohlcs.map(&:smoothed_trend), backtest.smoothed_trends
+    assert_equal ohlcs_list.map(&:smoothed_trend), backtest.smoothed_trends
   end
 
   test 'backtest_results, should not retrun unrelated smoothed_trends' do
@@ -26,6 +28,8 @@ class BacktestTest < ActiveSupport::TestCase
       range_position: 1, open: 1, high: 1, low: 1, close: 1, volume: 1
     )
 
+    # These OHLCs don't have enough prior data for SMMAs, so no trends will be created
+    CreateSmoothedMovingAveragesService.call([ohlc_h1, btc_ohlc])
     SmoothedTrendService.call([ohlc_h1, btc_ohlc])
 
     backtest = backtests(:atom)
@@ -34,16 +38,23 @@ class BacktestTest < ActiveSupport::TestCase
   end
 
   test 'new_smoothed_trends, should return untested smoothed_trends' do
-    SmoothedTrendService.call([ohlcs(:atom20230101)])
-    backtested_trend = ohlcs(:atom20230101).smoothed_trend
+    ohlc_01 = ohlcs(:atom20230101)
+    ohlc_02 = ohlcs(:atom20230102)
+    ohlc_03 = ohlcs(:atom20230103)
 
-    ohlcs = [ohlcs(:atom20230102), ohlcs(:atom20230103)]
-    SmoothedTrendService.call(ohlcs)
+    # Create SMMAs first, then trends
+    CreateSmoothedMovingAveragesService.call([ohlc_01])
+    SmoothedTrendService.call([ohlc_01])
+    backtested_trend = ohlc_01.smoothed_trend
+
+    ohlcs_list = [ohlc_02, ohlc_03]
+    CreateSmoothedMovingAveragesService.call(ohlcs_list)
+    SmoothedTrendService.call(ohlcs_list)
 
     backtest = backtests(:atom)
     backtest.update(last_range_position: backtested_trend.range_position)
 
-    assert_equal ohlcs.map(&:smoothed_trend), backtest.new_smoothed_trends
+    assert_equal ohlcs_list.map(&:smoothed_trend), backtest.new_smoothed_trends
   end
 
   test '#usd_quantitiy, sets backtest funds to 10.000$ on creation' do
