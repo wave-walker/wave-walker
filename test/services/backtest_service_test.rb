@@ -9,7 +9,7 @@ class BacktestServiceTest < ActiveSupport::TestCase
     backtest = backtests(:atom)
 
     # Create SMMAs first, then trends
-    CreateSmoothedMovingAveragesService.call([ohlc])
+    CreateSmoothedMovingAveragesService.call([ohlc], SmoothedMovingAverage::INTERVALS)
     SmoothedTrendService.call([ohlc])
     smoothed_trend = ohlc.smoothed_trend
     smoothed_trend.update!(trend: :bullish, flip: true)
@@ -35,7 +35,7 @@ class BacktestServiceTest < ActiveSupport::TestCase
     backtest.update!(usd_volume: 0, token_volume: 1000)
 
     # Create SMMAs first, then trends
-    CreateSmoothedMovingAveragesService.call([ohlc])
+    CreateSmoothedMovingAveragesService.call([ohlc], SmoothedMovingAverage::INTERVALS)
     SmoothedTrendService.call([ohlc])
     smoothed_trend = ohlc.smoothed_trend
     smoothed_trend.update!(trend: :neutral, flip: true)

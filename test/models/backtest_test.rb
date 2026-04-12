@@ -7,7 +7,7 @@ class BacktestTest < ActiveSupport::TestCase
     ohlcs_list = [ohlcs(:atom20230101), ohlcs(:atom20230102), ohlcs(:atom20230103)]
 
     # Create SMMAs first, then trends
-    CreateSmoothedMovingAveragesService.call(ohlcs_list)
+    CreateSmoothedMovingAveragesService.call(ohlcs_list, SmoothedMovingAverage::INTERVALS)
     SmoothedTrendService.call(ohlcs_list)
 
     backtest = backtests(:atom)
@@ -29,7 +29,7 @@ class BacktestTest < ActiveSupport::TestCase
     )
 
     # These OHLCs don't have enough prior data for SMMAs, so no trends will be created
-    CreateSmoothedMovingAveragesService.call([ohlc_h1, btc_ohlc])
+    CreateSmoothedMovingAveragesService.call([ohlc_h1, btc_ohlc], SmoothedMovingAverage::INTERVALS)
     SmoothedTrendService.call([ohlc_h1, btc_ohlc])
 
     backtest = backtests(:atom)
@@ -43,12 +43,12 @@ class BacktestTest < ActiveSupport::TestCase
     ohlc_03 = ohlcs(:atom20230103)
 
     # Create SMMAs first, then trends
-    CreateSmoothedMovingAveragesService.call([ohlc_01])
+    CreateSmoothedMovingAveragesService.call([ohlc_01], SmoothedMovingAverage::INTERVALS)
     SmoothedTrendService.call([ohlc_01])
     backtested_trend = ohlc_01.smoothed_trend
 
     ohlcs_list = [ohlc_02, ohlc_03]
-    CreateSmoothedMovingAveragesService.call(ohlcs_list)
+    CreateSmoothedMovingAveragesService.call(ohlcs_list, SmoothedMovingAverage::INTERVALS)
     SmoothedTrendService.call(ohlcs_list)
 
     backtest = backtests(:atom)

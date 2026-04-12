@@ -28,7 +28,7 @@ class SmoothedTrendSeriveTest < ActiveSupport::TestCase
                                          close: 30, volume: 1)
 
     # Create SMMAs first
-    CreateSmoothedMovingAveragesService.call(ohlcs)
+    CreateSmoothedMovingAveragesService.call(ohlcs, SmoothedMovingAverage::INTERVALS)
 
     SmoothedTrendService.call(ohlcs)
 
@@ -47,7 +47,7 @@ class SmoothedTrendSeriveTest < ActiveSupport::TestCase
                                          close: 0, volume: 1)
 
     # Create SMMAs first
-    CreateSmoothedMovingAveragesService.call(ohlcs)
+    CreateSmoothedMovingAveragesService.call(ohlcs, SmoothedMovingAverage::INTERVALS)
 
     SmoothedTrendService.call(ohlcs)
 
@@ -66,7 +66,7 @@ class SmoothedTrendSeriveTest < ActiveSupport::TestCase
                                          close: 1, volume: 1)
 
     # Create SMMAs first
-    CreateSmoothedMovingAveragesService.call(ohlcs)
+    CreateSmoothedMovingAveragesService.call(ohlcs, SmoothedMovingAverage::INTERVALS)
 
     SmoothedTrendService.call(ohlcs)
 
@@ -83,7 +83,7 @@ class SmoothedTrendSeriveTest < ActiveSupport::TestCase
 
     # Create SMMAs first (done by CreateSmoothedMovingAveragesService)
     assert_difference 'SmoothedMovingAverage.count' => 4 do
-      CreateSmoothedMovingAveragesService.call([ohlcs.last])
+      CreateSmoothedMovingAveragesService.call([ohlcs.last], SmoothedMovingAverage::INTERVALS)
     end
 
     # Now create trends (only trends, no SMMAs)
@@ -117,7 +117,7 @@ class SmoothedTrendSeriveTest < ActiveSupport::TestCase
                                          close: 4, volume: 1)
 
     # Create SMMAs first
-    CreateSmoothedMovingAveragesService.call(ohlcs)
+    CreateSmoothedMovingAveragesService.call(ohlcs, SmoothedMovingAverage::INTERVALS)
 
     SmoothedTrendService.call(ohlcs)
 

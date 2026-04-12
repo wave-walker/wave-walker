@@ -5,8 +5,6 @@ class CreateSmoothedTrendsJob < ApplicationJob
 
   queue_as :default
 
-  INTERVALS = [16, 28, 19, 25].freeze
-
   limits_concurrency key: ->(**attr) { "#{attr.fetch(:asset_pair).id}-#{attr.fetch(:duration)}" },
                      on_conflict: :discard
 
@@ -18,7 +16,7 @@ class CreateSmoothedTrendsJob < ApplicationJob
       .where(asset_pair: asset_pair)
       .by_duration(duration)
       .without_smoothed_trend
-      .with_complete_smmas(INTERVALS)
+      .with_complete_smmas(SmoothedMovingAverage::INTERVALS)
 
     enumerator_builder.active_record_on_batches(base_scope, cursor:)
   end

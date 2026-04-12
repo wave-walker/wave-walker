@@ -31,7 +31,7 @@ class CreateSmoothedTrendsJobTest < ActiveJob::TestCase
     ohlc_without_trend = ohlcs[-2]
 
     # Create SMMAs for both (required for the job to process them)
-    CreateSmoothedMovingAveragesService.call([ohlc_without_trend, ohlc_with_trend])
+    CreateSmoothedMovingAveragesService.call([ohlc_without_trend, ohlc_with_trend], SmoothedMovingAverage::INTERVALS)
 
     SmoothedTrend.create!(
       asset_pair: asset_pair,
@@ -77,7 +77,7 @@ class CreateSmoothedTrendsJobTest < ActiveJob::TestCase
     ohlc = ohlcs.last
 
     # Create SMMAs first (required for the job to process them)
-    CreateSmoothedMovingAveragesService.call([ohlc])
+    CreateSmoothedMovingAveragesService.call([ohlc], SmoothedMovingAverage::INTERVALS)
 
     SmoothedTrend.create!(
       asset_pair: asset_pair,

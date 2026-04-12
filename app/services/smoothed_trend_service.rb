@@ -1,13 +1,12 @@
 # frozen_string_literal: true
 
 class SmoothedTrendService
-  INTERVALS = [16, 28, 19, 25].freeze
-
   def self.call(ohlcs)
     return if ohlcs.empty?
 
     ohlcs = ohlcs.sort_by(&:range_position)
     trend_cache = build_trend_cache(ohlcs)
+    intervals = SmoothedMovingAverage::INTERVALS
 
     # Pre-load SMMAs for all ohlcs in one query
     smma_values = load_smma_values(ohlcs)
@@ -16,7 +15,7 @@ class SmoothedTrendService
     ActiveRecord::Base.transaction do
       ohlcs.each do |ohlc|
         values = smma_values[[ohlc.asset_pair_id, ohlc.iso8601_duration, ohlc.range_position]]
-        next unless values && (INTERVALS - values.keys).empty?
+        next unless values && (intervals - values.keys).empty?
 
         fast_smma = values[16]
         slow_smma = values[28]
@@ -51,7 +50,7 @@ class SmoothedTrendService
       asset_pair_id: first.asset_pair_id,
       iso8601_duration: first.iso8601_duration,
       range_position: first.range_position..last.range_position,
-      interval: INTERVALS
+      interval: SmoothedMovingAverage::INTERVALS
     ).each_with_object({}) do |sma, cache|
       key = [sma.asset_pair_id, sma.iso8601_duration, sma.range_position]
       cache[key] ||= {}

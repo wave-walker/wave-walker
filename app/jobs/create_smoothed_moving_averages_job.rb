@@ -28,6 +28,6 @@ class CreateSmoothedMovingAveragesJob < ApplicationJob
   end
 
   def each_iteration(ohlcs, _attr)
-    CreateSmoothedMovingAveragesService.call(ohlcs)
+    CreateSmoothedMovingAveragesService.call(ohlcs, SmoothedMovingAverage::INTERVALS)
   end
 end
