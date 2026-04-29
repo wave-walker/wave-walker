@@ -153,7 +153,7 @@ GEM
     jbuilder (2.14.1)
       actionview (>= 7.0.0)
       activesupport (>= 7.0.0)
-    job-iteration (1.13.0)
+    job-iteration (1.13.1)
       activejob (>= 7.0)
     json (2.19.4)
     language_server-protocol (3.17.0.5)
