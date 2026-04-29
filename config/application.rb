@@ -39,6 +39,7 @@ module WaveWalker
     # config.eager_load_paths << Rails.root.join("extras")
     # Since the hole application is authorized behind the proxy
     # no extra authorization is required.
+    config.active_record.schema_format = :sql
     config.mission_control.jobs.http_basic_auth_enabled = false
   end
 end
