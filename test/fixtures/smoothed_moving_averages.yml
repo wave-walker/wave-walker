@@ -1,0 +1,37 @@
+# Test data for SmoothedMovingAverage
+# Primary key: [asset_pair_id, iso8601_duration, range_position, interval]
+
+atom_p1d_range19327_interval10:
+  asset_pair_id: 1
+  iso8601_duration: 'P1D'
+  range_position: 19327
+  interval: 10
+  value: 12.5
+
+atom_p1d_range19328_interval10:
+  asset_pair_id: 1
+  iso8601_duration: 'P1D'
+  range_position: 19328
+  interval: 10
+  value: 12.6
+
+atom_p1d_range19329_interval10:
+  asset_pair_id: 1
+  iso8601_duration: 'P1D'
+  range_position: 19329
+  interval: 10
+  value: 12.8
+
+atom_p1d_range19329_interval20:
+  asset_pair_id: 1
+  iso8601_duration: 'P1D'
+  range_position: 19329
+  interval: 20
+  value: 12.7
+
+atom_p2d_range5000_interval10:
+  asset_pair_id: 1
+  iso8601_duration: 'P2D'
+  range_position: 5000
+  interval: 10
+  value: 13.0

@@ -1088,3 +1088,21 @@
     volume: 92036.3826406099
     asset_pair_id: 1
     iso8601_duration: 'P1D'
+- atom_p2d_range5000:
+    range_position: 5000
+    open: 11.0
+    high: 11.5
+    low: 10.5
+    close: 11.2
+    volume: 50000.0
+    asset_pair_id: 1
+    iso8601_duration: 'P2D'
+- atom_p2d_range5001:
+    range_position: 5001
+    open: 11.2
+    high: 11.6
+    low: 10.8
+    close: 11.4
+    volume: 52000.0
+    asset_pair_id: 1
+    iso8601_duration: 'P2D'
