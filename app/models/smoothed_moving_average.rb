@@ -1,9 +1,17 @@
 # frozen_string_literal: true
 
 class SmoothedMovingAverage < ApplicationRecord
+  INTERVALS = [16, 19, 25, 28].freeze
+
   include DurationConcern
 
   belongs_to :asset_pair
+
+  def self.bulk_create(asset_pair)
+    Ohlc::DURATIONS.each do |duration|
+      INTERVALS.each { |interval| bulk_create_interval(asset_pair:, duration:, interval:) }
+    end
+  end
 
   def self.create_initial_sma(asset_pair:, duration:, interval:)
     ohlcs = Ohlc.where(asset_pair:)

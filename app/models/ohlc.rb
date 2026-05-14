@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Ohlc < ApplicationRecord
+  DURATIONS = [1.hour, 4.hours, 8.hours, 1.day, 2.days, 1.week].freeze
+
   include DurationConcern
   include RangeConcern
 

@@ -71,7 +71,7 @@ class SmoothedMovingAverageTest < ActiveSupport::TestCase
     end
   end
 
-  test '.bulk_create_interval calculates mathematically correct SMMA values (SMA for first, SMMA formula for subsequent)' do
+  test '.bulk_create_interval calculates mathematically correct SMMA values (SMA for first, SMMA for later)' do
     asset_pair = asset_pairs(:atomusd)
     duration = 1.day
     interval = 3
@@ -103,5 +103,36 @@ class SmoothedMovingAverageTest < ActiveSupport::TestCase
     assert_difference -> { SmoothedMovingAverage.where(asset_pair:, interval:).by_duration(duration).count } do
       SmoothedMovingAverage.bulk_create_interval(asset_pair: asset_pair, duration: duration, interval: interval)
     end
+  end
+
+  test '.bulk_create, for OHLC durations and intervals' do
+    asset_pair = asset_pairs(:atomusd)
+
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 1.hour, interval: 16)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 1.hour, interval: 19)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 1.hour, interval: 25)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 1.hour, interval: 28)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 4.hours, interval: 16)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 4.hours, interval: 19)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 4.hours, interval: 25)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 4.hours, interval: 28)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 8.hours, interval: 16)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 8.hours, interval: 19)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 8.hours, interval: 25)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 8.hours, interval: 28)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 1.day, interval: 16)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 1.day, interval: 19)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 1.day, interval: 25)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 1.day, interval: 28)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 2.days, interval: 16)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 2.days, interval: 19)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 2.days, interval: 25)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 2.days, interval: 28)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 1.week, interval: 16)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 1.week, interval: 19)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 1.week, interval: 25)
+    SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration: 1.week, interval: 28)
+
+    SmoothedMovingAverage.bulk_create(asset_pair)
   end
 end
