@@ -19,7 +19,7 @@ class SmoothedMovingAverage < ApplicationRecord
     create!(asset_pair:, duration:, range_position:, interval:, value:)
   end
 
-  def self.bulk_create(asset_pair:, duration:, interval:) # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
+  def self.bulk_create_interval(asset_pair:, duration:, interval:) # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
     start_smma = order(range_position: :desc).find_by(asset_pair:, iso8601_duration: duration.iso8601, interval:) ||
                  create_initial_sma(asset_pair:, duration:, interval:)
 

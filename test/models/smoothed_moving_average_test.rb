@@ -43,7 +43,7 @@ class SmoothedMovingAverageTest < ActiveSupport::TestCase
     assert_equal 2, result.value.to_s.split('.').last.length
   end
 
-  test '.bulk_create creates initial SMA and subsequent SMMAs when no SMMAs exist' do
+  test '.bulk_create_interval creates initial SMA and subsequent SMMAs when no SMMAs exist' do
     asset_pair = asset_pairs(:atomusd)
     duration = 1.day
     interval = 3
@@ -53,30 +53,30 @@ class SmoothedMovingAverageTest < ActiveSupport::TestCase
     assert_difference lambda {
       SmoothedMovingAverage.where(asset_pair:, interval:).by_duration(duration).count
     }, smma_count do
-      SmoothedMovingAverage.bulk_create(asset_pair: asset_pair, duration: duration, interval: interval)
+      SmoothedMovingAverage.bulk_create_interval(asset_pair: asset_pair, duration: duration, interval: interval)
     end
   end
 
-  test '.bulk_create starts from next range_position after latest_range_position when some SMMAs exist' do
+  test '.bulk_create_interval starts from next range_position after latest_range_position when some SMMAs exist' do
     asset_pair = asset_pairs(:atomusd)
     duration = 1.day
     interval = 3
 
-    SmoothedMovingAverage.bulk_create(asset_pair: asset_pair, duration: duration, interval: interval)
+    SmoothedMovingAverage.bulk_create_interval(asset_pair: asset_pair, duration: duration, interval: interval)
     SmoothedMovingAverage.where(asset_pair:, interval:).by_duration(duration).order(range_position: :desc).limit(2)
                          .delete_all
 
     assert_difference -> { SmoothedMovingAverage.where(asset_pair:, interval:).by_duration(duration).count }, 2 do
-      SmoothedMovingAverage.bulk_create(asset_pair: asset_pair, duration: duration, interval: interval)
+      SmoothedMovingAverage.bulk_create_interval(asset_pair: asset_pair, duration: duration, interval: interval)
     end
   end
 
-  test '.bulk_create calculates mathematically correct SMMA values (SMA for first, SMMA formula for subsequent)' do
+  test '.bulk_create_interval calculates mathematically correct SMMA values (SMA for first, SMMA formula for subsequent)' do
     asset_pair = asset_pairs(:atomusd)
     duration = 1.day
     interval = 3
 
-    SmoothedMovingAverage.bulk_create(asset_pair: asset_pair, duration: duration, interval: interval)
+    SmoothedMovingAverage.bulk_create_interval(asset_pair: asset_pair, duration: duration, interval: interval)
     sma, smma1, smma2 = SmoothedMovingAverage.where(asset_pair:, interval:).by_duration(duration).order(:range_position)
                                              .take(3)
 
@@ -95,13 +95,13 @@ class SmoothedMovingAverageTest < ActiveSupport::TestCase
     assert_in_delta 10.27083, smma2.value, 0.00001
   end
 
-  test '.bulk_create works with different durations and intervals' do
+  test '.bulk_create_interval works with different durations and intervals' do
     asset_pair = asset_pairs(:atomusd)
     duration = 2.days
     interval = 10
 
     assert_difference -> { SmoothedMovingAverage.where(asset_pair:, interval:).by_duration(duration).count } do
-      SmoothedMovingAverage.bulk_create(asset_pair: asset_pair, duration: duration, interval: interval)
+      SmoothedMovingAverage.bulk_create_interval(asset_pair: asset_pair, duration: duration, interval: interval)
     end
   end
 end
