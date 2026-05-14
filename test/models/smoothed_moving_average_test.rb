@@ -3,39 +3,6 @@
 require 'test_helper'
 
 class SmoothedMovingAverageTest < ActiveSupport::TestCase
-  def smmas_for(asset_pair:, duration:, interval:)
-    SmoothedMovingAverage.where(asset_pair:, interval:).by_duration(duration)
-  end
-
-  test '.latest_range_position returns the maximum range_position for given asset_pair and duration' do
-    asset_pair = asset_pairs(:atomusd)
-    duration = 1.day
-    interval = 10
-
-    position = SmoothedMovingAverage.latest_range_position(asset_pair:, duration:, interval:)
-
-    assert_equal 19_329, position
-  end
-
-  test '.latest_range_position returns nil when no records exist for asset_pair and duration' do
-    asset_pair = asset_pairs(:btcusd)
-    duration = 1.week
-    interval = 10
-
-    assert_nil SmoothedMovingAverage.latest_range_position(asset_pair:, duration:, interval:)
-  end
-
-  test '.latest_range_position filters by duration correctly' do
-    asset_pair = asset_pairs(:atomusd)
-    duration = 1.week
-    interval = 10
-
-    Ohlc.create!(open: 1, high: 2, low: 3, close: 4, volume: 5, asset_pair:, duration:, range_position: 1234)
-    SmoothedMovingAverage.create!(asset_pair:, duration:, interval:, value: 1.1, range_position: 1234)
-
-    assert_equal 1234, SmoothedMovingAverage.latest_range_position(asset_pair:, duration:, interval:)
-  end
-
   test '.create_initial_sma returns nil when not enough OHLCs exist' do
     asset_pair = asset_pairs(:atomusd)
     duration = 2.days

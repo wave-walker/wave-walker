@@ -5,10 +5,6 @@ class SmoothedMovingAverage < ApplicationRecord
 
   belongs_to :asset_pair
 
-  def self.latest_range_position(asset_pair:, duration:, interval:)
-    by_duration(duration).where(asset_pair:, interval:).maximum(:range_position)
-  end
-
   def self.create_initial_sma(asset_pair:, duration:, interval:)
     ohlcs = Ohlc.where(asset_pair:)
                 .by_duration(duration)
@@ -23,14 +19,23 @@ class SmoothedMovingAverage < ApplicationRecord
     create!(asset_pair:, duration:, range_position:, interval:, value:)
   end
 
-  def self.bulk_create(asset_pair:, duration:, interval:)
+  def self.bulk_create(asset_pair:, duration:, interval:) # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
     start_smma = order(range_position: :desc).find_by(asset_pair:, iso8601_duration: duration.iso8601, interval:) ||
                  create_initial_sma(asset_pair:, duration:, interval:)
 
     return unless start_smma
 
-    Ohlc.where(asset_pair:, range_position: (start_smma.range_position + 1)..).by_duration(duration).in_batches do |ohlcs|
-      ohlcs.each { SmoothedMovingAverageService.call(ohlc: it, interval:) }
+    range_position = start_smma.range_position
+    value = start_smma.value
+
+    Ohlc.where(asset_pair:, range_position: (range_position + 1)..).by_duration(duration).in_batches do |ohlcs|
+      records = ohlcs.map do |ohlc|
+        value = ((value * (interval - 1)) + ohlc.hl2) / interval
+        range_position += 1
+
+        { asset_pair_id: asset_pair.id, iso8601_duration: duration.iso8601, range_position:, interval:, value: }
+      end
+      insert_all! records # rubocop:disable Rails/SkipsModelValidations
     end
   end
 end
