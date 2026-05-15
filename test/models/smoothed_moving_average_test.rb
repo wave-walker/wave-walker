@@ -105,7 +105,7 @@ class SmoothedMovingAverageTest < ActiveSupport::TestCase
     end
   end
 
-  test '.bulk_create calls bulk_create_interval for all intervals with given duration' do
+  test '.bulk_create, for OHLC duration and intervals' do
     asset_pair = asset_pairs(:atomusd)
     duration = 1.day
 
@@ -115,5 +115,52 @@ class SmoothedMovingAverageTest < ActiveSupport::TestCase
     SmoothedMovingAverage.expects(:bulk_create_interval).with(asset_pair:, duration:, interval: 28)
 
     SmoothedMovingAverage.bulk_create(asset_pair:, duration:)
+  end
+
+  test '.with_generated_intervals, returns records only where all 4 intervals exist for the same combination' do
+    asset_pair = asset_pairs(:atomusd)
+    iso8601_duration = 'P1D'
+
+    Ohlc.create!(asset_pair:, high: 1, low: 2, open: 3, close: 4, volume: 1, iso8601_duration:, range_position: 1)
+    Ohlc.create!(asset_pair:, high: 1, low: 2, open: 3, close: 4, volume: 1, iso8601_duration:, range_position: 2)
+
+    complete_records = [
+      SmoothedMovingAverage.create!(asset_pair:, iso8601_duration:, range_position: 1, interval: 16, value: 10.0),
+      SmoothedMovingAverage.create!(asset_pair:, iso8601_duration:, range_position: 1, interval: 19, value: 10.0),
+      SmoothedMovingAverage.create!(asset_pair:, iso8601_duration:, range_position: 1, interval: 25, value: 10.0),
+      SmoothedMovingAverage.create!(asset_pair:, iso8601_duration:, range_position: 1, interval: 28, value: 10.0)
+    ]
+
+    # Create only 3 intervals for range_position 2 (missing interval 28)
+    SmoothedMovingAverage.create!(asset_pair:, iso8601_duration:, range_position: 2, interval: 16, value: 10.0)
+    SmoothedMovingAverage.create!(asset_pair:, iso8601_duration:, range_position: 2, interval: 19, value: 10.0)
+    SmoothedMovingAverage.create!(asset_pair:, iso8601_duration:, range_position: 2, interval: 25, value: 10.0)
+
+    queried_records = SmoothedMovingAverage.with_generated_intervals.order(:interval)
+
+    assert_equal complete_records, queried_records
+  end
+
+  test '.with_generated_intervals, works with multiple complete sets' do
+    asset_pair = asset_pairs(:atomusd)
+    iso8601_duration = 'P1D'
+
+    Ohlc.create!(asset_pair:, high: 1, low: 2, open: 3, close: 4, volume: 1, iso8601_duration:, range_position: 1)
+    Ohlc.create!(asset_pair:, high: 1, low: 2, open: 3, close: 4, volume: 1, iso8601_duration:, range_position: 2)
+
+    complete_records = [
+      SmoothedMovingAverage.create!(asset_pair:, iso8601_duration:, range_position: 1, interval: 16, value: 10.0),
+      SmoothedMovingAverage.create!(asset_pair:, iso8601_duration:, range_position: 1, interval: 19, value: 10.0),
+      SmoothedMovingAverage.create!(asset_pair:, iso8601_duration:, range_position: 1, interval: 25, value: 10.0),
+      SmoothedMovingAverage.create!(asset_pair:, iso8601_duration:, range_position: 1, interval: 28, value: 10.0),
+      SmoothedMovingAverage.create!(asset_pair:, iso8601_duration:, range_position: 2, interval: 16, value: 10.0),
+      SmoothedMovingAverage.create!(asset_pair:, iso8601_duration:, range_position: 2, interval: 19, value: 10.0),
+      SmoothedMovingAverage.create!(asset_pair:, iso8601_duration:, range_position: 2, interval: 25, value: 10.0),
+      SmoothedMovingAverage.create!(asset_pair:, iso8601_duration:, range_position: 2, interval: 28, value: 10.0)
+    ]
+
+    queried_records = SmoothedMovingAverage.with_generated_intervals.order(:range_position, :interval).to_a
+
+    assert_equal complete_records, queried_records
   end
 end
