@@ -17,17 +17,21 @@ AllCops:
     - db/cable_schema.rb
     - db/cache_schema.rb
 
+Style/ClassAndModuleChildren:
+  Exclude:
+    - 'test/**/*'
+
 Style/Documentation:
   Enabled: false
 
 Rails/CreateTableWithTimestamps:
   Enabled: false
 
-Metrics/ClassLength:
+Metrics/ParameterLists:
   Exclude:
     - 'test/**/*'
 
-Metrics/MethodLength:
+Metrics/AbcSize:
   Exclude:
     - 'db/migrate/*'
 
@@ -35,10 +39,14 @@ Metrics/BlockLength:
   Exclude:
     - 'test/**/*'
   
-Metrics/AbcSize:
+Metrics/ClassLength:
+  Exclude:
+    - 'test/**/*'
+
+Layout/LineLength:
   Exclude:
     - 'db/migrate/*'
 
-Layout/LineLength:
+Metrics/MethodLength:
   Exclude:
     - 'db/migrate/*'

@@ -6,7 +6,12 @@ class BacktestTest < ActiveSupport::TestCase
   test 'smoothed_trends, should retrun associated smoothed_trends' do
     ohlcs = [ohlcs(:atom20230101), ohlcs(:atom20230102), ohlcs(:atom20230103)]
 
-    SmoothedTrendService.call(ohlcs)
+    ohlcs.each do |ohlc|
+      SmoothedTrend.create!(
+        asset_pair: ohlc.asset_pair, iso8601_duration: ohlc.iso8601_duration, range_position: ohlc.range_position,
+        fast_smma: 1.0, slow_smma: 1.0, trend: :bullish, flip: false
+      )
+    end
 
     backtest = backtests(:atom)
 
@@ -16,17 +21,15 @@ class BacktestTest < ActiveSupport::TestCase
   test 'backtest_results, should not retrun unrelated smoothed_trends' do
     asset_pair = asset_pairs(:atomusd)
 
-    ohlc_h1 = Ohlc.create!(
+    Ohlc.create!(
       asset_pair:, duration: 1.hour, range_position: 1,
       open: 1, high: 1, low: 1, close: 1, volume: 1
     )
 
-    btc_ohlc = Ohlc.create!(
+    Ohlc.create!(
       asset_pair: asset_pairs(:btcusd), duration: 1.day,
       range_position: 1, open: 1, high: 1, low: 1, close: 1, volume: 1
     )
-
-    SmoothedTrendService.call([ohlc_h1, btc_ohlc])
 
     backtest = backtests(:atom)
 
@@ -34,11 +37,20 @@ class BacktestTest < ActiveSupport::TestCase
   end
 
   test 'new_smoothed_trends, should return untested smoothed_trends' do
-    SmoothedTrendService.call([ohlcs(:atom20230101)])
-    backtested_trend = ohlcs(:atom20230101).smoothed_trend
+    backtested_trend = SmoothedTrend.create!(
+      asset_pair: ohlcs(:atom20230101).asset_pair,
+      iso8601_duration: ohlcs(:atom20230101).iso8601_duration,
+      range_position: ohlcs(:atom20230101).range_position,
+      fast_smma: 1.0, slow_smma: 1.0, trend: :bullish, flip: false
+    )
 
     ohlcs = [ohlcs(:atom20230102), ohlcs(:atom20230103)]
-    SmoothedTrendService.call(ohlcs)
+    ohlcs.each do |ohlc|
+      SmoothedTrend.create!(
+        asset_pair: ohlc.asset_pair, iso8601_duration: ohlc.iso8601_duration, range_position: ohlc.range_position,
+        fast_smma: 1.0, slow_smma: 1.0, trend: :bullish, flip: false
+      )
+    end
 
     backtest = backtests(:atom)
     backtest.update(last_range_position: backtested_trend.range_position)

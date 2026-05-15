@@ -6,7 +6,8 @@ class BacktestJobTest < ActiveJob::TestCase
   test '#perform, execute a backtest for batch of trends' do
     backtest = backtests(:atom)
 
-    SmoothedTrendService.call([ohlcs(:atom20230101), ohlcs(:atom20230102)])
+    SmoothedMovingAverage.bulk_create(asset_pair: backtest.asset_pair, duration: backtest.duration)
+    SmoothedTrend.bulk_create(asset_pair: backtest.asset_pair, duration: backtest.duration)
 
     smoothed_trends = backtest.new_smoothed_trends
 

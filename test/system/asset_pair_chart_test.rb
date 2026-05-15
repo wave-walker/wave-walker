@@ -9,8 +9,8 @@ class AssetPairChartTest < ApplicationSystemTestCase
   setup do
     asset_pair = asset_pairs(:atomusd)
 
-    Ohlc.where(asset_pair:).by_duration(1.day).order(:range_position)
-        .then { SmoothedTrendService.call(it) }
+    SmoothedMovingAverage.bulk_create(asset_pair:, duration: 1.day)
+    SmoothedTrend.bulk_create(asset_pair:, duration: 1.day)
 
     BacktestJob.perform_now(backtests(:atom))
 

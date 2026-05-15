@@ -8,7 +8,8 @@ class BacktestServiceTest < ActiveSupport::TestCase
     ohlc.update!(close: 100)
     backtest = backtests(:atom)
 
-    SmoothedTrendService.call([ohlc])
+    SmoothedMovingAverage.bulk_create(asset_pair: ohlc.asset_pair, duration: ohlc.duration)
+    SmoothedTrend.bulk_create(asset_pair: ohlc.asset_pair, duration: ohlc.duration)
     smoothed_trend = ohlc.smoothed_trend
     smoothed_trend.update!(trend: :bullish, flip: true)
 
@@ -32,7 +33,8 @@ class BacktestServiceTest < ActiveSupport::TestCase
     backtest = backtests(:atom)
     backtest.update!(usd_volume: 0, token_volume: 1000)
 
-    SmoothedTrendService.call([ohlc])
+    SmoothedMovingAverage.bulk_create(asset_pair: ohlc.asset_pair, duration: ohlc.duration)
+    SmoothedTrend.bulk_create(asset_pair: ohlc.asset_pair, duration: ohlc.duration)
     smoothed_trend = ohlc.smoothed_trend
     smoothed_trend.update!(trend: :neutral, flip: true)
 

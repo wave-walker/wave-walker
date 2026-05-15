@@ -29,16 +29,11 @@ class OhlcJobTest < ActiveJob::TestCase
     )
 
     assert_difference 'Ohlc.count', 2 do
-      assert_enqueued_with(
-        job: CreateSmoothedTrendsJob,
-        args: [{ asset_pair:, duration: 1.hour }]
-      ) do
-        OhlcJob.perform_now(asset_pair:, duration: 1.hour)
-      end
+      OhlcJob.perform_now(asset_pair:, duration: 1.hour)
     end
   end
 
-  test '#on_complete, enqueues create smoothed trends job' do
+  test '#on_complete, enqueues the ohlc analyzer job' do
     asset_pair = asset_pairs(:atomusd)
     range = OhlcRangeValue.at(duration: 1.hour, time: Time.current)
     enumerator = [[[range], range.next.position]].to_enum
@@ -47,7 +42,7 @@ class OhlcJobTest < ActiveJob::TestCase
     OhlcService.stubs(:call)
 
     assert_enqueued_with(
-      job: CreateSmoothedTrendsJob,
+      job: OhlcAnalyzeJob,
       args: [{ asset_pair:, duration: 1.hour }]
     ) do
       OhlcJob.perform_now(asset_pair:, duration: 1.hour)
