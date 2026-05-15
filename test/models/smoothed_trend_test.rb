@@ -344,4 +344,85 @@ class SmoothedTrendTest < ActiveSupport::TestCase
       SmoothedTrend.bulk_create_for_duration(asset_pair:, duration:)
     end
   end
+
+  test '.bulk_create_for_duration correctly handles multiple trend transitions with flip flags' do
+    asset_pair = asset_pairs(:atomusd)
+    duration = 1.day
+    iso8601_duration = duration.iso8601
+
+    # Create OHLCs for multiple transitions
+    create_test_ohlc(asset_pair:, iso8601_duration:, range_position: 1000)
+    create_test_ohlc(asset_pair:, iso8601_duration:, range_position: 1001)
+    create_test_ohlc(asset_pair:, iso8601_duration:, range_position: 1002)
+    create_test_ohlc(asset_pair:, iso8601_duration:, range_position: 1003)
+    create_test_ohlc(asset_pair:, iso8601_duration:, range_position: 1004)
+
+    # Position 1000: bullish
+    create_smma_set(
+      asset_pair:,
+      iso8601_duration:,
+      range_position: 1000,
+      values: { 16 => 100.0, 19 => 98.0, 25 => 96.0, 28 => 94.0 }
+    )
+
+    # Position 1001: neutral (trend change from bullish)
+    create_smma_set(
+      asset_pair:,
+      iso8601_duration:,
+      range_position: 1001,
+      values: { 16 => 98.0, 19 => 100.0, 25 => 96.0, 28 => 94.0 }
+    )
+
+    # Position 1002: neutral (no trend change)
+    create_smma_set(
+      asset_pair:,
+      iso8601_duration:,
+      range_position: 1002,
+      values: { 16 => 97.0, 19 => 99.0, 25 => 95.0, 28 => 93.0 }
+    )
+
+    # Position 1003: neutral (no trend change)
+    create_smma_set(
+      asset_pair:,
+      iso8601_duration:,
+      range_position: 1003,
+      values: { 16 => 96.0, 19 => 98.0, 25 => 94.0, 28 => 92.0 }
+    )
+
+    # Position 1004: bearish (trend change from neutral)
+    create_smma_set(
+      asset_pair:,
+      iso8601_duration:,
+      range_position: 1004,
+      values: { 16 => 90.0, 19 => 92.0, 25 => 94.0, 28 => 96.0 }
+    )
+
+    SmoothedTrend.bulk_create_for_duration(asset_pair:, duration:)
+
+    bullish_trend = SmoothedTrend.find_by(asset_pair:, iso8601_duration:, range_position: 1000)
+    neutral_trend1 = SmoothedTrend.find_by(asset_pair:, iso8601_duration:, range_position: 1001)
+    neutral_trend2 = SmoothedTrend.find_by(asset_pair:, iso8601_duration:, range_position: 1002)
+    neutral_trend3 = SmoothedTrend.find_by(asset_pair:, iso8601_duration:, range_position: 1003)
+    bearish_trend = SmoothedTrend.find_by(asset_pair:, iso8601_duration:, range_position: 1004)
+
+    # First trend should be bullish with flip=true (no previous trend)
+    assert_equal 'bullish', bullish_trend.trend
+    assert bullish_trend.flip
+
+    # Second trend should be neutral with flip=true (changed from bullish)
+    assert_equal 'neutral', neutral_trend1.trend
+    assert neutral_trend1.flip
+
+    # Third trend should be neutral with flip=false (stayed neutral)
+    assert_equal 'neutral', neutral_trend2.trend
+    assert_not neutral_trend2.flip
+
+    # Fourth trend should be neutral with flip=false (stayed neutral)
+    assert_equal 'neutral', neutral_trend3.trend
+    assert_not neutral_trend3.flip
+
+    # Fifth trend should be bearish with flip=true (changed from neutral)
+    assert_equal 'bearish', bearish_trend.trend
+    assert bearish_trend.flip
+  end
 end
