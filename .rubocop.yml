@@ -23,6 +23,10 @@ Style/Documentation:
 Rails/CreateTableWithTimestamps:
   Enabled: false
 
+Metrics/ClassLength:
+  Exclude:
+    - 'test/**/*'
+
 Metrics/MethodLength:
   Exclude:
     - 'db/migrate/*'

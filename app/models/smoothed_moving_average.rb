@@ -7,6 +7,19 @@ class SmoothedMovingAverage < ApplicationRecord
 
   belongs_to :asset_pair
 
+  scope :with_generated_intervals, lambda {
+    where(interval: INTERVALS).joins(<<~SQL.squish)
+      INNER JOIN (
+        #{where(interval: INTERVALS)
+            .select(:asset_pair_id, :iso8601_duration, :range_position)
+            .group(:asset_pair_id, :iso8601_duration, :range_position)
+            .having('COUNT(DISTINCT "interval") = ?', INTERVALS.count)
+            .to_sql}
+      ) with_generated_intervals
+      USING (asset_pair_id, iso8601_duration, range_position)
+    SQL
+  }
+
   def self.bulk_create(asset_pair)
     Ohlc::DURATIONS.each do |duration|
       INTERVALS.each { |interval| bulk_create_interval(asset_pair:, duration:, interval:) }
