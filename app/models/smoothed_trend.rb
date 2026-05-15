@@ -21,7 +21,15 @@ class SmoothedTrend < ApplicationRecord
     by_duration(duration).where(range_position: OhlcRangeValue.at(duration:, time:).position...)
   }
 
-  def self.bulk_create(asset_pair:, duration:)
-    NewSmoothedTendParameterQuery.new(asset_pair:, duration:).in_batches { insert_all! it } # rubocop:disable Rails/SkipsModelValidations
+  def self.bulk_create_for_duration(asset_pair:, duration:)
+    query = BulkQuery.new(asset_pair:, duration:)
+    return if query.empty?
+
+    builder = BulkBuilder.new(previous_trend: query.last_trend&.trend)
+
+    query.each_batch do |batch|
+      records = builder.build_records(batch, asset_pair:, duration:)
+      insert_all!(records) if records.any? # rubocop:disable Rails/SkipsModelValidations
+    end
   end
 end

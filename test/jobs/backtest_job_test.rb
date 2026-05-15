@@ -7,7 +7,7 @@ class BacktestJobTest < ActiveJob::TestCase
     backtest = backtests(:atom)
 
     SmoothedMovingAverage.bulk_create(asset_pair: backtest.asset_pair, duration: backtest.duration)
-    SmoothedTrend.bulk_create(asset_pair: backtest.asset_pair, duration: backtest.duration)
+    SmoothedTrend.bulk_create_for_duration(asset_pair: backtest.asset_pair, duration: backtest.duration)
 
     smoothed_trends = backtest.new_smoothed_trends
 

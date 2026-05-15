@@ -7,7 +7,7 @@ class AssetPairBacktestTest < ApplicationSystemTestCase
     asset_pair = asset_pairs(:atomusd)
 
     SmoothedMovingAverage.bulk_create(asset_pair:, duration: 1.day)
-    SmoothedTrend.bulk_create(asset_pair:, duration: 1.day)
+    SmoothedTrend.bulk_create_for_duration(asset_pair:, duration: 1.day)
 
     BacktestJob.perform_now(backtests(:atom))
 
