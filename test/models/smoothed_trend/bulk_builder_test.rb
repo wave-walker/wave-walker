@@ -113,74 +113,6 @@ class SmoothedTrend::BulkBuilderTest < ActiveSupport::TestCase
     assert_equal 1002, records[1][:range_position]
   end
 
-  test '#build_records correctly calculates bullish trend' do
-    asset_pair = asset_pairs(:atomusd)
-    duration = 1.day
-
-    # fast (100) > slow (94) and neutral conditions don't apply = bullish
-    smmas_by_position = {
-      1000 => create_complete_smma_set(values: { 16 => 100.0, 19 => 98.0, 25 => 96.0, 28 => 94.0 })
-    }
-
-    builder = SmoothedTrend::BulkBuilder.new(previous_trend: nil)
-    records = builder.build_records(smmas_by_position, asset_pair: asset_pair, duration: duration)
-
-    assert_equal 'bullish', records.first[:trend]
-    assert_equal 100.0, records.first[:fast_smma]
-    assert_equal 94.0, records.first[:slow_smma]
-  end
-
-  test '#build_records correctly calculates bearish trend' do
-    asset_pair = asset_pairs(:atomusd)
-    duration = 1.day
-
-    # fast (90) < slow (96) and neutral conditions don't apply = bearish
-    smmas_by_position = {
-      1000 => create_complete_smma_set(values: { 16 => 90.0, 19 => 92.0, 25 => 94.0, 28 => 96.0 })
-    }
-
-    builder = SmoothedTrend::BulkBuilder.new(previous_trend: nil)
-    records = builder.build_records(smmas_by_position, asset_pair: asset_pair, duration: duration)
-
-    assert_equal 'bearish', records.first[:trend]
-    assert_equal 90.0, records.first[:fast_smma]
-    assert_equal 96.0, records.first[:slow_smma]
-  end
-
-  test '#build_records correctly calculates neutral trend when neutral_up condition is met' do
-    asset_pair = asset_pairs(:atomusd)
-    duration = 1.day
-
-    # fast (100) > slow (94) = bullish?=true
-    # BUT fast (100) < medium_fast (102) which contradicts bullish
-    # This means: (fast < medium_fast) == bullish? => true == true => neutral_up
-    smmas_by_position = {
-      1000 => create_complete_smma_set(values: { 16 => 100.0, 19 => 102.0, 25 => 96.0, 28 => 94.0 })
-    }
-
-    builder = SmoothedTrend::BulkBuilder.new(previous_trend: nil)
-    records = builder.build_records(smmas_by_position, asset_pair: asset_pair, duration: duration)
-
-    assert_equal 'neutral', records.first[:trend]
-  end
-
-  test '#build_records correctly calculates neutral trend when neutral_down condition is met' do
-    asset_pair = asset_pairs(:atomusd)
-    duration = 1.day
-
-    # fast (100) > slow (94) = bullish?=true
-    # BUT medium_slow (92) < slow (94) which aligns with bullish
-    # This means: (medium_slow < slow) == bullish? => true == true => neutral_down
-    smmas_by_position = {
-      1000 => create_complete_smma_set(values: { 16 => 100.0, 19 => 98.0, 25 => 92.0, 28 => 94.0 })
-    }
-
-    builder = SmoothedTrend::BulkBuilder.new(previous_trend: nil)
-    records = builder.build_records(smmas_by_position, asset_pair: asset_pair, duration: duration)
-
-    assert_equal 'neutral', records.first[:trend]
-  end
-
   test '#build_records sets flip=true when previous_trend is nil (first position)' do
     asset_pair = asset_pairs(:atomusd)
     duration = 1.day
@@ -335,6 +267,70 @@ class SmoothedTrend::BulkBuilderTest < ActiveSupport::TestCase
     # Should not flip because previous was already bullish
     assert_equal 'bullish', records.first[:trend]
     assert_not records.first[:flip], 'Should not flip when continuing from previous bullish trend'
+  end
+
+  test '#calculate_trend returns bullish when fast > slow and no neutral conditions' do
+    asset_pair = asset_pairs(:atomusd)
+    duration = 1.day
+
+    # fast (100) > slow (94) and neutral conditions don't apply = bullish
+    smmas_by_position = {
+      1000 => create_complete_smma_set(values: { 16 => 100.0, 19 => 98.0, 25 => 96.0, 28 => 94.0 })
+    }
+
+    builder = SmoothedTrend::BulkBuilder.new(previous_trend: nil)
+    records = builder.build_records(smmas_by_position, asset_pair: asset_pair, duration: duration)
+
+    assert_equal 'bullish', records.first[:trend]
+  end
+
+  test '#calculate_trend returns bearish when fast < slow and no neutral conditions' do
+    asset_pair = asset_pairs(:atomusd)
+    duration = 1.day
+
+    # fast (90) < slow (96) and neutral conditions don't apply = bearish
+    smmas_by_position = {
+      1000 => create_complete_smma_set(values: { 16 => 90.0, 19 => 92.0, 25 => 94.0, 28 => 96.0 })
+    }
+
+    builder = SmoothedTrend::BulkBuilder.new(previous_trend: nil)
+    records = builder.build_records(smmas_by_position, asset_pair: asset_pair, duration: duration)
+
+    assert_equal 'bearish', records.first[:trend]
+  end
+
+  test '#calculate_trend returns neutral when neutral_up condition is met' do
+    asset_pair = asset_pairs(:atomusd)
+    duration = 1.day
+
+    # fast (100) > slow (94) = bullish?=true
+    # BUT fast (100) < medium_fast (102) which contradicts bullish
+    # This means: (fast < medium_fast) == bullish? => true == true => neutral_up
+    smmas_by_position = {
+      1000 => create_complete_smma_set(values: { 16 => 100.0, 19 => 102.0, 25 => 96.0, 28 => 94.0 })
+    }
+
+    builder = SmoothedTrend::BulkBuilder.new(previous_trend: nil)
+    records = builder.build_records(smmas_by_position, asset_pair: asset_pair, duration: duration)
+
+    assert_equal 'neutral', records.first[:trend]
+  end
+
+  test '#calculate_trend returns neutral when neutral_down condition is met' do
+    asset_pair = asset_pairs(:atomusd)
+    duration = 1.day
+
+    # fast (100) > slow (94) = bullish?=true
+    # BUT medium_slow (92) < slow (94) which aligns with bullish
+    # This means: (medium_slow < slow) == bullish? => true == true => neutral_down
+    smmas_by_position = {
+      1000 => create_complete_smma_set(values: { 16 => 100.0, 19 => 98.0, 25 => 92.0, 28 => 94.0 })
+    }
+
+    builder = SmoothedTrend::BulkBuilder.new(previous_trend: nil)
+    records = builder.build_records(smmas_by_position, asset_pair: asset_pair, duration: duration)
+
+    assert_equal 'neutral', records.first[:trend]
   end
 
   private

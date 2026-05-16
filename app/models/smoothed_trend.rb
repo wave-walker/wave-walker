@@ -32,16 +32,4 @@ class SmoothedTrend < ApplicationRecord
       insert_all!(records) unless records.empty? # rubocop:disable Rails/SkipsModelValidations
     end
   end
-
-  private_class_method def self.calculate_trend(fast_smma, medium_fast_smma, medium_slow_smma, slow_smma)
-    bullish = fast_smma > slow_smma
-    neutral_up = (fast_smma < medium_fast_smma) == bullish
-    neutral_down = (medium_slow_smma < slow_smma) == bullish
-    neutral = neutral_up || neutral_down
-
-    return 'neutral' if neutral
-    return 'bullish' if bullish
-
-    'bearish'
-  end
 end

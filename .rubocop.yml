@@ -17,6 +17,10 @@ AllCops:
     - db/cable_schema.rb
     - db/cache_schema.rb
 
+Style/ClassAndModuleChildren:
+  Exclude:
+    - 'test/**/*'
+
 Style/Documentation:
   Enabled: false
 
