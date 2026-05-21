@@ -21,15 +21,15 @@ class SmoothedTrend < ApplicationRecord
     by_duration(duration).where(range_position: OhlcRangeValue.at(duration:, time:).position...)
   }
 
-  def self.bulk_create_for_duration(asset_pair:, duration:)
-    query = BulkQuery.new(asset_pair:, duration:)
-    return if query.empty?
+  def self.bulk_create(asset_pair:, duration:)
+    last_trend = where(asset_pair:, duration:).last&.trend
 
-    builder = BulkBuilder.new(previous_trend: query.last_trend&.trend)
-
-    query.each_batch do |smmas_by_position|
-      records = builder.build_records(smmas_by_position, asset_pair:, duration:)
-      insert_all!(records) unless records.empty? # rubocop:disable Rails/SkipsModelValidations
+    UnprocessedSmmasQuery.new(asset_pair:, duration:).call.in_batches do |smmas|
+      import_all! smmas.reduce([]) do |trends, smma|
+        params = ParameterBuilder.new(smma:, last_trend:).call
+        last_trend = params.fetch(:trend)
+        trends << params
+      end
     end
   end
 end

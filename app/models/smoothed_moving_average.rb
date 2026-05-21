@@ -20,10 +20,8 @@ class SmoothedMovingAverage < ApplicationRecord
     SQL
   }
 
-  def self.bulk_create(asset_pair)
-    Ohlc::DURATIONS.each do |duration|
-      INTERVALS.each { |interval| bulk_create_interval(asset_pair:, duration:, interval:) }
-    end
+  def self.bulk_create(asset_pair:, duration:)
+    INTERVALS.each { |interval| bulk_create_interval(asset_pair:, duration:, interval:) }
   end
 
   def self.create_initial_sma(asset_pair:, duration:, interval:)
