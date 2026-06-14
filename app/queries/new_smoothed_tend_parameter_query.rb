@@ -9,7 +9,10 @@ class NewSmoothedTendParameterQuery
   def in_batches
     SmoothedMovingAverage.from(build_subquery, :smoothed_moving_averages)
                          .order(:range_position)
-                         .in_batches do |smmas|
+                         # `in_batches` build large OR conditions per row instead of
+                         # optimized tuple comparisons.
+                         # TODO: Find a way to make range_position the cursor.
+                         .in_batches(of: 100) do |smmas|
                            yield smmas.map { build_params(it) }
                          end
   end
